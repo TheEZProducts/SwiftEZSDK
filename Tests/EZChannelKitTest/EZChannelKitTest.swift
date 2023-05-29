@@ -10,6 +10,9 @@ import EZChannelKit
 import EZThreadSafetyKit
 
 final class EZChannelKitTest: XCTestCase {
+    @available(watchOS 6.0, *)
+    @available(tvOS 13.0.0, *)
+    @available(iOS 13.0, *)
     func test_ChannelTest() async{
         print("start")
         
