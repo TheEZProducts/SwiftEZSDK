@@ -11,38 +11,60 @@ public protocol EZJsonKeyProtocol: Hashable, CaseIterable{
     var rawValue: String { get }
 }
 
+public struct EZJsonStriderValue{
+    private var _value: Any?
+    
+    public var value: Any? { _value }
+    public var json: [String: Any] { _value as? [String: Any] ?? [:] }
+    public var array: [Any] { _value as? [Any] ?? [] }
+    public var count: Int{ array.count }
+    
+    public var bool: Bool { (_value as? Bool) ?? false }
+    public var string: String { _value as? String ?? "" }
+    public var int: Int { _value as? Int ?? 0 }
+    public var double: Double { _value as? Double ?? 0 }
+    
+    init(value: Any?) { self._value = value }
+}
+
 @dynamicMemberLookup
 public struct EZJsonStrider<Key: EZJsonKeyProtocol>{
     private var _value: Any?
     
-    public func value() -> Any? { _value }
-    public func json() -> [String: Any] { _value as? [String: Any] ?? [:] }
-    public func array() -> [Any] { _value as? [Any] ?? [] }
-    public func count() -> Int{ array().count }
-    
-    public func bool() -> Bool { (_value as? Bool) ?? false }
-    public func string() -> String { _value as? String ?? "" }
-    public func int() -> Int { _value as? Int ?? 0 }
-    public func double() -> Double { _value as? Double ?? 0 }
-    
     public func forEach(_ closure: (Self) ->()){
-        array().forEach { closure(.init($0)) }
+        self().array.forEach { closure(.init($0)) }
     }
     public func forEach(_ closure: (Int, Self) ->()){
-        array().enumerated().forEach { closure($0.offset, .init($0.element)) }
+        self().array.enumerated().forEach { closure($0.offset, .init($0.element)) }
     }
     
     public subscript(index: Key) -> Self{
         self[index.rawValue]
     }
     public subscript(index: String) -> Self{
-        Self(json()[index])
+        Self(self().json[index])
     }
     public subscript(index: Int) -> Self{
-        Self(array()[safe: index])
+        Self(self().array[safe: index])
     }
     public subscript(dynamicMember key: KeyPath<Key, Key>) -> Self{
         get{ self[Key.allCases.first?[keyPath: key].rawValue ?? ""] }
+    }
+    
+    public func callAsFunction() -> EZJsonStriderValue {
+        .init(value: _value)
+    }
+    
+    public func callAsFunction<T>(type: T.Type = T.self, _ defaultValue: T) -> T {
+        _value as? T ?? defaultValue
+    }
+    
+    public func callAsFunction<T>(type: T.Type = T.self) -> T? {
+        _value as? T
+    }
+    
+    public func callAsFunction<T>(_ transform: (Any?) -> (T)) -> T {
+        transform(_value)
     }
     
     public init(_ value: Any?){ _value = value }
@@ -63,6 +85,19 @@ public struct EZJsonStrider<Key: EZJsonKeyProtocol>{
         else{ self.init("non"); return }
         self.init(json)
     }
+}
+
+public struct EZJsonStriderGroupValue{
+    private var _values: [EZJsonStriderValue]
+    
+    private func cast<T>(_ defaultValue: T, _ closure: (Any?) -> (T?)) -> T{
+        for value in _values{
+            if let value = closure(value.value) { return value }
+        }
+        return defaultValue
+    }
+    
+    init(values: [EZJsonStriderValue]) { self._values = values }
 }
 
 @dynamicMemberLookup
@@ -102,9 +137,29 @@ public struct EZJsonStriderGroup<Key: EZJsonKeyProtocol>{
         get{ self[Key.allCases.first?[keyPath: key].rawValue ?? ""] }
     }
     
+    public func callAsFunction() -> EZJsonStriderGroupValue {
+        .init(values: striders.map{ $0() })
+    }
+    
+    public func callAsFunction<T>(type: T.Type = T.self, _ defaultValue: T) -> T {
+        cast(defaultValue) { $0 as? T }
+    }
+    
+    public func callAsFunction<T>(type: T.Type = T.self) -> T? {
+        cast(nil) { $0 as? T }
+    }
+    
+    public func callAsFunction<T>(_ transform: (Any?) -> (T?)) -> T? {
+        cast(nil, transform)
+    }
+    
+    public func callAsFunction<T>(_ defaultValue: T, _ transform: (Any?) -> (T?)) -> T {
+        cast(defaultValue, transform)
+    }
+    
     private func cast<T>(_ defaultValue: T, _ closure: (Any?) -> (T?)) -> T{
         for strider in striders{
-            if let value = closure(strider.value()) { return value }
+            if let value = closure(strider().value) { return value }
         }
         return defaultValue
     }

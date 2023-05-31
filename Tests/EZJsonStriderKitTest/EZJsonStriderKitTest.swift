@@ -11,36 +11,35 @@ import EZJsonStriderKit
 final class EZJsonStriderKitTest: XCTestCase {
 
     func test_getKeys(){
-        let keyStrider = KeyStrider(noWrite: MyJsonKeys.hello)
+        let keyStrider = KeyStrider(noWrite: MyJsonKey.hello)
         let strider = MyJsonStrider(
             url: getResourePath(MyJsonStrider.testJsonFileName)
         )
-
         
         XCTAssertEqual(
-            strider[0].key.keyArreyJson[0].key.string(),
+            strider[0].key.keyArreyJson[0].key(""),
             keyStrider[0].key.keyArreyJson[0].key.path()
         )
         XCTAssertEqual(
-            strider[0].key.hello.string(),
+            strider[0].key.hello().string,
             keyStrider[0].key.hello.path()
         )
         XCTAssertEqual(
-            strider[1].key.testInt.int(),
+            strider[1].key.testInt().int,
             10
         )
         XCTAssertEqual(
-            strider[1].key.doubleTest.double(),
+            strider[1].key.doubleTest().double,
             1.2
         )
         XCTAssertEqual(
-            strider[1].key.boolTestValue.bool(),
+            strider[1].key.boolTestValue().bool,
             true
         )
-        
+
         strider[1].key.testStringArr.forEach { i, strider in
             XCTAssertEqual(
-                strider.string(),
+                strider().string,
                 keyStrider[1].key.testStringArr[i].path()
             )
         }

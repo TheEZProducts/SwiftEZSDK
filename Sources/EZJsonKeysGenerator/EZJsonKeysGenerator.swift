@@ -130,15 +130,15 @@ struct EZJsonKeysGenerator {
     private static var enumTemplate = {
         """
         //MARK: - ${0}
-        enum ${0}Keys: String, CaseIterable{
+        enum ${0}Key: String, CaseIterable{
         ${1}
         }
         #if canImport(EZJsonStriderKit)
-        typealias ${0}Strider = EZJsonStrider<${0}Keys>
+        typealias ${0}Strider = EZJsonStrider<${0}Key>
         extension ${0}Strider{
         ${2}
         }
-        extension ${0}Keys: EZJsonKeyProtocol{}
+        extension ${0}Key: EZJsonKeyProtocol{}
         #endif
         """
     }()
