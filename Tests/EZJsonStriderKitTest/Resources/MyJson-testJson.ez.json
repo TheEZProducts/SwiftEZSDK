@@ -1,0 +1,27 @@
+[
+    {
+        "Key": {
+            "Hello": "/0/Key/Hello",
+            "Key Arrey Json": [
+                {
+                    "Key": "/0/Key/Key Arrey Json/0/Key"
+                },
+                {
+                    "Key": "/0/Key/Key Arrey Json/1/Key"
+                }
+            ]
+        }
+    },
+    {
+        "Key": {
+            "test.int": 10,
+            "double/test": 1.2,
+            "bool_test_value": true,
+            "Test-String-Arr": [
+                "/1/Key/Test-String-Arr/0",
+                "/1/Key/Test-String-Arr/1",
+                "/1/Key/Test-String-Arr/2"
+            ]
+        }
+    }
+]
