@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import RegexBuilder
 
 struct FileModel{
     var name: String = ""
@@ -42,7 +43,7 @@ extension Array where Element == FileModel{
 }
 
 @main
-@available(macOS 10.15, watchOS 6.0, tvOS 13.0, iOS 13.0, *)
+@available(macOS 13.0, watchOS 6.0, tvOS 13.0, iOS 16.0, *)
 struct EZJsonKeysGenerator {
     static func main() async throws {
         let output = URL(fileURLWithPath: CommandLine.arguments[1])
@@ -161,12 +162,10 @@ struct EZJsonKeysGenerator {
     
     private static func makePrety(text: String) -> String{
         let words = text
-            .replacingOccurrences(of: "-", with: "_")
-            .replacingOccurrences(of: ".", with: "_")
-            .replacingOccurrences(of: " ", with: "_")
-            .replacingOccurrences(of: "/", with: "_")
-            .replacingOccurrences(of: "(", with: "_")
-            .replacingOccurrences(of: ")", with: "_")
+            .replacing(
+                Regex { CharacterClass(.anyOf("-./()"), .whitespace) },
+                with: "_"
+            )
             .components(separatedBy: "_")
         var first = true
         var result = ""
