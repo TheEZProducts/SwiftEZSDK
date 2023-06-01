@@ -10,10 +10,7 @@ import Foundation
 infix operator <-
 prefix operator <-
 
-@available(watchOS 6.0, *)
-@available(tvOS 13.0, *)
-@available(iOS 13.0, *)
-@available(macOS 10.15, *)
+@available(watchOS 6.0, tvOS 13.0, iOS 13.0, macOS 10.15, *)
 extension AsyncStream{
     static func create() -> (Self, Continuation){
         var cont: Continuation!
@@ -21,10 +18,7 @@ extension AsyncStream{
     }
 }
 
-@available(watchOS 6.0, *)
-@available(tvOS 13.0, *)
-@available(iOS 13.0, *)
-@available(macOS 10.15, *)
+@available(watchOS 6.0, tvOS 13.0, iOS 13.0, macOS 10.15, *)
 public struct EZChannel<Element>: @unchecked Sendable{
     public enum State{
         case finish
@@ -72,10 +66,7 @@ public struct EZChannel<Element>: @unchecked Sendable{
     }
 }
 
-@available(watchOS 6.0, *)
-@available(tvOS 13.0, *)
-@available(iOS 13.0, *)
-@available(macOS 10.15, *)
+@available(watchOS 6.0, tvOS 13.0, iOS 13.0, macOS 10.15, *)
 extension EZChannel: AsyncSequence{
     public func makeAsyncIterator() -> AsyncStream<Element>.Iterator { stream.makeAsyncIterator() }
 }

@@ -42,14 +42,10 @@ extension Array where Element == FileModel{
 }
 
 @main
-@available(iOS 16.0, *)
-@available(macCatalyst 16.0, *)
-@available(macOS 13.0.0, *)
-@available(tvOS 16.0.0, *)
-@available(watchOS 9.0.0, *)
+@available(macOS 10.15, watchOS 6.0, tvOS 13.0, iOS 13.0, *)
 struct EZJsonKeysGenerator {
     static func main() async throws {
-        let output = URL(filePath: CommandLine.arguments[1])
+        let output = URL(fileURLWithPath: CommandLine.arguments[1])
         let sourceFiles = CommandLine.arguments.dropFirst(2)
         
         let models = sourceFiles.compactMap {value in
@@ -80,7 +76,7 @@ struct EZJsonKeysGenerator {
     }
     
     private static func pars(jsonPath: String) -> Any?{
-        let url = URL(filePath: jsonPath)
+        let url = URL(fileURLWithPath: jsonPath)
         guard
             let data = try? Data(contentsOf: url),
             let json = try? JSONSerialization.jsonObject(with: data)
@@ -98,7 +94,7 @@ struct EZJsonKeysGenerator {
     }
     
     private static func getName(jsonPath: String) -> (String, String, String)?{
-        let url = URL(filePath: jsonPath)
+        let url = URL(fileURLWithPath: jsonPath)
         let path = url.lastPathComponent.replacingOccurrences(of: ".ez.json", with: "").components(separatedBy: "-")
         
         let instanceName = [String](path.dropFirst()).joined()
@@ -227,4 +223,3 @@ extension String{
         return prefix(1).uppercased() + dropFirst()
     }
 }
-

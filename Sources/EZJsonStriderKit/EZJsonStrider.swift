@@ -76,13 +76,7 @@ public struct EZJsonStrider<Key: EZJsonKeyProtocol>{
         }
     }
     public init(path: String){
-        let url: URL
-        if #available(macOS 13.0, iOS 16.0, tvOS 16.0, watchOS 9.0, *) {
-            url = URL(filePath: #file)
-        } else {
-            url = URL(fileURLWithPath: #file)
-        }
-        self.init(url: url)
+        self.init(url: URL(fileURLWithPath: path))
     }
     public init(url: URL){
         guard
@@ -165,7 +159,7 @@ public struct EZJsonStriderGroup<Key: EZJsonKeyProtocol>{
     }
     
     public func callAsFunction(at: Int) -> EZJsonStriderValue {
-        striders[safe: at]?() ?? .init(value: nil)
+        (striders[safe: at] ?? .init(nil))()
     }
     
     private func cast<T>(_ defaultValue: T, _ closure: (Any?) -> (T?)) -> T{

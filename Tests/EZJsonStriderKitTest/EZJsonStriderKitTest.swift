@@ -5,6 +5,7 @@
 //  Created by Александр Сенин on 30.05.2023.
 //
 
+import Foundation
 import XCTest
 import EZJsonStriderKit
 
@@ -116,12 +117,7 @@ struct KeyStrider<Key: EZJsonKeyProtocol>{
 }
 
 func getResourePath(_ name: String) -> URL{
-    let thisSourceFile: URL
-    if #available(macOS 13.0, iOS 16.0, tvOS 16.0, watchOS 9.0, *) {
-        thisSourceFile = URL(filePath: #file)
-    } else {
-        thisSourceFile = URL(fileURLWithPath: #file)
-    }
+    let thisSourceFile = URL(fileURLWithPath: #file)
     let thisDirectory = thisSourceFile.deletingLastPathComponent()
     return thisDirectory
         .appendingPathComponent("Resources")
