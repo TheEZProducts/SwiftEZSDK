@@ -76,7 +76,13 @@ public struct EZJsonStrider<Key: EZJsonKeyProtocol>{
         }
     }
     public init(path: String){
-        self.init(url: URL(fileURLWithPath: path))
+        let url: URL
+        if #available(macOS 13.0, iOS 16.0, tvOS 16.0, watchOS 9.0, *) {
+            url = URL(filePath: #file)
+        } else {
+            url = URL(fileURLWithPath: #file)
+        }
+        self.init(url: url)
     }
     public init(url: URL){
         guard
@@ -89,6 +95,16 @@ public struct EZJsonStrider<Key: EZJsonKeyProtocol>{
 
 public struct EZJsonStriderGroupValue{
     private var _values: [EZJsonStriderValue]
+    
+    public var value: Any? { cast(nil){ $0 } }
+    public var json: [String: Any] { cast([:]){ $0 as? [String: Any] } }
+    public var array: [Any] { cast([]){ $0 as? [Any] } }
+    public var count: Int{ array.count }
+    
+    public var bool: Bool { cast(false){ $0 as? Bool } }
+    public var string: String { cast(""){ $0 as? String } }
+    public var int: Int { cast(0){ $0 as? Int } }
+    public var double: Double { cast(0){ $0 as? Double } }
     
     private func cast<T>(_ defaultValue: T, _ closure: (Any?) -> (T?)) -> T{
         for value in _values{
@@ -103,23 +119,14 @@ public struct EZJsonStriderGroupValue{
 @dynamicMemberLookup
 public struct EZJsonStriderGroup<Key: EZJsonKeyProtocol>{
     public private(set) var striders: [EZJsonStrider<Key>]
-    
-    public func json() -> [String: Any] { cast([:]){ $0 as? [String: Any] } }
-    public func array() -> [Any] { cast([]){ $0 as? [Any] } }
-    public func count() -> Int{ array().count }
-    
-    public func bool() -> Bool { cast(false){ $0 as? Bool } }
-    public func string() -> String { cast(""){ $0 as? String } }
-    public func int() -> Int { cast(0){ $0 as? Int } }
-    public func double() -> Double { cast(0){ $0 as? Double } }
-    
+        
     public func forEach(_ closure: (Self) ->()){
-        array().enumerated().forEach {
+        self().array.enumerated().forEach {
             closure(self[$0.offset])
         }
     }
     public func forEach(_ closure: (Int, Self) ->()){
-        array().enumerated().forEach {
+        self().array.enumerated().forEach {
             closure($0.offset, self[$0.offset])
         }
     }
@@ -155,6 +162,10 @@ public struct EZJsonStriderGroup<Key: EZJsonKeyProtocol>{
     
     public func callAsFunction<T>(_ defaultValue: T, _ transform: (Any?) -> (T?)) -> T {
         cast(defaultValue, transform)
+    }
+    
+    public func callAsFunction(at: Int) -> EZJsonStriderValue {
+        striders[safe: at]?() ?? .init(value: nil)
     }
     
     private func cast<T>(_ defaultValue: T, _ closure: (Any?) -> (T?)) -> T{
