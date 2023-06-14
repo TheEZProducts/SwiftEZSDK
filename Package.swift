@@ -12,7 +12,8 @@ let package = Package(
         .library(name: EZThreadSafetyKit.name, targets: [EZThreadSafetyKit.name]),
         .library(name: EZChannelKit.name, targets: [EZChannelKit.name]),
         .library(name: EZObservableKit.name, targets: [EZObservableKit.name]),
-        
+        .library(name: EZSwiftUIBridgeKit.name, targets: [EZSwiftUIBridgeKit.name]),
+        .library(name: EZUIPacKit.name, targets: [EZUIPacKit.name]),
         //MARK: - Experimental
         .library(name: EZJsonStriderKit._name, targets: [EZJsonStriderKit.name]),
         .plugin(name: EZJsonKeysPlugin._name, targets: [EZJsonKeysPlugin.name])
@@ -26,7 +27,9 @@ let package = Package(
                 .target(name: EZAssociatedKit.name, condition: EZAssociatedKit.condition),
                 .target(name: EZThreadSafetyKit.name, condition: EZThreadSafetyKit.condition),
                 .target(name: EZChannelKit.name, condition: EZChannelKit.condition),
-                .target(name: EZObservableKit.name, condition: EZObservableKit.condition)
+                .target(name: EZObservableKit.name, condition: EZObservableKit.condition),
+                .target(name: EZSwiftUIBridgeKit.name, condition: EZSwiftUIBridgeKit.condition),
+                .target(name: EZUIPacKit.name, condition: EZUIPacKit.condition)
             ]
         ),
         //MARK: - EZAssociatedKit
@@ -82,9 +85,22 @@ let package = Package(
             ]
         ),
         
+        //MARK: - EZSwiftUIBridgeKit
+        .target(
+            name: EZSwiftUIBridgeKit.name,
+            dependencies: []
+        ),
         
+        //MARK: - EZUIPacKit
+        .target(
+            name: EZUIPacKit.name,
+            dependencies: [
+                .target(name: EZSwiftUIBridgeKit.name),
+                .target(name: EZObservableKit.name)
+            ]
+        ),
         
-        //MARK: - Experimental Targets
+        //MARK: - Experimental
         //MARK: - EZJsonStriderKit
         .target(
             name: EZJsonStriderKit.name,
@@ -146,6 +162,15 @@ struct EZChannelKit: EZTargetProtocol{}
 
 //MARK: EZObservableKit
 struct EZObservableKit: EZTargetProtocol{}
+
+//MARK: EZUIPacKit
+struct EZUIPacKit: EZTargetProtocol {
+    static var condition: TargetDependencyCondition? {.when(platforms: [.iOS, .macCatalyst, .macOS, .tvOS])}
+}
+
+struct EZSwiftUIBridgeKit: EZTargetProtocol {
+    static var condition: TargetDependencyCondition? {.when(platforms: [.iOS, .macCatalyst, .macOS, .tvOS])}
+}
 
     
 //MARK: - Experimental Targets

@@ -23,5 +23,13 @@ import Foundation
 @_exported import EZChannelKit
 #endif
 
+#if canImport(EZUIPacKit)
+@_exported import EZUIPacKit
+#endif
+
+#if canImport(EZSwiftUIBridgeKit)
+@_exported import EZSwiftUIBridgeKit
+#endif
+
 infix operator <-
 prefix operator <-

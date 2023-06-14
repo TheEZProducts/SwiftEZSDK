@@ -241,8 +241,8 @@ final class EZObservableKitTest: XCTestCase {
 #if canImport(SwiftUI)
     @available(tvOS 13.0, *)
     @available(watchOS 6.0, *)
-    @available(iOS 13.0, *)
-    @available(macOS 10.15, *)
+    @available(macOS 10.15, iOS 13.0, tvOS 13.0, *)
+    @available(macOS 10.15, iOS 13.0, tvOS 13.0, *)
     func test_ObservableBinding(){
         let testBuffer: Int = 10
         @EZObservable var value: Obj1 = .init()
