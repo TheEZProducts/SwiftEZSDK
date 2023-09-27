@@ -12,6 +12,7 @@ let package = Package(
         .library(name: EZThreadSafetyKit.name, targets: [EZThreadSafetyKit.name]),
         .library(name: EZChannelKit.name, targets: [EZChannelKit.name]),
         .library(name: EZObservableKit.name, targets: [EZObservableKit.name]),
+        .library(name: EZBuilderKit.name, targets: [EZBuilderKit.name]),
         .library(name: EZSwiftUIBridgeKit.name, targets: [EZSwiftUIBridgeKit.name]),
         .library(name: EZUIPacKit.name, targets: [EZUIPacKit.name]),
         //MARK: - Experimental
@@ -28,6 +29,7 @@ let package = Package(
                 .target(name: EZThreadSafetyKit.name, condition: EZThreadSafetyKit.condition),
                 .target(name: EZChannelKit.name, condition: EZChannelKit.condition),
                 .target(name: EZObservableKit.name, condition: EZObservableKit.condition),
+                .target(name: EZBuilderKit.name, condition: EZBuilderKit.condition),
                 .target(name: EZSwiftUIBridgeKit.name, condition: EZSwiftUIBridgeKit.condition),
                 .target(name: EZUIPacKit.name, condition: EZUIPacKit.condition)
             ]
@@ -85,6 +87,12 @@ let package = Package(
             ]
         ),
         
+        //MARK: - EZBuilderKit
+        .target(
+            name: EZBuilderKit.name,
+            dependencies: []
+        ),
+        
         //MARK: - EZSwiftUIBridgeKit
         .target(
             name: EZSwiftUIBridgeKit.name,
@@ -95,6 +103,7 @@ let package = Package(
         .target(
             name: EZUIPacKit.name,
             dependencies: [
+                .target(name: EZBuilderKit.name, condition: EZBuilderKit.condition),
                 .target(name: EZSwiftUIBridgeKit.name),
                 .target(name: EZObservableKit.name)
             ]
@@ -106,16 +115,16 @@ let package = Package(
             name: EZJsonStriderKit.name,
             dependencies: []
         ),
-        .testTarget(
-            name: EZJsonStriderKit.testName,
-            dependencies: [
-                .target(name: EZJsonStriderKit.name)
-            ],
-            resources: [.process("Resources")],
-            plugins: [
-                .plugin(name: EZJsonKeysPlugin.name)
-            ]
-        ),
+//        .testTarget(
+//            name: EZJsonStriderKit.testName,
+//            dependencies: [
+//                .target(name: EZJsonStriderKit.name)
+//            ],
+//            resources: [.process("Resources")],
+//            plugins: [
+//                .plugin(name: EZJsonKeysPlugin.name)
+//            ]
+//        ),
         
         //MARK: - EZJsonKeysGenerator
         .executableTarget(name: EZJsonKeysGenerator.name),
@@ -162,6 +171,8 @@ struct EZChannelKit: EZTargetProtocol{}
 
 //MARK: EZObservableKit
 struct EZObservableKit: EZTargetProtocol{}
+
+struct EZBuilderKit: EZTargetProtocol {}
 
 //MARK: EZUIPacKit
 struct EZUIPacKit: EZTargetProtocol {

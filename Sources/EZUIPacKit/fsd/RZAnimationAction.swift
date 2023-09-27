@@ -1,5 +1,5 @@
 //
-//  RZAnimationAction.swift
+//  EZAnimationAction.swift
 //  Yoga
 //
 //  Created by Александр Сенин on 13.05.2021.
@@ -8,8 +8,8 @@
 
 import UIKit
 
-public class RZAnimationAction{
-    private var flow: RZAnimationAction?
+public class EZAnimationAction{
+    private var flow: EZAnimationAction?
     public func start(){isActive = true; flow?.start()}
     public func pause(){isActive = false; flow?.pause()}
     public func restart(){isEnd = false; flow?.restart()}
@@ -21,49 +21,49 @@ public class RZAnimationAction{
     fileprivate(set) var duration: TimeInterval = 0
     
     public init() {}
-    public init(_ flow: RZAnimationAction) {
+    public init(_ flow: EZAnimationAction) {
         self.flow = flow
         
         duration = flow.duration
         flow.endBlock = {[weak self] in self?.isEnd = true }
     }
     
-    public class func delay(duration: TimeInterval) -> RZAnimationAction{
+    public class func delay(duration: TimeInterval) -> EZAnimationAction{
         .animation(duration: duration, animation: {_ in})
     }
-    public class func action(_ action: @escaping ()->() = {}) -> RZAnimationAction{
+    public class func action(_ action: @escaping ()->() = {}) -> EZAnimationAction{
         .animation(duration: 0, animation: {_ in action()})
     }
-    public class func reverse(_ animation: RZAnimationAction) -> RZAnimationAction{
+    public class func reverse(_ animation: EZAnimationAction) -> EZAnimationAction{
         animation.reverse()
         return animation
     }
     public class func animation(
         duration: TimeInterval,
-        curve: RZAnimationCurve = .standart,
+        curve: EZAnimationCurve = .standart,
         animation: @escaping (CGFloat)->()
-    ) -> RZAnimationAction{
-        RZAnimationCustomAction(duration: duration, curve: curve, animation: animation)
+    ) -> EZAnimationAction{
+        EZAnimationCustomAction(duration: duration, curve: curve, animation: animation)
     }
     public class func animation(
         duration: TimeInterval,
-        curve: RZAnimationCurve = .standart,
+        curve: EZAnimationCurve = .standart,
         animation: @escaping (CGFloat, TimeInterval)->()
-    ) -> RZAnimationAction{
-        RZAnimationCustomAction(duration: duration, curve: curve, animation: animation)
+    ) -> EZAnimationAction{
+        EZAnimationCustomAction(duration: duration, curve: curve, animation: animation)
     }
     
-    public class func loop(count: Int, _ animation: RZAnimationAction) -> RZAnimationAction{
-        RZAnimationActionLoop(count: count, animation: animation)
+    public class func loop(count: Int, _ animation: EZAnimationAction) -> EZAnimationAction{
+        EZAnimationActionLoop(count: count, animation: animation)
     }
-    public class func infinityLoop(_ animation: RZAnimationAction) -> RZAnimationAction{
-        RZAnimationActionLoop(animation: animation)
+    public class func infinityLoop(_ animation: EZAnimationAction) -> EZAnimationAction{
+        EZAnimationActionLoop(animation: animation)
     }
     
-    public class func group(_ animations: [RZAnimationAction]) -> RZAnimationAction{
+    public class func group(_ animations: [EZAnimationAction]) -> EZAnimationAction{
         var duration: TimeInterval = 0
         animations.forEach{ if duration < $0.duration{ duration = $0.duration } }
-        var newAnimateArr = [RZAnimationAction]()
+        var newAnimateArr = [EZAnimationAction]()
         for animation in animations{
             if animation.duration < duration{
                 newAnimateArr.append(.queue([animation, .delay(duration: duration - animation.duration)]))
@@ -71,15 +71,15 @@ public class RZAnimationAction{
                 newAnimateArr.append(animation)
             }
         }
-        return RZAnimationActionGroup(animations: newAnimateArr)
+        return EZAnimationActionGroup(animations: newAnimateArr)
     }
     
-    public class func queue(_ animations: [RZAnimationAction]) -> RZAnimationAction{
-        RZAnimationActionQueue(animations: animations)
+    public class func queue(_ animations: [EZAnimationAction]) -> EZAnimationAction{
+        EZAnimationActionQueue(animations: animations)
     }
 }
 
-fileprivate class RZAnimationCustomAction: RZAnimationAction{
+fileprivate class EZAnimationCustomAction: EZAnimationAction{
     override func start() {isActive = true; setAnimator()}
     override func pause() {isActive = false; removeAnimator()}
     override func restart() {
@@ -87,10 +87,10 @@ fileprivate class RZAnimationCustomAction: RZAnimationAction{
         currentTime = 0
         startTime = CACurrentMediaTime()
     }
-    override func reverse() {curve = RZAnimationReverstCurve(curve)}
+    override func reverse() {curve = EZAnimationReverstCurve(curve)}
     
     private var animationBlock: (CGFloat, TimeInterval)->() = {_, _ in}
-    private var curve: RZAnimationCurve = .standart
+    private var curve: EZAnimationCurve = .standart
     
     
     private var startTime: TimeInterval = 0
@@ -126,7 +126,7 @@ fileprivate class RZAnimationCustomAction: RZAnimationAction{
     
     convenience init(
         duration: TimeInterval,
-        curve: RZAnimationCurve = .standart,
+        curve: EZAnimationCurve = .standart,
         animation: @escaping (CGFloat)->()
     ) {
         self.init(duration: duration, curve: curve, animation: {value, _ in animation(value)})
@@ -134,7 +134,7 @@ fileprivate class RZAnimationCustomAction: RZAnimationAction{
     
     init(
         duration: TimeInterval,
-        curve: RZAnimationCurve = .standart,
+        curve: EZAnimationCurve = .standart,
         animation: @escaping (CGFloat, TimeInterval)->()
     ) {
         super.init()
@@ -144,10 +144,10 @@ fileprivate class RZAnimationCustomAction: RZAnimationAction{
     }
 }
 
-fileprivate class RZAnimationActionLoop: RZAnimationAction{
+fileprivate class EZAnimationActionLoop: EZAnimationAction{
     private var count = 0
     private var counter = 1
-    private var animation: RZAnimationAction
+    private var animation: EZAnimationAction
     override func reverse() {animation.reverse()}
     
     override func start() {isActive = true; animation.start()}
@@ -173,7 +173,7 @@ fileprivate class RZAnimationActionLoop: RZAnimationAction{
         animation.start()
     }
     
-    init(count: Int = 0, animation: RZAnimationAction) {
+    init(count: Int = 0, animation: EZAnimationAction) {
         self.animation = animation
         super.init()
         
@@ -183,9 +183,9 @@ fileprivate class RZAnimationActionLoop: RZAnimationAction{
     }
 }
 
-fileprivate class RZAnimationActionQueue: RZAnimationAction{
-    private var animations = [RZAnimationAction]()
-    private var activeAnimation: RZAnimationAction?
+fileprivate class EZAnimationActionQueue: EZAnimationAction{
+    private var animations = [EZAnimationAction]()
+    private var activeAnimation: EZAnimationAction?
     private var activeAnimationNumber: Int = 0
     
     override func start() {
@@ -211,7 +211,7 @@ fileprivate class RZAnimationActionQueue: RZAnimationAction{
     }
     
     
-    init(animations: [RZAnimationAction]){
+    init(animations: [EZAnimationAction]){
         self.animations = animations
         super.init()
         
@@ -235,8 +235,8 @@ fileprivate class RZAnimationActionQueue: RZAnimationAction{
     }
 }
 
-fileprivate class RZAnimationActionGroup: RZAnimationAction{
-    private var animations = [RZAnimationAction]()
+fileprivate class EZAnimationActionGroup: EZAnimationAction{
+    private var animations = [EZAnimationAction]()
     
     override func start() {
         isActive = true
@@ -257,7 +257,7 @@ fileprivate class RZAnimationActionGroup: RZAnimationAction{
         for animation in animations { animation.reverse() }
     }
     
-    init(animations: [RZAnimationAction]){
+    init(animations: [EZAnimationAction]){
         self.animations = animations
         super.init()
         animations.forEach{ if duration < $0.duration{ duration = $0.duration } }

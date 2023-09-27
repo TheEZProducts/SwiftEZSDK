@@ -19,36 +19,52 @@ public typealias EZWindow = UIWindow
 public typealias EZWindow = NSWindow
 #endif
 
+enum EZUIPacWrapper{
+    case line(EZUIPacLine)
+    case pack(any EZUIPacProtocol)
+    
+    var pack: any EZUIPacProtocol{
+        switch self{
+            case let .line(line): return line.currentPack
+            case let .pack(pack): return pack
+        }
+    }
+}
+
+
 #if canImport(UIKit) || canImport(Cocoa)
 open class EZUIPacWindow: EZWindow{
     @MainActor
-    public static var needToPerform: (any EZUIPacProtocol)?
+    public static var needToPerform: EZUIPacLine?
+    
+//    @MainActor
+    public var rootUIPac: (any EZUIPacProtocol)? { rootLine?.currentPack }
     
     @MainActor
-    public var rootUIPac: (any EZUIPacProtocol)?{
-        didSet(old){
-            if rootUIPac == nil{
-#if targetEnvironment(macCatalyst)
-                closePacks(old)
-                close()
-#endif
-            }else{
-                old?.window = nil
-                rootViewController = rootUIPac?.controller
-                rootUIPac?.window = self
-            }
-        }
-    }
+    public var rootLine: EZUIPacLine?//{
+//        didSet(old){
+//            if rootUIPac == nil{
+//#if targetEnvironment(macCatalyst)
+//                closePacks(old)
+//                close()
+//#endif
+//            }else{
+//                old?.window = nil
+//                rootViewController = rootUIPac?.controller
+//                rootUIPac?.window = self
+//            }
+//        }
+//    }
+    
 #if canImport(UIKit) && os(iOS) && !targetEnvironment(macCatalyst)
     lazy open var interfaceOrientation: UIInterfaceOrientation = getInterfaceOrientation()
-    var orientationKey: NSKeyValueObservation?
+    private var orientationKey: NSKeyValueObservation?
 #endif
     
     @available(iOS 13.0, *)
     @MainActor
     override public init(windowScene: UIWindowScene) {
         super.init(windowScene: windowScene)
-        canResizeToFitContent = true
         setup()
     }
     
@@ -58,7 +74,6 @@ open class EZUIPacWindow: EZWindow{
         setup()
     }
         
-    var anim: RZAnimationAction?
     @MainActor
     open func setup(){
         setupPack()
@@ -70,57 +85,29 @@ open class EZUIPacWindow: EZWindow{
         rootUIPac?.openAction()
         rootUIPac?.openWithAnimationAction()
         rootUIPac?.completedOpenAction()
-        
-        
-//        if #available(macCatalyst 16.0, *) {
-//            var frame: CGRect =  .zero
-//            var newFrame: CGRect = .zero
-//            
-//        
-//            self.anim = .infinityLoop(
-//                .queue([
-//                    .action{
-//                        newFrame = .init(x: .random(in: 0...800), y: .random(in: 0...500), width: .random(in: 0...700), height: .random(in: 0...700))
-//                        frame = self.windowScene?.effectiveGeometry.systemFrame ?? .zero
-//                    },
-//                    .animation(duration: 5, animation: {
-//                        self.transitFrame(
-//                            frome: frame,
-//                            to: newFrame,
-//                            state: $0
-//                        )
-//                    })
-//                ])
-//            )
-//
-//            self.anim?.start()
-//            
-//        }
-    }
-    
-    func transitFrame(frome: CGRect = .zero, to: CGRect, state: CGFloat = 1){
-        let f: CGRect = .init(
-            x: frome.minX + (to.minX - frome.minX) * state,
-            y: frome.minY + (to.minY - frome.minY) * state,
-            width: frome.width + (to.width - frome.width) * state,
-            height: frome.height + (to.height - frome.height) * state
-        )
-        if #available(macCatalyst 16.0, *) {
-            self.windowScene?.requestGeometryUpdate(.Mac(systemFrame: f))
-        }
     }
     
     @MainActor
     open func setupPack(){
-        guard let pack = Self.needToPerform else { return }
+        guard let line = Self.needToPerform else { return }
         Self.needToPerform = nil
-        rootUIPac = pack
-        makeKeyAndVisible()
+        rootLine = line
+//        rootViewController = rootUIPac?.controller
+//        rootUIPac?.window = self
+        updateRootPack()
+        
         
 #if canImport(UIKit) && os(iOS) && !targetEnvironment(macCatalyst)
-        interfaceOrientation = pack.controller.preferredInterfaceOrientationForPresentation
+        interfaceOrientation = line.currentPack.controller.preferredInterfaceOrientationForPresentation
         rotatePacks(newOrientation: interfaceOrientation)
 #endif
+    }
+    
+    open func updateRootPack(){
+        rootUIPac?.container.removeFromSuperview()
+        rootViewController = self.rootUIPac?.controller
+        makeKeyAndVisible()
+        rootUIPac?.window = self
     }
     
 #if canImport(UIKit) && os(iOS) && !targetEnvironment(macCatalyst)
@@ -149,9 +136,8 @@ open class EZUIPacWindow: EZWindow{
             return UIApplication.shared.statusBarOrientation
         }
     }
-    
-    
 #endif
+    
 #if targetEnvironment(macCatalyst)
     @objc
     open func close(){
@@ -164,7 +150,6 @@ open class EZUIPacWindow: EZWindow{
     }
 #endif
     
-
     private func closePacks(_ pack: (any EZUIPacProtocol)?){
         pack?.forEachAtPacksTree{
             $0.closeAction()
@@ -173,10 +158,7 @@ open class EZUIPacWindow: EZWindow{
         }
     }
     
-    
-    deinit{
-        closePacks(rootUIPac)
-    }
+    deinit{ closePacks(rootUIPac) }
     
     @MainActor
     required public init?(coder: NSCoder) {

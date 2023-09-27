@@ -129,7 +129,6 @@ struct EZUIPacRotateController{
 //        container.superview?.frame.size = size
         
         pack.currentOrientation = newOrintation
-        pack.parentOrientation = pack.parent?.currentOrientation
         if oldOrintation != newOrintation, pack.isStarted{
             notifications.notifications.append {
                 pack.didRotateAction(oldOrientation: oldOrintation, newOrientation: newOrintation)
@@ -233,7 +232,7 @@ struct RotateMode{
 
 //
 //
-//public class RZRotater: UIView{
+//public class EZRotater: UIView{
 //    var mateOrientation: UIInterfaceOrientation?
 //    var mateGoodOrientation: [UIInterfaceOrientation] {
 //        mateController?.supportedInterfaceOrientations.orientations ?? []
@@ -244,7 +243,7 @@ struct RotateMode{
 //
 //    static func resizeAllChild(
 //        isInstall: Bool = false,
-//        child: RZUIPacControllerNGProtocol,
+//        child: EZUIPacControllerNGProtocol,
 //        parentOrientation: UIInterfaceOrientation,
 //        parentRotatin: RotateMode,
 //        transitionDuration: CGFloat? = nil
@@ -257,7 +256,7 @@ struct RotateMode{
 //        ) ?? .non
 //
 //        for childL in child.children{
-//            if let childL = childL as? RZUIPacControllerNGProtocol{
+//            if let childL = childL as? EZUIPacControllerNGProtocol{
 //                resizeAllChild(
 //                    isInstall: isInstall,
 //                    child: childL,
@@ -280,7 +279,7 @@ struct RotateMode{
 //
 //
 //
-//    private static var rotatingUIPacC: [RZUIPacControllerNGProtocol] = []
+//    private static var rotatingUIPacC: [EZUIPacControllerNGProtocol] = []
 //    static func rotate(){
 //        for uiPacC in rotatingUIPacC{
 //            uiPacC.rotate()
@@ -294,9 +293,9 @@ struct RotateMode{
 //        let superV = view.superview
 //        superV?.addSubview(self)
 //
-//        superV?.rzFrame.add{[weak self, weak view, weak viewController] in
+//        superV?.ezFrame.add{[weak self, weak view, weak viewController] in
 //            guard let self = self, let view = view else {return}
-//            if RZRotater.isRotate {return}
+//            if EZRotater.isRotate {return}
 //
 //            if self.frame.size != $0.new.size{
 //                self.frame.size = $0.new.size
@@ -304,13 +303,13 @@ struct RotateMode{
 //            if view.frame.size != $0.new.size{
 //                view.frame.size = $0.new.size
 //            }
-//            (viewController as? RZUIPacControllerNGProtocol)?.resize()
+//            (viewController as? EZUIPacControllerNGProtocol)?.resize()
 //        }
 //
 //        view.frame.origin = .zero
 //        addSubview(view)
 //        mate = view
-//        if let viewController = viewController as? RZUIPacControllerNGProtocol{
+//        if let viewController = viewController as? EZUIPacControllerNGProtocol{
 //            mateController = viewController
 //        }
 //    }

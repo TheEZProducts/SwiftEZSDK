@@ -31,5 +31,9 @@ import Foundation
 @_exported import EZSwiftUIBridgeKit
 #endif
 
+#if canImport(EZBuilderKit)
+@_exported import EZBuilderKit
+#endif
+
 infix operator <-
 prefix operator <-

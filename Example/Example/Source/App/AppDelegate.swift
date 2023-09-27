@@ -13,7 +13,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         
-        EZUIPacWindow.needToPerform = FirstPac()
+        EZUIPacWindow.needToPerform = .init(FirstPac())
         
         return true
     }

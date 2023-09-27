@@ -1,6 +1,6 @@
 //
-//  RZCubicBezier.swift
-//  RZAnimationKit
+//  EZCubicBezier.swift
+//  EZAnimationKit
 //
 //  Created by Александр Сенин on 27.04.2022.
 //

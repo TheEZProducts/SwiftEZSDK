@@ -14,6 +14,7 @@ open class EZUIPacLine{
     
     public init(_ pack: any EZUIPacProtocol, useRootPack: Bool = false) {
         self.currentPack = pack
+        pack.line = self
         if useRootPack { rootPack = pack }
     }
     

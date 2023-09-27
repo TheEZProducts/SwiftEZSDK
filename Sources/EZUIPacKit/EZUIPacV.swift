@@ -16,13 +16,19 @@ import SwiftUI
 import EZSwiftUIBridgeKit
 #endif
 
-public protocol EZUIPacViewProtocol<Router>: EZUIPacWithRouterProtocol, EZUIPacWithStateStorage{
-    var supportedOrientations: UIInterfaceOrientationMask { get }
-    
-    func getView(router: Router) -> EZView
-    
+public protocol EZViewProtocol<Router>: EZUIPacWithRouterProtocol{
     func initActions()
     func create()
+}
+
+extension EZViewProtocol{
+    public func initActions(){}
+    public func create(){}
+}
+
+public protocol EZUIPacViewProtocol<Router>: EZViewProtocol, EZUIPacWithRouterProtocol, EZUIPacWithStateStorage{
+    func getView(router: Router) -> EZView
+    
     func open()
     func openWithAnimation()
     func completedOpen()
@@ -30,14 +36,14 @@ public protocol EZUIPacViewProtocol<Router>: EZUIPacWithRouterProtocol, EZUIPacW
     func closeWithAnimation()
     func completedClose()
     func didResize()
+    
 #if canImport(UIKit) && os(iOS) && !targetEnvironment(macCatalyst)
+    var supportedOrientations: UIInterfaceOrientationMask { get }
     func didRotate(oldOrientation: UIInterfaceOrientation, newOrientation: UIInterfaceOrientation)
 #endif
 }
 
 extension EZUIPacViewProtocol{
-    public func initActions(){}
-    public func create(){}
     public func open(){}
     public func openWithAnimation(){}
     public func completedOpen(){}
@@ -66,9 +72,7 @@ extension EZUIPacWithRouterProtocol where Self: EZView{
 #endif
 
 #if canImport(UIKit) || canImport(Cocoa)
-public protocol EZUIPacUIViewProtocol: EZView, EZUIPacViewProtocol, EZUIPacWithRouterProtocol{
-    
-}
+public protocol EZUIPacUIViewProtocol: EZView, EZUIPacViewProtocol, EZUIPacWithRouterProtocol{}
 extension EZUIPacUIViewProtocol{
     public func getView(router: Router) -> EZView { self }
 }

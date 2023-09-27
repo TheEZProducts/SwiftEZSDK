@@ -18,7 +18,7 @@ func setUIInterfaceOrientation(_ value: UIInterfaceOrientation) {
 }
 
 class SecondPacC: EZUIPacC{
-//    override var supportedInterfaceOrientations: UIInterfaceOrientationMask { .portrait }
+    override var supportedInterfaceOrientations: UIInterfaceOrientationMask { .all }
     var router: SecondPacR!
     
     func close() {
@@ -26,7 +26,10 @@ class SecondPacC: EZUIPacC{
     }
     
     func initActions() {
-        cActions.next = {[weak self] in self?.next()}
+        cActions.next = {[weak self] in
+            print(self)
+            self?.next()
+        }
         cActions.back = {[weak self] in self?.back()}
     }
     
@@ -43,7 +46,7 @@ class SecondPacC: EZUIPacC{
     }
     private func back(){
 //        pack?.rootWindow?.rootUIPac = nil
-        pack?.back.transit()
+        pack?.back.animation(.ezAnim).transit()
     }
 }
 
@@ -85,7 +88,8 @@ class SecondPacV: EZUIPacV{
 class MyViewStates: ObservableObject{
     @Published var test: Int = 0
     @Published var isPortrait: Bool = true
-
+    var test1: Int = 0
+    var placeTocken = PlaceTocken()
     init(){
         
     }
@@ -108,41 +112,45 @@ struct SecondPacSV: EZUIPacSV{
     }
 
     var body: some View{
-        ZStack {
+//        ContentView(content: "Test")
             
+        ZStack {
             router.color
-            Text("Данька Гей")
-//            TestR(bool: viewStorage.isPortrait){
-//                Spacer()
-//                Button{
-//                    cActions.next()
-//                } label: {
-//                    Text("Next")
-//                }
-//
-//                Button{
-//                    cActions.back()
-//                } label: {
-//                    Text("Back")
-//                }
-//                Spacer()
-//        //                MyView(router: router).id(router.count1)
-//                    //.onReceive(router.$count1, perform: {_ in})
-//                //.update(count: router.count)
-//                Button{
-//                    stateStorage.pack?.rootWindow?.windowScene?.requestGeometryUpdate(.iOS(interfaceOrientations: .portrait))
-//                } label: {
-//                    Text("Test")
-//                }
-//                Button{
-//                    router.count += 1
-//                } label: {
-//                    Text("\(router.count)")
-//                }
-//                Text(String("\(color)"))
-//                TestView()
-//                Spacer()
-//            }
+            TestR(bool: viewStorage.isPortrait){
+                Spacer()
+                Button{
+                    cActions.next()
+                } label: {
+                    Text("Next")
+                }
+
+                Button{
+                    cActions.back()
+                } label: {
+                    Text("Back")
+                }
+                Spacer()
+        //                MyView(router: router).id(router.count1)
+                    //.onReceive(router.$count1, perform: {_ in})
+                //.update(count: router.count)
+                Button{
+                    stateStorage.pack?.rootWindow?.windowScene?.requestGeometryUpdate(.iOS(interfaceOrientations: .portrait))
+                } label: {
+                    Text("Test")
+                }
+                Button{
+                    viewStorage.placeTocken.view = AnyView(ContentView(content: "Test"))
+                } label: {
+                    Text("Change Place")
+                }
+                Text(String("\(color)"))
+                TestView()
+                ContentView(content: "Test")
+//                Place(viewStorage.placeTocken)
+                Spacer()
+
+
+            }
         }
         //.animation(.easeOut, value: 10)
         
@@ -160,16 +168,9 @@ struct TestR<V: View>: View{
     }
     
     var body: some View{
-        ZStack{
-            if bool{
-                VStack{
-                    view.id(2)
-                }.id(10)
-            }else{
-                HStack{
-                    view.id(2)
-                }.id(10)
-            }
+        
+        (bool ? AnyLayout(VStackLayout()) : AnyLayout(HStackLayout())){
+            view.id(2)
         }//.animation(.easeOut, value: bool)
     }
 }
@@ -177,6 +178,7 @@ struct TestR<V: View>: View{
 var couter: Int = 0
 struct TestView: View{
 //    @Environment(\.colorScheme) var color
+    
     @State var value: Int = 0
     init(){
         print("upadte")
@@ -187,5 +189,45 @@ struct TestView: View{
         } label: {
             Text("\(value)")
         }
+    }
+}
+
+
+class PlaceTocken: ObservableObject{
+    @Published var view: AnyView?
+}
+
+struct Place: View{
+    @ObservedObject var plaseTocken: PlaceTocken
+    
+    init(_ plaseTocken: PlaceTocken) {
+        self.plaseTocken = plaseTocken
+    }
+    
+    var body: some View{
+        VStack{
+            plaseTocken.view
+        }
+    }
+}
+
+struct ContentView: View {
+    @State private var content: String = "Первый контент"
+    
+    init(content: String) {
+        self.content = content
+    }
+
+    var body: some View {
+        NavigationView {
+            Text("Hello, World!")
+        }
+//        NavigationView {
+//            VStack {
+//                NavigationLink(destination: ContentView(content: content + "Next ")) {
+//                    Text("Hello!")
+//                }
+//            }
+//        }
     }
 }

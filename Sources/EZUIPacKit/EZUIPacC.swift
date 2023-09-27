@@ -25,7 +25,14 @@ extension EZUIPacWithRouterProtocol where Self: EZViewController{
         self.router = router
     }
 }
-public protocol EZUIPacControllerProtocol: EZViewController, EZUIPacWithStateStorage, EZUIPacWithRouterProtocol{
+
+public protocol EZUIPacBaseControllerProtocol{}
+public protocol EZUIPacControllerProtocol:
+    EZViewController,
+    EZUIPacBaseControllerProtocol,
+    EZUIPacWithStateStorage,
+    EZUIPacWithRouterProtocol
+{
     func initActions()
     func start()
     func didCreate()

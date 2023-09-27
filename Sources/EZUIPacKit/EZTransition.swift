@@ -12,6 +12,7 @@ import UIKit
 #elseif canImport(Cocoa)
 import Cocoa
 #endif
+import EZBuilderKit
 
 extension EZTransitionConfig{
     public enum TransitionType{
@@ -144,6 +145,7 @@ public struct EZTransition{
     @MainActor
     static func transit(_ config: EZTransitionConfig) -> (any EZUIPacProtocol)?{
         let config = setLinePack(config)
+        config._toPack?.controller.beginAppearanceTransition(true, animated: false)
         switch config._type{
             case .In: return transitIn(config)
             case .Instead: return transitInstead(config)
@@ -151,20 +153,34 @@ public struct EZTransition{
             case .Window: return transitWindow(config)
 #endif
         }
-        
     }
     
     static private func setLinePack(_ config: EZTransitionConfig) -> EZTransitionConfig{
-        if config._toPack == nil {
-            return config.pack(config._toLine?.currentPack)
-        }else{
-            return config
-        }
+        if config._toPack == nil { return config.pack(config._toLine?.currentPack) }
+        else{ return config }
     }
     
+    //MARK: - In
     @MainActor
     static private func transitIn(_ config: EZTransitionConfig) -> (any EZUIPacProtocol)?{
         if !checkValid(config) { return nil }
+        
+        config._animation.build{$0
+            .setPacks{$0
+                .toPack(config._toPack)
+            }
+            .setActions{ $0
+                .prepareAction { prepareIn(config) }
+                .animationAction { animationIn(config) }
+                .completionAction { completionIn(config) }
+            }
+        }.animate()
+
+        return config._toPack
+    }
+    
+    @MainActor
+    static private func prepareIn(_ config: EZTransitionConfig){
         config._toPack?.isTransiting = true
         if let pack = config._toPack{
             config._toLine?.setPack(pack)
@@ -174,30 +190,48 @@ public struct EZTransition{
         rotateIn(config)
 #endif
         useStartActions(config)
+    }
+    
+    @MainActor
+    static private func animationIn(_ config: EZTransitionConfig){
+        config._toPack?.openWithAnimationAction()
+    }
+    
+    @MainActor
+    static private func completionIn(_ config: EZTransitionConfig){
+        config._toPack?.isTransiting = false
+        config._toPack?.completedOpenAction()
+    }
+    
+    
+    //MARK: - Instead
+    @MainActor
+    static private func transitInstead(_ config: EZTransitionConfig) -> (any EZUIPacProtocol)?{
+        if !checkValid(config) { return nil }
         
-        config._animation.animate(
-            fromPack: nil,
-            toPack: config._toPack,
-            foundation: config._toPack?.container.superview ?? EZView(),
-            additionalAnimation: {
-                config._toPack?.openWithAnimationAction()
-            },
-            completion:  {
-                config._toPack?.isTransiting = false
-                config._toPack?.completedOpenAction()
+        config._animation.build { $0
+            .setPacks{$0
+                .fromPack(config._fromPack)
+                .toPack(config._toPack)
             }
-        )
+            .setActions{$0
+                .prepareAction { prepareInstead(config) }
+                .animationAction { animationInstead(config) }
+                .completionAction { completionInstead(config) }
+            }
+        }.animate()
+    
         return config._toPack
     }
     
     @MainActor
-    static private func transitInstead(_ config: EZTransitionConfig) -> (any EZUIPacProtocol)?{
-        if !checkValid(config) { return nil }
+    static private func prepareInstead(_ config: EZTransitionConfig){
         config._fromPack?.isTransiting = true
         config._toPack?.isTransiting = true
         if let archivedPack = config._archivedPack{
             config._toPack?.archived = archivedPack
         }
+        
         if let pack = config._toPack{
             (config._toLine ?? config._fromPack?.line)?.setPack(pack)
         }
@@ -207,32 +241,33 @@ public struct EZTransition{
 #endif
         useStartActions(config)
         config._fromPack?.closeAction()
-        
-        config._animation.animate(
-            fromPack: config._fromPack,
-            toPack: config._toPack,
-            foundation: config._toPack?.container.superview ?? EZView(),
-            additionalAnimation: {
-                config._toPack?.openWithAnimationAction()
-                config._fromPack?.closeWithAnimationAction()
-            },
-            completion:  {
-                config._fromPack?.isTransiting = false
-                config._toPack?.isTransiting = false
-                config._toPack?.completedOpenAction()
-                config._fromPack?.completedCloseAction()
-                removeFromParent(config)
-            }
-        )
-        return config._toPack
     }
+    
+    @MainActor
+    static private func animationInstead(_ config: EZTransitionConfig){
+        config._toPack?.openWithAnimationAction()
+        config._fromPack?.closeWithAnimationAction()
+    }
+    
+    @MainActor
+    static private func completionInstead(_ config: EZTransitionConfig){
+        config._fromPack?.isTransiting = false
+        config._toPack?.isTransiting = false
+        config._toPack?.completedOpenAction()
+        config._fromPack?.completedCloseAction()
+        removeFromParent(config)
+        config._toPack?.window?.updateRootPack()
+    }
+    
+    //MARK: - Metods
 #if targetEnvironment(macCatalyst)
     @MainActor
     static private func transitWindow(_ config: EZTransitionConfig) -> (any EZUIPacProtocol)?{
-        EZUIPacWindow.needToPerform = config._toPack
+        guard let toPack = config._toPack else { return nil }
+        EZUIPacWindow.needToPerform = .init(toPack)
         if let pack = config._toPack{ config._toLine?.setPack(pack) }
         UIApplication.shared.requestSceneSessionActivation(nil, userActivity: nil, options: nil, errorHandler: nil)
-        return config._toPack
+        return toPack
     }
 #endif
 
@@ -263,12 +298,15 @@ public struct EZTransition{
 #if canImport(UIKit) && os(iOS) && !targetEnvironment(macCatalyst)
         toPack.container.autoResizeParentOnRotation = config._fromPack?.container.autoResizeParentOnRotation ?? false
         if #available(iOS 16.0, *) {
-            config._fromPack?.window?.windowScene?.requestGeometryUpdate(.iOS(interfaceOrientations: toPack.controller.supportedInterfaceOrientations))
+            config._fromPack?.window?.windowScene?.requestGeometryUpdate(
+                .iOS(interfaceOrientations: toPack.controller.supportedInterfaceOrientations)
+            )
         }
 #endif
         toPack.window = config._fromPack?.window
-        setupContainer(config._fromPack?.container.superview, toPack.container)
+        config._fromPack?.window = nil
         if let parent = config._fromPack?.parent{ setChild(parent, toPack) }
+        setupContainer(config._fromPack?.container.superview, toPack.container)
     }
     
     @MainActor
@@ -290,6 +328,7 @@ public struct EZTransition{
     
     @MainActor
     private static func setChild(_ parent: EZViewController, _ child: EZViewController){
+        child.willMove(toParent: parent)
         parent.addChild(child)
 #if canImport(UIKit)
         child.didMove(toParent: parent)
@@ -315,8 +354,8 @@ public struct EZTransition{
             rotate(parent.currentOrientation, parent.rootWindow?.interfaceOrientation, toPack)
         }else{
             rotate(
-                config._fromPack?.rootWindow?.interfaceOrientation,
-                config._fromPack?.rootWindow?.interfaceOrientation,
+                config._toPack?.rootWindow?.interfaceOrientation,
+                config._toPack?.rootWindow?.interfaceOrientation,
                 toPack
             )
         }
@@ -342,15 +381,14 @@ public struct EZTransition{
     @MainActor
     private static func removeFromParent(_ config: EZTransitionConfig){
         config._fromPack?.removeFromParent()
+        config._fromPack?.container.removeFromSuperview()
         removeFromParent(config._fromPack?.controller)
         
         
-        config._fromPack?.container.removeFromSuperview()
-        config._fromPack?.container.transform = UIView().transform
+        config._fromPack?.container.transform = .init(scaleX: 1, y: 1)
+#if canImport(UIKit) && os(iOS) && !targetEnvironment(macCatalyst)
         config._fromPack?.currentOrientation = nil
-        
-        
-        config._fromPack?.window?.rootUIPac = config._toPack
+#endif
     }
     
     @MainActor
@@ -359,6 +397,7 @@ public struct EZTransition{
         controller?.willMove(toParent: nil)
 #endif
         controller?.removeFromParent()
+        controller?.didMove(toParent: nil)
     }
 #endif
 }

@@ -29,7 +29,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
         if let windowScene = scene as? UIWindowScene {
             let ezWindow = EZUIPacWindow(windowScene: windowScene)
-            
             window = ezWindow
           
         }

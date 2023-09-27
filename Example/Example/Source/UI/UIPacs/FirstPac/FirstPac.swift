@@ -105,7 +105,7 @@ class FirstPacV: EZUIPacPlatformsV<FirstPacR>{
 
 
 class FirstPacC: EZUIPacC{
-    override var supportedInterfaceOrientations: UIInterfaceOrientationMask {.landscape}
+    override var supportedInterfaceOrientations: UIInterfaceOrientationMask {.all}
     var router: FirstPacR!
     
     func start() {
@@ -120,17 +120,28 @@ class FirstPacC: EZUIPacC{
     }
     
     func didCreate() {
+//        transition(from: self, to: self, duration: 0.5, animations: {})
+        
         transit()
     }
     
     private func transit(){
-//        let s = SecondPac()
+        let s = SecondPac()
 //        s.currentOrientation = .portrait
-//        _ = Timer.scheduledTimer(withTimeInterval: 5, repeats: false, block: { _ in
-//            EZTransition.instead(self.pack)
-//    //            .container(router.testView)
-//                .pack(s).safe(false).animation(.ezAnim).transit()
-//        })
+        _ = Timer.scheduledTimer(withTimeInterval: 5, repeats: false, block: { _ in
+            
+            
+//            self.pack?.container.superview?.addSubview(s.container)
+//            s.startAction()
+//            s.container.removeFromSuperview()
+//            self.pack?.window?.rootViewController = s.controller
+           
+//            s.controller.beginAppearanceTransition(true, animated: false)
+            EZTransition.instead(self.pack)
+                .container(self.router.testView)
+                .pack(s).safe(false).transit()
+//            s.controller.endAppearanceTransition()
+        })
         
     }
 }
@@ -183,8 +194,7 @@ class FirstPacIOSV: EZUIPacV{
     }
     
     private func createSelf(){
-        
-        
+        backgroundColor = .blue
 //        let aa = UIView()
 //        aa.backgroundColor.updateSelf(new: #colorLiteral(red: 0.09803921569, green: 0.09803921569, blue: 0.09803921569, alpha: 1))
 //        addSubview(aa)

@@ -55,16 +55,12 @@ open class EZContainerView: EZView{
     
     @discardableResult
     private func addParentView(_ parent: EZView?) -> Self{
-//        removeFromSuperview()
         parentObserver = nil
         guard let parent = parent else {return self}
         self.parentView = parent
-//        parent.addSubview(self)
         parentObserver = parent.ezBounds.add {[weak self] in
-            print("oooo", $0.new.size)
             self?.frame = .init(origin: .zero, size: $0.new.size)
         }.use().anchorObject
-//        parentObserver = scaleLike(frame: parent).anchorObject
         return self
     }
 #if canImport(UIKit) && os(iOS) && !targetEnvironment(macCatalyst)
