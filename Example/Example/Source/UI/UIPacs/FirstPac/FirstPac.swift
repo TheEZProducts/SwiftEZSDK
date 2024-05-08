@@ -44,6 +44,7 @@ class ColorSeter<Subject>{
 
 typealias FirstPac = EZUIPac<FirstPacC, FirstPacR, FirstPacV>
 
+
 class EZUIPacPlatformsV<R: EZUIPacRouterProtocol>: EZUIPacViewProtocol{
     var router: R!
     private(set) var view: (any EZUIPacViewProtocol<R>)?

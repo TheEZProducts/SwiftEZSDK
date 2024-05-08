@@ -25,18 +25,17 @@ import Cocoa
 #endif
 
 #if canImport(UIKit) || canImport(Cocoa)
-public protocol EZUIPacBaseProtocol<PackProtocol>: AnyObject{
+public protocol EZUIPacBaseProtocol: AnyObject{
     associatedtype C: EZUIPacControllerProtocol where C.Router == R
     associatedtype R: EZUIPacRouterProtocol
     associatedtype V: EZUIPacViewProtocol where V.Router == R
-    associatedtype PackProtocol
     
     var controller: C {get}
     var router: R {get}
     var view: V {get}
 }
 
-public protocol EZUIPacBaseWithActionsProtocol<PackProtocol>: EZUIPacBaseProtocol{
+public protocol EZUIPacBaseWithActionsProtocol: EZUIPacBaseProtocol{
     func startAction()
     func openAction()
     func openWithAnimationAction()
@@ -50,43 +49,43 @@ public protocol EZUIPacBaseWithActionsProtocol<PackProtocol>: EZUIPacBaseProtoco
 #endif
 }
 
-public protocol EZUIPacBaseWithTreeProtocol<PackProtocol>: EZUIPacBaseProtocol{
+public protocol EZUIPacBaseWithTreeProtocol: EZUIPacBaseProtocol{
     var key: UInt { get }
     var window: EZUIPacWindow? { get set }
     var rootWindow: EZUIPacWindow? { get }
     
-    var parent: (PackProtocol)? { get set }
-    var children: [UInt: PackProtocol] { get }
+    var parent: (any EZUIPacProtocol)? { get set }
+    var children: [UInt: any EZUIPacProtocol] { get }
     
     @discardableResult
     func setKey(key: UInt) -> Self
-    func addChild(pack: PackProtocol)
-    func addToParent(pack: PackProtocol)
-    func remove(pack: PackProtocol)
+    func addChild(pack: any EZUIPacProtocol)
+    func addToParent(pack: any EZUIPacProtocol)
+    func remove(pack: any EZUIPacProtocol)
     func removeFromParent()
     
-    func forEachAtPacksTree(_ body: (PackProtocol) throws -> ()) rethrows
+    func forEachAtPacksTree(_ body: (any EZUIPacProtocol) throws -> ()) rethrows
 }
 
-public protocol EZUIPacBaseWithContainerProtocol<PackProtocol>: EZUIPacBaseProtocol{
+public protocol EZUIPacBaseWithContainerProtocol: EZUIPacBaseProtocol{
     var container: EZContainerView { get }
 }
 
-public protocol EZUIPacBaseSupportRotationProtocol<PackProtocol>: EZUIPacBaseProtocol{
+public protocol EZUIPacBaseSupportRotationProtocol: EZUIPacBaseProtocol{
 #if canImport(UIKit) && os(iOS) && !targetEnvironment(macCatalyst)
     var supportedOrientations: UIInterfaceOrientationMask { get }
     var currentOrientation: UIInterfaceOrientation? { get set }
 #endif
 }
 
-public protocol EZUIPacBaseSupportTransitionProtocol<PackProtocol>:
+public protocol EZUIPacBaseSupportTransitionProtocol:
     EZUIPacBaseWithActionsProtocol,
     EZUIPacBaseWithTreeProtocol,
     EZUIPacBaseWithContainerProtocol,
     EZUIPacBaseSupportRotationProtocol
 {
     var line: EZUIPacLine? { get set }
-    var archived: (PackProtocol)? { get set }
+    var archived: (any EZUIPacProtocol)? { get set }
     
     var isTransiting: Bool { get set }
     var isStarted: Bool { get set }
@@ -100,7 +99,7 @@ public protocol EZUIPacBaseSupportTransitionProtocol<PackProtocol>:
 #endif
 }
 
-public protocol EZUIPacProtocol: EZUIPacBaseSupportTransitionProtocol<(any EZUIPacProtocol)>{}
+public protocol EZUIPacProtocol: EZUIPacBaseSupportTransitionProtocol{}
 
 open class EZUIPac<
     C: EZUIPacControllerProtocol,
