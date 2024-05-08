@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Combine
 
 @propertyWrapper
 public struct EZObservable<Value>: Sendable{
@@ -54,6 +55,32 @@ public struct EZObservable<Value>: Sendable{
     
     @discardableResult
     public func breakParentDependansy() -> Self { storage.breakParentDependansy(); return self }
+    
+    @available(tvOS 13.0, *)
+    @available(watchOS 6.0, *)
+    @available(iOS 13.0, *)
+    @available(macOS 10.15, *)
+    public static subscript<OuterSelf>(
+        _enclosingInstance observed: OuterSelf,
+        wrapped wrappedKeyPath: ReferenceWritableKeyPath<OuterSelf, Value>,
+        storage storageKeyPath: ReferenceWritableKeyPath<OuterSelf, Self>
+    ) -> Value {
+        get {
+            observed[keyPath: storageKeyPath].wrappedValue
+        }
+        set {
+            if let observed = observed as? (any ObservableObject) { send(observed) }
+            observed[keyPath: storageKeyPath].wrappedValue = newValue
+        }
+    }
+    
+    @available(tvOS 13.0, *)
+    @available(watchOS 6.0, *)
+    @available(iOS 13.0, *)
+    private static func send<OuterSelf: ObservableObject>(_ observed: OuterSelf){
+        guard let subject = observed.objectWillChange as? ObservableObjectPublisher else { return }
+        subject.send()
+    }
 }
 
 extension EZObservable{
