@@ -77,6 +77,7 @@ public struct EZObservable<Value>: Sendable{
     @available(tvOS 13.0, *)
     @available(watchOS 6.0, *)
     @available(iOS 13.0, *)
+    @available(macOS 10.15, *)
     private static func send<OuterSelf: ObservableObject>(_ observed: OuterSelf){
         guard let subject = observed.objectWillChange as? ObservableObjectPublisher else { return }
         subject.send()
