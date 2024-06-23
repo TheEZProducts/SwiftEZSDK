@@ -25,9 +25,10 @@ public class EZThreadSafety<T>: @unchecked Sendable{
         }
     }
     
-    public func update(_ clusure: (inout T) -> ()){
+    @discardableResult
+    public func update<Value>(_ clusure: (inout T) throws -> (Value)) rethrows -> Value{
         semaphore.wait(); defer { semaphore.signal() }
-        clusure(&value)
+        return try clusure(&value)
     }
     
     public init(wrappedValue: T){
