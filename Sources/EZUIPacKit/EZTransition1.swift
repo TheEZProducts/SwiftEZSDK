@@ -28,7 +28,7 @@ public struct EZInTransitionConfig: EZTransitionConfigProtocol{
     var _container: EZView?
 #endif
     
-    
+    var _animation: EZTransitionAnimation<Self> = .init()
 }
 
 public struct EZTransition1<Config: EZTransitionConfigProtocol, Return>{
@@ -43,17 +43,12 @@ public struct EZTransition1<Config: EZTransitionConfigProtocol, Return>{
 }
 
 extension EZTransition1 where Config == EZInTransitionConfig{
-    init(config: Config) where Return == any EZUIPacProtocol {
-        self.config = config
-        self.returnValue = config._toPack
-    }
-    
     @MainActor
     static func `in`(
         _ fromPack: any EZUIPacProtocol,
         to pack: any EZUIPacProtocol
     ) -> Self where Return == any EZUIPacProtocol{
-        .init(config: .init(_fromPack: fromPack, _toPack: pack))
+        .init(config: .init(_fromPack: fromPack, _toPack: pack), returnValue: pack)
     }
     
     @MainActor
@@ -64,22 +59,15 @@ extension EZTransition1 where Config == EZInTransitionConfig{
         .init(config: .init(_fromPack: fromPack, _toPack: pack), returnValue: pack)
     }
     
-//    public func from<From: EZUIPacProtocol, To: EZUIPacProtocol>(
-//        _ pack: From
-//    ) -> Self where Config == EZInTransitionConfig<From, To>{
-//        var new = config
-//        new._fromPack = pack
-//        return .init(config: new)
-//    }
-//    public func pack(_ pack: (any EZUIPacProtocol)? = nil) -> Self{
-//        var new = config
-//        new._toPack = pack
-//        return .init(config: new)
-//    }
-    
     public func container(_ view: EZView) -> Self{
         var new = config
         new._container = view
+        return .init(config: new, returnValue: returnValue)
+    }
+    
+    public func animation(_ animation: EZTransitionAnimation<Config>) -> Self{
+        var new = config
+        new._animation = animation
         return .init(config: new, returnValue: returnValue)
     }
     
@@ -90,7 +78,7 @@ extension EZTransition1 where Config == EZInTransitionConfig{
 
 @MainActor func test(){
     let a: any EZUIPacProtocol = TestPack()
-    EZTransition1.in(TestPack(), to: a)
+    let b = EZTransition1.in(TestPack(), to: a).transit()
 }
 
 typealias TestPack = EZUIPac<TestC, TestR, TestV>

@@ -145,7 +145,7 @@ public struct EZTransition{
     @MainActor
     static func transit(_ config: EZTransitionConfig) -> (any EZUIPacProtocol)?{
         let config = setLinePack(config)
-        config._toPack?.controller.beginAppearanceTransition(true, animated: false)
+        config._toPack?.ezController.beginAppearanceTransition(true, animated: false)
         switch config._type{
             case .In: return transitIn(config)
             case .Instead: return transitInstead(config)
@@ -288,7 +288,7 @@ public struct EZTransition{
 #if canImport(UIKit) && os(iOS) && !targetEnvironment(macCatalyst)
         toPack.container.autoResizeParentOnRotation = config._autoResizeContainerOnRotation
 #endif
-        setupContainer(config._container ?? fromPack.controller.view, toPack.container)
+        setupContainer(config._container ?? fromPack.ezController.view, toPack.container)
         setChild(fromPack, toPack)
     }
     
@@ -299,7 +299,7 @@ public struct EZTransition{
         toPack.container.autoResizeParentOnRotation = config._fromPack?.container.autoResizeParentOnRotation ?? false
         if #available(iOS 16.0, *) {
             config._fromPack?.window?.windowScene?.requestGeometryUpdate(
-                .iOS(interfaceOrientations: toPack.controller.supportedInterfaceOrientations)
+                .iOS(interfaceOrientations: toPack.ezController.supportedInterfaceOrientations)
             )
         }
 #endif
@@ -315,7 +315,7 @@ public struct EZTransition{
         _ child: any EZUIPacProtocol
     ){
         parent.addChild(pack: child)
-        setChild(parent.controller, child.controller)
+        setChild(parent.ezController, child.ezController)
     }
     
     @MainActor
@@ -382,7 +382,7 @@ public struct EZTransition{
     private static func removeFromParent(_ config: EZTransitionConfig){
         config._fromPack?.removeFromParent()
         config._fromPack?.container.removeFromSuperview()
-        removeFromParent(config._fromPack?.controller)
+        removeFromParent(config._fromPack?.ezController)
         
         
         config._fromPack?.container.transform = .init(scaleX: 1, y: 1)
@@ -392,12 +392,12 @@ public struct EZTransition{
     }
     
     @MainActor
-    private static func removeFromParent(_ controller: EZViewController?){
+    private static func removeFromParent(_ ezController: EZViewController?){
 #if canImport(UIKit)
-        controller?.willMove(toParent: nil)
+        ezController?.willMove(toParent: nil)
 #endif
-        controller?.removeFromParent()
-        controller?.didMove(toParent: nil)
+        ezController?.removeFromParent()
+        ezController?.didMove(toParent: nil)
     }
 #endif
 }

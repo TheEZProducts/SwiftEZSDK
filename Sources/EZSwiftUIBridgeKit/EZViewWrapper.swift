@@ -49,16 +49,16 @@ extension EZView{
         _ observable: ObservObj = EZViewWraperObservable(),
         @ViewBuilder view: @escaping (ObservObj)->V
     ) -> EZView{
-        let controller = EZHostingController(rootView: EZObserveView(observable, view))
+        let ezController = EZHostingController(rootView: EZObserveView(observable, view))
         
 #if canImport(UIKit)
-        controller._disableSafeArea = true
-        controller.view?.backgroundColor = .clear
-        let view = controller.view ?? EZView()
+        ezController._disableSafeArea = true
+        ezController.view?.backgroundColor = .clear
+        let view = ezController.view ?? EZView()
 #else
-        let view = controller.view
+        let view = ezController.view
 #endif
-        controller.view = EZView()
+        ezController.view = EZView()
         return view
     }
 }

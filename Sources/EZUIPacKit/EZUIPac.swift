@@ -24,15 +24,22 @@ import UIKit
 import Cocoa
 #endif
 
+#if canImport(UIKit)
+public typealias EZViewController = UIViewController
+#elseif canImport(Cocoa)
+public typealias EZViewController = NSViewController
+#endif
+
+
 #if canImport(UIKit) || canImport(Cocoa)
-public protocol EZUIPacBaseProtocol: AnyObject{
+public protocol EZUIPacBaseProtocol: EZViewController, AnyObject{
     associatedtype C: EZUIPacControllerProtocol where C.Router == R
     associatedtype R: EZUIPacRouterProtocol
     associatedtype V: EZUIPacViewProtocol where V.Router == R
     
-    var controller: C {get}
-    var router: R {get}
-    var view: V {get}
+    var ezController: C {get}
+    var ezRouter: R {get}
+    var ezView: V {get}
 }
 
 public protocol EZUIPacBaseWithActionsProtocol: EZUIPacBaseProtocol{
@@ -49,24 +56,6 @@ public protocol EZUIPacBaseWithActionsProtocol: EZUIPacBaseProtocol{
 #endif
 }
 
-public protocol EZUIPacBaseWithTreeProtocol: EZUIPacBaseProtocol{
-    var key: UInt { get }
-    var window: EZUIPacWindow? { get set }
-    var rootWindow: EZUIPacWindow? { get }
-    
-    var parent: (any EZUIPacProtocol)? { get set }
-    var children: [UInt: any EZUIPacProtocol] { get }
-    
-    @discardableResult
-    func setKey(key: UInt) -> Self
-    func addChild(pack: any EZUIPacProtocol)
-    func addToParent(pack: any EZUIPacProtocol)
-    func remove(pack: any EZUIPacProtocol)
-    func removeFromParent()
-    
-    func forEachAtPacksTree(_ body: (any EZUIPacProtocol) throws -> ()) rethrows
-}
-
 public protocol EZUIPacBaseWithContainerProtocol: EZUIPacBaseProtocol{
     var container: EZContainerView { get }
 }
@@ -80,7 +69,6 @@ public protocol EZUIPacBaseSupportRotationProtocol: EZUIPacBaseProtocol{
 
 public protocol EZUIPacBaseSupportTransitionProtocol:
     EZUIPacBaseWithActionsProtocol,
-    EZUIPacBaseWithTreeProtocol,
     EZUIPacBaseWithContainerProtocol,
     EZUIPacBaseSupportRotationProtocol
 {
@@ -105,34 +93,22 @@ open class EZUIPac<
     C: EZUIPacControllerProtocol,
     R: EZUIPacRouterProtocol,
     V: EZUIPacViewProtocol
->: EZUIPacProtocol where C.Router == R, V.Router == R{
+>: UIViewController, EZUIPacProtocol where C.Router == R, V.Router == R{
     //MARK: - Property
     //MARK: - Base
-    open private(set) var controller: C
-    open private(set) var router: R
-    open private(set) var view: V
-    
-    //MARK: - WithTree
-    private var keyIncrement: UInt = 1
-    open private(set) var key: UInt = 0
-    
-    open weak var window: EZUIPacWindow?
-    open var rootWindow: EZUIPacWindow?{
-        if let window { return window }
-        else{ return parent?.rootWindow }
-    }
-    open weak var parent: (any EZUIPacProtocol)?
-    open var children: [UInt: any EZUIPacProtocol] = [:]
+    open private(set) var ezController: C
+    open private(set) var ezRouter: R
+    open private(set) var ezView: V
     
     //MARK: - WithContainer
     open private(set) var container = EZContainerView()
     
     //MARK: - SupportRotation
 #if canImport(UIKit) && os(iOS) && !targetEnvironment(macCatalyst)
-    open var supportedOrientations: UIInterfaceOrientationMask { view.supportedOrientations }
+    open var supportedOrientations: UIInterfaceOrientationMask { ezView.supportedOrientations }
     open var currentOrientation: UIInterfaceOrientation? {
-        set(value){ router.stateStorage.currentOrientation = value }
-        get{ router.stateStorage.currentOrientation }
+        set(value){ ezRouter.stateStorage.currentOrientation = value }
+        get{ ezRouter.stateStorage.currentOrientation }
     }
 #endif
     
@@ -141,68 +117,37 @@ open class EZUIPac<
     open var archived: (any EZUIPacProtocol)?
     
     open var isTransiting: Bool {
-        set(value){ router.stateStorage.isTransiting = value }
-        get{ router.stateStorage.isTransiting }
+        set(value){ ezRouter.stateStorage.isTransiting = value }
+        get{ ezRouter.stateStorage.isTransiting }
     }
     open var isStarted: Bool {
-        set(value){ router.stateStorage.isStarted = value }
-        get{ router.stateStorage.isStarted }
+        set(value){ ezRouter.stateStorage.isStarted = value }
+        get{ ezRouter.stateStorage.isStarted }
     }
     
     
     //MARK: - Metods
     //MARK: - EZUIPac
-    public convenience init(controller: C.Type = C.self, view: V.Type = V.self){
+    public convenience init(ezController: C.Type = C.self, view: V.Type = V.self){
         self.init(router: .init())
     }
     
-    public init(controller: C.Type = C.self, router: R, view: V.Type = V.self){
-        self.controller = .init(router: router)
-        self.view = .init(router: router)
-        self.router = router
+    public init(ezController: C.Type = C.self, router: R, view: V.Type = V.self){
+        self.ezController = .init(router: router)
+        self.ezView = .init(router: router)
+        self.ezRouter = router
+        
+        super.init(nibName: nil, bundle: nil)
+        
         router.stateStorage.setup(self)
         setView()
     }
-    
-    open func setView(){
-        container.addChildView(view.getView(router: router))
-        container.ezBounds.add{[weak self] _ in self?.didResizeAction() }
-        controller.view = container
-    }
 
-    //MARK: - WithTree
-    open func createKey() -> UInt {
-        let key = keyIncrement
-        keyIncrement += 1
-        return key
+    open func setView(){
+        container.addChildView(ezView.getView(router: ezRouter))
+        container.ezBounds.add{[weak self] _ in self?.didResizeAction() }
+        ezController.view = container
     }
-    
-    @discardableResult
-    open func setKey(key: UInt) -> Self { self.key = key; return self }
-    open func addChild(pack: any EZUIPacProtocol) {
-        let key = createKey()
-        pack.removeFromParent()
-        children[key] = pack.setKey(key: key)
-        pack.parent = self
-    }
-    
-    open func addToParent(pack: any EZUIPacProtocol) {
-        pack.addChild(pack: self)
-    }
-        
-    open func remove(pack: any EZUIPacProtocol) {
-        children[pack.key] = nil
-    }
-    
-    open func removeFromParent() {
-        parent?.remove(pack: self)
-    }
-    
-    open func forEachAtPacksTree(_ body: (any EZUIPacProtocol) throws -> ()) rethrows {
-        try body(self)
-        try children.forEach{ try $0.value.forEachAtPacksTree(body) }
-    }
-    
     
     //MARK: - SupportTransition
     open var `in`: EZTransitionConfig { .init(.In, self) }
@@ -215,45 +160,49 @@ open class EZUIPac<
     
     //MARK: - WithActions
     open func startAction(){
-        if router.stateStorage.isStarted == true{ return }
-        router.stateStorage.isStarted = true
-        controller.initActions()
-        view.initActions()
-        controller.start()
-        view.create()
-        controller.didCreate()
+        if ezRouter.stateStorage.isStarted == true{ return }
+        ezRouter.stateStorage.isStarted = true
+        ezController.initActions()
+        ezView.initActions()
+        ezController.start()
+        ezView.create()
+        ezController.didCreate()
     }
     open func openAction(){
-        controller.open()
-        view.open()
+        ezController.open()
+        ezView.open()
     }
     open func openWithAnimationAction(){
-        view.openWithAnimation()
+        ezView.openWithAnimation()
     }
     open func completedOpenAction(){
-        controller.completedOpen()
-        view.completedOpen()
+        ezController.completedOpen()
+        ezView.completedOpen()
     }
     open func closeAction(){
-        controller.close()
-        view.close()
+        ezController.close()
+        ezView.close()
     }
     
     open func closeWithAnimationAction() {
-        view.closeWithAnimation()
+        ezView.closeWithAnimation()
     }
     open func completedCloseAction(){
-        controller.completedClose()
-        view.completedClose()
+        ezController.completedClose()
+        ezView.completedClose()
     }
     
     open func didResizeAction(){
-        view.didResize()
+        ezView.didResize()
     }
 #if canImport(UIKit) && os(iOS) && !targetEnvironment(macCatalyst)
     open func didRotateAction(oldOrientation: UIInterfaceOrientation, newOrientation: UIInterfaceOrientation){
-        view.didRotate(oldOrientation: oldOrientation, newOrientation: newOrientation)
+        ezView.didRotate(oldOrientation: oldOrientation, newOrientation: newOrientation)
     }
 #endif
+    
+    required public init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 }
 #endif

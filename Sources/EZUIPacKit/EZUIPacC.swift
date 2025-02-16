@@ -11,17 +11,12 @@ import UIKit
 import Cocoa
 #endif
 
-#if canImport(UIKit)
-public typealias EZViewController = UIViewController
-#elseif canImport(Cocoa)
-public typealias EZViewController = NSViewController
-#endif
 
 #if canImport(UIKit) || canImport(Cocoa)
 //MARK: - Controller
-extension EZUIPacWithRouterProtocol where Self: EZViewController{
+extension EZUIPacWithRouterProtocol where Self == EZUIPacControllerProtocol{
     public init(router: Router){
-        self.init(nibName: nil, bundle: nil)
+        self.init()
         self.router = router
     }
 }
@@ -33,6 +28,8 @@ public protocol EZUIPacControllerProtocol:
     EZUIPacWithStateStorage,
     EZUIPacWithRouterProtocol
 {
+    init()
+    
     func initActions()
     func start()
     func didCreate()

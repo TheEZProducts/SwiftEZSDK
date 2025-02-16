@@ -14,29 +14,38 @@ import EZBuilderKit
 #endif
 
 #if canImport(UIKit) ||  canImport(Cocoa)
-public struct EZTransitionAnimationModel{
-    public var fromPack: (any EZUIPacProtocol)?
-    public var toPack: (any EZUIPacProtocol)?
-    
-    public var fromView: EZView? { fromPack?.controller.view }
-    public var toView: EZView? { toPack?.controller.view }
-    public var foundation: EZView? { toView?.superview }
+public struct EZTransitionAnimationModel<Config: EZTransitionConfigProtocol>{
+    public var config: Config
     
     public var animationAction: () -> () = {}
     public var completionAction: () -> () = {}
 }
 
+extension EZTransitionAnimationModel where Config == EZInTransitionConfig{
+    public var fromView: EZView { config._fromPack.ezController.view }
+    public var toView: EZView { config._toPack.ezController.view }
+    public var foundation: EZView? { toView.superview }
+}
 
-public struct EZTransitionAnimation: EZBuildableProtocol{
+
+public struct EZTransitionAnimation<Config: EZTransitionConfigProtocol>: EZBuildableProtocol{
     public typealias AnimationAction = (
-        _ model: EZTransitionAnimationModel
+        _ model: EZTransitionAnimationModel<Config>
     ) -> ()
 
     private var animation: AnimationAction?
-    public fileprivate(set) var prepareAction: () -> () = {}
-    public fileprivate(set) var model = EZTransitionAnimationModel()
     
-    public func animate(){
+    public func animate(
+        config: Config,
+        prepareAction: @escaping () -> () = {},
+        animationAction: @escaping () -> () = {},
+        completionAction: @escaping () -> () = {}
+    ){
+        let model = EZTransitionAnimationModel(
+            config: config, 
+            animationAction: animationAction,
+            completionAction: completionAction
+        )
         prepareAction()
         if let animation {
             animation(model)
@@ -53,53 +62,34 @@ public struct EZTransitionAnimation: EZBuildableProtocol{
     public init(){}
 }
 
-#if canImport(EZBuilderKit)
-extension EZBuilder<EZTransitionAnimation>{
-    @discardableResult
-    func setPacks(_ action: (Pack) -> ()) -> Self { use(action) }
-    class Pack: EZBuilder{
-        @discardableResult
-        public func fromPack(_ pack: (any EZUIPacProtocol)?) -> Self{
-            value.model.fromPack = pack
-            return self
-        }
-        
-        @discardableResult
-        public func toPack(_ pack: (any EZUIPacProtocol)?) -> Self{
-            value.model.toPack = pack
-            return self
-        }
-    }
 
-    @discardableResult
-    func setActions(_ action: (Action) -> ()) -> Self { use(action) }
-    class Action: EZBuilder{
-        @discardableResult
-        public func prepareAction(_ action: @escaping () -> ()) -> Self{
-            value.prepareAction = action
-            return self
-        }
-
-        @discardableResult
-        public func animationAction(_ action: @escaping () -> ()) -> Self{
-            value.model.animationAction = action
-            return self
-        }
-
-        @discardableResult
-        public func completionAction(_ action: @escaping () -> ()) -> Self{
-            value.model.completionAction = action
-            return self
-        }
-    }
-}
-#endif
-
-extension EZTransitionAnimation{
+extension EZTransitionAnimation where Config == EZInTransitionConfig{
+//    public static var ezAnim: Self{
+//        .init{ model in
+//            let rootSize = model.foundation?.frame.size ?? .zero
+//            model.toView?.transform.ty += rootSize.height
+//            UIView.animate(
+//                withDuration: 0.6,
+//                delay: 0.0,
+//                usingSpringWithDamping: 1,
+//                initialSpringVelocity: 0,
+//                options: [.curveEaseInOut],
+//                animations:{
+//                    model.toView?.transform.ty = 0
+//                    model.fromView?.transform.ty -= rootSize.height * 0.3
+//                    model.animationAction()
+//                }
+//            ){_ in
+//                model.fromView?.transform.ty = 0
+//                model.completionAction()
+//            }
+//        }
+//    }
+    
     public static var ezAnim: Self{
         .init{ model in
             let rootSize = model.foundation?.frame.size ?? .zero
-            model.toView?.transform.ty += rootSize.height
+            model.toView.transform.ty += rootSize.height
             UIView.animate(
                 withDuration: 0.6,
                 delay: 0.0,
@@ -107,12 +97,10 @@ extension EZTransitionAnimation{
                 initialSpringVelocity: 0,
                 options: [.curveEaseInOut],
                 animations:{
-                    model.toView?.transform.ty = 0
-                    model.fromView?.transform.ty -= rootSize.height * 0.3
+                    model.toView.transform.ty = 0
                     model.animationAction()
                 }
             ){_ in
-                model.fromView?.transform.ty = 0
                 model.completionAction()
             }
         }

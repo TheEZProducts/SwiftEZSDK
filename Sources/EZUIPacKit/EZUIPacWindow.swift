@@ -98,16 +98,15 @@ open class EZUIPacWindow: EZWindow{
         
         
 #if canImport(UIKit) && os(iOS) && !targetEnvironment(macCatalyst)
-        interfaceOrientation = line.currentPack.controller.preferredInterfaceOrientationForPresentation
+        interfaceOrientation = line.currentPack.ezController.preferredInterfaceOrientationForPresentation
         rotatePacks(newOrientation: interfaceOrientation)
 #endif
     }
     
     open func updateRootPack(){
         rootUIPac?.container.removeFromSuperview()
-        rootViewController = self.rootUIPac?.controller
+        rootViewController = self.rootUIPac?.ezController
         makeKeyAndVisible()
-        rootUIPac?.window = self
     }
     
 #if canImport(UIKit) && os(iOS) && !targetEnvironment(macCatalyst)
@@ -151,11 +150,11 @@ open class EZUIPacWindow: EZWindow{
 #endif
     
     private func closePacks(_ pack: (any EZUIPacProtocol)?){
-        pack?.forEachAtPacksTree{
-            $0.closeAction()
-            $0.closeWithAnimationAction()
-            $0.completedCloseAction()
-        }
+//        pack?.forEachAtPacksTree{
+//            $0.closeAction()
+//            $0.closeWithAnimationAction()
+//            $0.completedCloseAction()
+//        }
     }
     
     deinit{ closePacks(rootUIPac) }
