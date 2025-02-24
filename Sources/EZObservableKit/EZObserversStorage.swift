@@ -23,6 +23,7 @@ protocol EZObserversStorageProtocol<Value>: AnyObject, Sendable{
     
     @discardableResult
     func add(wrapper: EZObserverWrapperProtocol?, action: @escaping (EZObserverValue<Value>) -> ()) -> EZObserverToken<Value>
+    
     func remove(id: UInt)
     func removeAll()
     
@@ -54,7 +55,7 @@ class EZObserversStorage<Value>: EZObserversStorageProtocol, @unchecked Sendable
             id: idCounter,
             storage: self,
             action: .init(action: action),
-            wreapper: wrapper ?? defaultWrapper
+            wrapper: wrapper ?? defaultWrapper
         )
         tokens.append(token)
         idCounter += 1

@@ -17,11 +17,18 @@ public protocol EZObserverTokenRemoveProtocol: Sendable{
     func remove()
 }
 
-public struct EZObserverToken<Value>: EZObserverTokenRemoveProtocol, Sendable{
+public protocol EZObserverTokenProtocol: EZObserverTokenRemoveProtocol{
+    var anchorObject: EZObserveAnchorObject { get }
+    
+    @discardableResult
+    func use(_ type: EZSetType) -> Self
+}
+
+public struct EZObserverToken<Value>: EZObserverTokenProtocol, Sendable{
     private(set) var id: UInt
     private(set) weak var storage: (any EZObserversStorageProtocol<Value>)?
     private(set) var action: EZObserverAction<Value>
-    private(set) var wreapper: EZObserverWrapperProtocol?
+    private(set) var wrapper: EZObserverWrapperProtocol?
     public var anchorObject: EZObserveAnchorObject { EZObserveAnchorObject(self) }
     
     public var value: Value? {
@@ -37,9 +44,9 @@ public struct EZObserverToken<Value>: EZObserverTokenRemoveProtocol, Sendable{
     }
     
     func use(old: Value, new: Value, _ type: EZSetType){
-        var wreapper = self.wreapper
-        if case .changeWrapper(let newWrapper) = type { wreapper = newWrapper }
-        action.use(value: EZObserverValue(old: old, new: new, wreapper: wreapper))
+        var wrapper = self.wrapper
+        if case .changeWrapper(let newWrapper) = type { wrapper = newWrapper }
+        action.use(value: EZObserverValue(old: old, new: new, wrapper: wrapper))
     }
     
     public func remove(){ storage?.remove(id: id) }

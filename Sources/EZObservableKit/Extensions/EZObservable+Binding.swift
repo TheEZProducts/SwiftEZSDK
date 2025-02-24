@@ -10,10 +10,7 @@ import Foundation
 #if canImport(SwiftUI)
 import SwiftUI
 
-@available(tvOS 13.0, *)
-@available(watchOS 6.0, *)
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, *)
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, *)
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension EZObservable{
     func binding<BindingValue>(keyPath: ReferenceWritableKeyPath<Value, BindingValue>) -> Binding<BindingValue?>{
         let wrapper = EZSendableWrapper(keyPath)

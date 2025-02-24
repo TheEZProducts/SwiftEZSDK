@@ -10,7 +10,7 @@ import Foundation
 #if canImport(EZAssociatedKit)
 import EZAssociatedKit
 
-extension EZObserverToken{
+extension EZObserverTokenProtocol{
     @discardableResult
     public func snapToObject(_ object: AnyObject) -> Self{
         EZAssociated(object).set(anchorObject, .random, .OBJC_ASSOCIATION_RETAIN)

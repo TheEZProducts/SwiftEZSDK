@@ -10,8 +10,8 @@ import Foundation
 public struct EZObserverAction<Value>: @unchecked Sendable{
     private(set) var action: (EZObserverValue<Value>) -> ()
     func use(value: EZObserverValue<Value>){
-        if let wreapper = value.wreapper {
-            wreapper.use { action(value) }
+        if let wrapper = value.wrapper {
+            wrapper.use { action(value) }
         }else{
             action(value)
         }

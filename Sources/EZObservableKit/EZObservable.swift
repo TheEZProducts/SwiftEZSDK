@@ -8,8 +8,19 @@
 import Foundation
 import Combine
 
+public protocol EZObservableProtocol{
+    @discardableResult
+    func signal(_ type: EZSetType) -> Self
+    
+    @discardableResult
+    func unknownAdd(
+        wrapper: EZObserverWrapperProtocol?,
+        action: @escaping (EZObserverValueProtocol) -> ()
+    ) -> EZObserverTokenProtocol
+}
+
 @propertyWrapper
-public struct EZObservable<Value>: Sendable{
+public struct EZObservable<Value>: Sendable, EZObservableProtocol{
     private(set) var storage: any EZObserversStorageProtocol<Value>
     
     public var wrappedValue: Value{
@@ -43,8 +54,19 @@ public struct EZObservable<Value>: Sendable{
     }
     
     @discardableResult
-    public func add(wrapper: EZObserverWrapperProtocol? = nil, action: @escaping (EZObserverValue<Value>) -> ()) -> EZObserverToken<Value>{
+    public func add(
+        wrapper: EZObserverWrapperProtocol? = nil,
+        action: @escaping (EZObserverValue<Value>) -> ()
+    ) -> EZObserverToken<Value>{
         storage.add(wrapper: wrapper, action: action)
+    }
+    
+    @discardableResult
+    public func unknownAdd(
+        wrapper: EZObserverWrapperProtocol? = nil,
+        action: @escaping (EZObserverValueProtocol) -> ()
+    ) -> EZObserverTokenProtocol{
+        add(wrapper: wrapper) { action($0) }
     }
     
     @discardableResult

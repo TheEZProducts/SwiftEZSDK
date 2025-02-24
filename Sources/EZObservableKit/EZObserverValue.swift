@@ -7,9 +7,13 @@
 
 import Foundation
 
-public struct EZObserverValue<Value>: @unchecked Sendable{
+public protocol EZObserverValueProtocol{
+    var wrapper: EZObserverWrapperProtocol? { get }
+}
+
+public struct EZObserverValue<Value>: @unchecked Sendable, EZObserverValueProtocol{
     public private(set) var old: Value
     public private(set) var new: Value
-    public private(set) var wreapper: EZObserverWrapperProtocol?
+    public private(set) var wrapper: EZObserverWrapperProtocol?
 }
 
