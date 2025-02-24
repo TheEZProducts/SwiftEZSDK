@@ -23,8 +23,8 @@ import Foundation
 @_exported import EZChannelKit
 #endif
 
-#if canImport(EZUIPacKit)
-@_exported import EZUIPacKit
+#if canImport(EZUIPackKit)
+@_exported import EZUIPackKit
 #endif
 
 #if canImport(EZSwiftUIBridgeKit)

@@ -16,22 +16,24 @@ import SwiftUI
 @available(macOS 10.15, iOS 13.0, tvOS 13.0, *)
 extension EZObservable{
     func binding<BindingValue>(keyPath: ReferenceWritableKeyPath<Value, BindingValue>) -> Binding<BindingValue?>{
-        .init {[weak storage] in
-            storage?.get()[keyPath: keyPath]
+        let wrapper = EZSendableWrapper(keyPath)
+        return .init {[weak storage] in
+            storage?.get()[keyPath: wrapper.value]
         } set: {[weak storage] newValue in
             if let newValue{
-                storage?.get()[keyPath: keyPath] = newValue
+                storage?.get()[keyPath: wrapper.value] = newValue
                 storage?.signal(.common)
             }
         }
     }
     
     func binding<BindingValue>(keyPath: WritableKeyPath<Value, BindingValue>) -> Binding<BindingValue?>{
-        .init {[weak storage] in
-            storage?.get()[keyPath: keyPath]
+        let wrapper = EZSendableWrapper(keyPath)
+        return .init {[weak storage] in
+            storage?.get()[keyPath: wrapper.value]
         } set: {[weak storage] newValue in
             if let newValue, var value = storage?.get(){
-                value[keyPath: keyPath] = newValue
+                value[keyPath: wrapper.value] = newValue
                 storage?.set(value: value, .common)
             }
         }

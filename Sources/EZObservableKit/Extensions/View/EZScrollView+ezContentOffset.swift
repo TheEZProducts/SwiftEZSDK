@@ -16,8 +16,8 @@ import UIKit
 import Cocoa
 #endif
 
-
 #if canImport(UIKit) || canImport(Cocoa)
+@MainActor
 class EZUIScrollViewContentOffSetObserve{
     private var key: NSKeyValueObservation?
     @EZObservable var ezContentOffSet: CGPoint = .zero
@@ -28,15 +28,19 @@ class EZUIScrollViewContentOffSetObserve{
 #if canImport(UIKit)
         ezContentOffSet = view.contentOffset
         key = view.observe(\.contentOffset) {[weak self] (scroll, _) in
-            if self?.ezContentOffSet != scroll.contentOffset{
-                self?.ezContentOffSet = scroll.contentOffset
+            EZMainWrapper.run{
+                if self?.ezContentOffSet != scroll.contentOffset{
+                    self?.ezContentOffSet = scroll.contentOffset
+                }
             }
         }
 #elseif canImport(Cocoa)
         ezContentOffSet = view.contentView.bounds.origin
         key = view.contentView.observe(\.bounds) {[weak self] (scroll, _) in
-            if self?.ezContentOffSet != scroll.bounds.origin{
-                self?.ezContentOffSet = scroll.bounds.origin
+            MainWrapper.run{
+                if self?.ezContentOffSet != scroll.bounds.origin{
+                    self?.ezContentOffSet = scroll.bounds.origin
+                }
             }
         }
 #endif

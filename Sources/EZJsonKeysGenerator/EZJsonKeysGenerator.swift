@@ -105,7 +105,7 @@ struct EZJsonKeysGenerator {
         return nil
     }
     
-    private static var fileTemplate = {
+    private static let fileTemplate = {
         """
         //
         // EZJsonKeysPlugin.generated.swift
@@ -124,7 +124,7 @@ struct EZJsonKeysGenerator {
         """
     }()
     
-    private static var enumTemplate = {
+    private static let enumTemplate = {
         """
         //MARK: - ${0}
         enum ${0}Key: String, CaseIterable{
@@ -140,13 +140,13 @@ struct EZJsonKeysGenerator {
         """
     }()
     
-    private static var pathTemplate = {
+    private static let pathTemplate = {
         """
         // ${0}
         """
     }()
     
-    private static var jsonTemplate = {
+    private static let jsonTemplate = {
         """
         \t//MARK: ${1}
         \tstatic var ${0}FileName: String { \"${1}\" }
@@ -154,7 +154,7 @@ struct EZJsonKeysGenerator {
         """
     }()
     
-    private static var caseTemplate = {
+    private static let caseTemplate = {
         """
         \tcase `${0}` = \"${1}\"; var `${0}`: Self {.`${0}`}
         """

@@ -24,12 +24,12 @@ extension EZBuildableProtocol{
     }
     
     @discardableResult
-    public static func build(@RZAnyBuilder _ closure: () -> ([EZBuilderScript<Self>])) -> Self{
+    public static func build(@EZAnyBuilder _ closure: () -> ([EZBuilderScript<Self>])) -> Self{
         Self().build(closure)
     }
     
     @discardableResult
-    public func build(@RZAnyBuilder _ closure: () -> ([EZBuilderScript<Self>])) -> Self{
+    public func build(@EZAnyBuilder _ closure: () -> ([EZBuilderScript<Self>])) -> Self{
         closure().forEach{ $0.action(self) }
         return self
     }
@@ -50,6 +50,6 @@ extension EZBuildableProtocol{
     }
 }
 
-@resultBuilder public struct RZAnyBuilder{
+@resultBuilder public struct EZAnyBuilder{
     public static func buildBlock<T>(_ atrs: T...) -> [T] { atrs }
 }

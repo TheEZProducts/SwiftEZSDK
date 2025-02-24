@@ -6,9 +6,9 @@
 //
 
 import UIKit
-import EZUIPacKit
+import EZUIPackKit
 
-extension EZUIPacViewProtocol{
+extension EZUIPackViewProtocol{
     var supportedOrientations: UIInterfaceOrientationMask {.portrait}
 }
 
@@ -28,9 +28,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
 
         if let windowScene = scene as? UIWindowScene {
-            let ezWindow = EZUIPacWindow(windowScene: windowScene)
-            window = ezWindow
-          
+            let window = UIWindow(windowScene: windowScene)
+            window.rootViewController = MainPack()
+            window.makeKeyAndVisible()
+            self.window = window
         }
     }
 

@@ -27,7 +27,7 @@ class Obj1{
     var value: Int = 0
 }
 
-final class EZObservableKitTest: XCTestCase {
+final class EZObservableKitTest: XCTestCase, @unchecked Sendable {
     func test_ObservableSet(){
         @EZObservable var value: String = "Hello"
         
@@ -307,19 +307,20 @@ final class EZObservableKitTest: XCTestCase {
 
     
     typealias Seter = TestKeyStrider1
+    @MainActor
     func test_my(){
-        let view = UIView()
-        TestKeyStrider1(view)
-            .frame{$0
-                .size(.init(width: 10, height: 10))
-                .origin{ $0.x(10).y(10) }
-            }
-            .layer{$0
-                .shadowOffset(.init(width: 10, height: 10))
-                .masksToBounds(true)
-            }
-            .backgroundColor(.white)
-            .isHidden(true)
+//        let view = UIView()
+//        TestKeyStrider1(view)
+//            .frame{$0
+//                .size(.init(width: 10, height: 10))
+//                .origin{ $0.x(10).y(10) }
+//            }
+//            .layer{$0
+//                .shadowOffset(.init(width: 10, height: 10))
+//                .masksToBounds(true)
+//            }
+//            .backgroundColor(.white)
+//            .isHidden(true)
 //
         
 //        TestKeyStrider(view)
@@ -335,12 +336,8 @@ final class EZObservableKitTest: XCTestCase {
         
         
         
-        print(view.frame)
-        print(view.backgroundColor)
-        print(view.alpha)
-        
             
-        let test = TestClass()
+//        let test = TestClass()
 //        let key = \TestClass.value1?.value1?.value
 //        TestKeyStrider1(test)
 //            .value3{$0
@@ -387,12 +384,6 @@ final class EZObservableKitTest: XCTestCase {
 ////            .value1(.init())
 //            .value1.value(100)
 //            .value2("world")
-        print()
-        print(test.value)
-        print(test.value1?.value)
-        print(test.value1?.value1?.value)
-        print(test.value2)
-        print(test.value3)
     }
     
     class Dier{

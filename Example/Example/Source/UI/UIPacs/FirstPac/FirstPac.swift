@@ -6,7 +6,7 @@
 //
 
 import UIKit
-import EZUIPacKit
+import EZUIPackKit
 import EZAssociatedKit
 import SwiftUI
 
@@ -39,181 +39,250 @@ class ColorSeter<Subject>{
     }
 }
 
+typealias FirstPac = EZUITabBarPack<FirstPacI, FirstPacM, FirstPacV>
 
-
-
-typealias FirstPac = EZUIPac<FirstPacC, FirstPacR, FirstPacV>
-
-
-class EZUIPacPlatformsV<R: EZUIPacRouterProtocol>: EZUIPacViewProtocol{
-    var router: R!
-    private(set) var view: (any EZUIPacViewProtocol<R>)?
-    
-    
-    var iOS: (any EZUIPacViewProtocol<R>)? { nil }
-    var iPadOS: (any EZUIPacViewProtocol<R>)? { nil }
-    var macCatalyst: (any EZUIPacViewProtocol<R>)? { nil }
-    var macOS: (any EZUIPacViewProtocol<R>)? { nil }
-    var tvOS: (any EZUIPacViewProtocol<R>)? { nil }
-    
-    
-    func getView(router: R) -> EZView {
-        view?.getView(router: router) ?? EZView()
-    }
-    
-    required init(router: R) {
-        self.router = router
-        setView()
-    }
-    
-    open func setView(){
-#if targetEnvironment(macCatalyst)
-        view = macCatalyst
-#elseif os(iOS)
-        if UIDevice.current.userInterfaceIdiom == .phone{
-            view = iOS
-        }else{
-            view = iPadOS
-        }
-#elseif os(macOS)
-        view = macOS
-#elseif os(tvOS)
-        view = tvOS
-#endif
-    }
-    
-    public var supportedOrientations: UIInterfaceOrientationMask { view?.supportedOrientations ?? .all }
-    public func initActions(){ view?.initActions() }
-    public func create(){ view?.create() }
-    public func open(){ view?.open() }
-    public func openWithAnimation(){ view?.openWithAnimation() }
-    public func completedOpen(){ view?.completedOpen() }
-    public func close(){ view?.close() }
-    public func closeWithAnimation(){ view?.closeWithAnimation() }
-    public func completedClose(){ view?.completedClose() }
-    public func didResize(){ view?.didResize() }
-#if canImport(UIKit) && os(iOS) && !targetEnvironment(macCatalyst)
-    public func didRotate(oldOrientation: UIInterfaceOrientation, newOrientation: UIInterfaceOrientation){
-        view?.didRotate(oldOrientation: oldOrientation, newOrientation: newOrientation)
-    }
-#endif
-}
-
-class FirstPacV: EZUIPacPlatformsV<FirstPacR>{
-    override var iOS: (any EZUIPacViewProtocol<FirstPacR>)? { FirstPacIOSV(router: router) }
-    override var macCatalyst: (any EZUIPacViewProtocol<FirstPacR>)? { FirstPacIOSV(router: router) }
+class FirstPacV: EZUIPackPlatformsV<FirstPacM>{
+    override var iOS: (any EZUIPackViewProtocol<FirstPacM>)? { FirstPacIOSV(mediator: mediator) }
+    override var macCatalyst: (any EZUIPackViewProtocol<FirstPacM>)? { FirstPacIOSV(mediator: mediator) }
 }
 
 
-class FirstPacC: EZUIPacC{
-    override var supportedInterfaceOrientations: UIInterfaceOrientationMask {.all}
-    var router: FirstPacR!
+class FirstPacI: EZUIPackI{
+    var mediator: FirstPacM!
+    
+    func didInitialize() {
+        
+    }
     
     func start() {
-       
-        
-        print("C - start")
-        
-//        _ = Timer.scheduledTimer(withTimeInterval: 5, repeats: false, block: { _ in
-//            self.pack?.instead.pack(FirstPac()).transit()
-//        })
-        
+    
     }
     
     func didCreate() {
-//        transition(from: self, to: self, duration: 0.5, animations: {})
+        transit
+            .tabBarSet([UIViewController().apply(template: .custom{ $0.view.backgroundColor = .init(red: .random(in: 0...1), green: .random(in: 0...1), blue: .random(in: 0...1), alpha: 1) })])
+            .transit()
         
+//        DispatchQueue.main.asyncAfter(deadline: .now() + 2){
+//            self.transit
+//                .tabBarSet([.tabBarWrapper([SecondPac(), SecondPac(), SecondPac()])])
+//                .unsafeTransition()
+//                .animation(.ezOpen)
+//                .transit()
+//        }
+        
+    }
+    
+    func didInstall() {
         transit()
     }
     
+    func willOpen() {
+    }
+    
+    func didOpen() {
+
+    }
+    
     private func transit(){
-        let s = SecondPac()
-//        s.currentOrientation = .portrait
-        _ = Timer.scheduledTimer(withTimeInterval: 5, repeats: false, block: { _ in
-            
-            
-//            self.pack?.container.superview?.addSubview(s.container)
-//            s.startAction()
-//            s.container.removeFromSuperview()
-//            self.pack?.window?.rootViewController = s.controller
-           
-//            s.controller.beginAppearanceTransition(true, animated: false)
-            EZTransition.instead(self.pack)
-                .container(self.router.testView)
-                .pack(s).safe(false).transit()
-//            s.controller.endAppearanceTransition()
-        })
+//        DispatchQueue.main.asyncAfter(deadline: .now() + 2){
+//            let navigation = UINavigationController()
+//            self.mediator.testView.transit
+//                .present(navigation)
+//                .unsafeTransition()
+//                .animation(.coverVertical)
+//                .transit()
+//            
+//            EZTransition(navigation)
+//                .navigationPush(SecondPac())
+//                .unsafeTransition()
+//                .transit()
+//        DispatchQueue.main.asyncAfter(deadline: .now() + 5){
+//            Task{
+                var animator: UIPercentDrivenInteractiveTransition?
+                var test: UIViewController?
         
+            print()
+            print()
+            print()
+            print()
+            let tansition = self.mediator.testView.transit
+//            .present(SecondPac())
+                    .present(
+                        .tabBarWrapper([SecondPac(), SecondPac(), SecondPac()])
+//                        SecondPac()
+                        //                .apply(template: .childAnimation(animation: .ezOpen))
+                        //                .apply(template: .hiddenNavigationBar)
+                        //                .apply(template: .childAnimations(push: .ezAppearance, pop: .ezDisappearance))
+                            .apply(template: .custom{
+                                $0.transitionController = .custom{[weak self] context in
+                                    self?.transit(context: context) ?? false
+                                }
+                                test = $0
+                                $0.tabBar.isHidden = true
+                            })
+//                            .apply(template: .custom({
+//                                $0.preferredContentSize = .init(width: 200, height: 300)
+//                            }))
+//                            .apply(template: .custom{
+//                                $0.modalPresentationStyle = .popover
+//                                if
+//                                    let popover = $0.popoverPresentationController,
+//                                    let view = self.packBridge.pack!.view
+//                                {
+//                                    popover.sourceView = view  // или, например, сама кнопка
+//                                    popover.sourceRect = CGRect(x: view.bounds.midX,
+//                                                                y: view.bounds.midY,
+//                                                                width: 0,
+//                                                                height: 0)
+//                                    popover.permittedArrowDirections = []
+//                                    $0.preferredContentSize = CGSize(width: 400, height: 300)
+//                                }
+//                            })
+                    )
+//                    .presentationStyle(.automatic)
+                    .unsafeTransition()
+//                    .animate()
+//                    .animation(.ezOpen)
+                
+                tansition.transit()
+                print("open bbb")
+//            }
+//        }
+//        }
+        
+    }
+    
+    required init(){}
+}
+
+extension FirstPacI: EZTransitionControllerProtocol{
+    func transit(context: EZCustomTransitionContext) -> Bool {
+        transitTabBar(context: context)
+    }
+    
+    private func transitNavigation(context: EZCustomTransitionContext) -> Bool{
+        if context.transitionType == .ezNext{
+            return context.fromController.transit
+                .navigationPush(SecondPac())
+                .animate()
+                .completion {
+                    context.completion?()
+                    print("next completion")
+                }
+                .transit()
+        }else if context.transitionType == .ezBack{
+            return context.fromController.transit
+                .navigationPop()
+                .animate()
+                .completion {
+                    context.completion?()
+                    print("back completion")
+                }
+                .transit()
+        }else if context.transitionType == .ezClose{
+            return context.fromController.transit
+                .dismiss()
+                .completion {
+                    context.completion?()
+                    print("close completion")
+                }
+                .transit()
+        }else{ return false }
+    }
+    
+    private func transitTabBar(context: EZCustomTransitionContext) -> Bool{
+        if context.transitionType == .ezNext{
+            return context.fromController.transit
+                .tabBarNext()
+                .animation(.ezShift(direction: .up))
+                .completion {
+                    context.completion?()
+                    print("next completion")
+                }
+                .transit()
+        }else if context.transitionType == .ezBack{
+            return context.fromController.transit
+                .tabBarBack()
+                .animation(.ezShift(direction: .down))
+                .completion {
+                    context.completion?()
+                    print("back completion")
+                }
+                .transit()
+        }else if context.transitionType == .ezClose{
+            return context.fromController.transit
+                .dismiss()
+                .animation(.ezDisappearance(duration: 1))
+                .completion {
+                    context.completion?()
+                    print("close completion")
+                }
+                .transit()
+        }else{ return false }
     }
 }
 
-class FirstPacR: EZUIPacR{
-    var testView: UIView = .init()
+class FirstPacM: EZUIPackM{
+    var packBridge = EZUIPackBridge()
     
-    var cActions = CAction()
-    struct CAction: EZUIPacActionProviderProtocol{
+    var testView: EZContainerView = .init()
+    
+    var iActions = iAction()
+    struct iAction: EZUIPackActionProviderProtocol{
         
     }
     
     var vActions = VAction()
-    struct VAction: EZUIPacActionProviderProtocol{
+    struct VAction: EZUIPackActionProviderProtocol{
         
     }
 }
+ 
+extension UIView{
+    var isPortrait: Bool { bounds.width < bounds.height }
+}
 
-class FirstPacIOSV: EZUIPacV{
-    var supportedOrientations: UIInterfaceOrientationMask { .all }
+class FirstPacIOSV: EZUIPackV{
+    var supportedInterfaceOrientations: UIInterfaceOrientationMask? { .all }
     
-    var router: FirstPacR!
-    
-    func didRotate(oldOrientation: UIInterfaceOrientation, newOrientation: UIInterfaceOrientation) {
-//        router.testView.frame.size = newOrientation.isPortrait == true ?
-//            .init(width: 300, height: 500) :
-//            .init(width: 500, height: 300)
-        
-        router.testView.center.x = bounds.midX
-        router.testView.center.y = bounds.midY
-    }
-    
-    func didResize() {
-        router.testView.center.x = bounds.midX
-        router.testView.center.y = bounds.midY
-    }
+    var mediator: FirstPacM!
     
     func create() {
         createSelf()
+        createTestView()
+    }
+    
+    func willOpen() {
+        print("FirstPacIOSV", "willOpen", frame)
+    }
+    
+    func animateOpen() {
+        print("FirstPacIOSV", "animateOpen", frame)
+    }
+    
+    func didOpen() {
+        print("FirstPacIOSV", "didOpen", frame)
+    }
         
-        resize()
-        addSubview(router.testView)
-    }
-    
-    func resize(){
-        self.router.testView.backgroundColor = .black
-        self.router.testView.frame.size = router.stateStorage.currentOrientation?.isPortrait == true ? .init(width: 300, height: 500) : .init(width: 500, height: 300)
-        self.router.testView.center.x = self.bounds.midX
-        self.router.testView.center.y = self.bounds.midY
-    }
-    
     private func createSelf(){
         backgroundColor = .blue
-//        let aa = UIView()
-//        aa.backgroundColor.updateSelf(new: #colorLiteral(red: 0.09803921569, green: 0.09803921569, blue: 0.09803921569, alpha: 1))
-//        addSubview(aa)
-       
-//        EZAssociated(c).setDeinitObserver {
-//            print("C i die")
-//        }
-//
-//        EZAssociated(aa).setDeinitObserver {
-//            print("i die")
-//        }
-//
-        
-        let testView = UIView()
-        testView.frame.size.width = 200
-        testView.frame.size.height = 200
-        testView.backgroundColor = .black
-        addSubview(testView)
+    }
+    
+    private func createTestView(){
+        addSubview(mediator.testView)
+        mediator.testView.translatesAutoresizingMaskIntoConstraints = false
+        mediator.testView.layer.masksToBounds = true
+        mediator.testView.isUserInteractionEnabled = false
+        NSLayoutConstraint.activate([
+            mediator.testView.centerXAnchor.constraint(equalTo: centerXAnchor),
+            mediator.testView.centerYAnchor.constraint(equalTo: centerYAnchor),
+            mediator.testView.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 0.5),
+            mediator.testView.heightAnchor.constraint(equalTo: heightAnchor, multiplier: 0.5)
+        ])
+        mediator.testView.presentationStatusDidUpdateAction = {view, status in
+            view.isUserInteractionEnabled = status
+        }
     }
 }
 

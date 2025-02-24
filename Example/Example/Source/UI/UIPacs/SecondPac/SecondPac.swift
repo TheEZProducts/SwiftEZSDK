@@ -6,72 +6,118 @@
 //
 
 import UIKit
-import EZUIPacKit
+import EZUIPackKit
 import EZSwiftUIBridgeKit
 import EZObservableKit
 import SwiftUI
 
-typealias SecondPac = EZUIPac<SecondPacC, SecondPacR, SecondPacSV>
+typealias SecondPac = EZUIPack<SecondPacI, SecondPacM, SecondPacSV>
 
-func setUIInterfaceOrientation(_ value: UIInterfaceOrientation) {
-    UIDevice.current.setValue(value.rawValue, forKey: "orientation")
-}
-
-class SecondPacC: EZUIPacC{
-    override var supportedInterfaceOrientations: UIInterfaceOrientationMask { .all }
-    var router: SecondPacR!
+class SecondPacI: EZUIPackI{
+    var mediator: SecondPacM!
     
-    func close() {
-        print("close")
-    }
     
-    func initActions() {
-        cActions.next = {[weak self] in
-            print(self)
-            self?.next()
-        }
-        cActions.back = {[weak self] in self?.back()}
+    
+    func setupActions() {
+        iActions.next = {[weak self] in self?.next() }
+        iActions.back = {[weak self] in self?.back() }
+        iActions.close = {[weak self] in self?.close() }
     }
     
     func start() {
         print("C - start")
         
-//        _ = Timer.scheduledTimer(withTimeInterval: 5, repeats: false, block: {[weak self] _ in
-//            self?.transit()
-//        })
+        _ = Timer.scheduledTimer(withTimeInterval: 1, repeats: true, block: {[weak self] _ in
+            Task{@MainActor in
+                self?.mediator.count += 1
+            }
+        })
     }
     
     private func next(){
-        pack?.instead.pack(SecondPac()).archive().transit()
+        print("next")
+//        transit
+////            .tabBarNext()
+//            .navigationPush(SecondPac())
+//            .animate()
+////            .animation(.ezOpen)
+//            .transit()
+        
+        transit
+            .custom()
+            .transitionType(.ezNext)
+            .animate()
+            .transit()
     }
+    
     private func back(){
-//        pack?.rootWindow?.rootUIPac = nil
-        pack?.back.animation(.ezAnim).transit()
+        print("back")
+//        transit
+//            .navigationPop()
+////            .tabBarBack()
+////            .animation(.ezClose)
+////            .navigationPop()
+//            .animate()
+//            .transit()
+        
+        transit
+            .custom()
+            .transitionType(.ezBack)
+            .animate()
+            .transit()
     }
+    
+    private func close(){
+        print("close")
+        transit
+            .custom()
+            .transitionType(.ezClose)
+            .animate()
+            .transit()
+    }
+    
+    required init(){}
 }
 
-class SecondPacR: EZUIPacR{
+
+
+class SecondPacM: EZUIPackM{
+    var packBridge = EZUIPackBridge()
+    
     var color: Color = Color(uiColor: .init(red: .random(in: 0...1), green: .random(in: 0...1), blue: .random(in: 0...1), alpha: 1))
     @Published var count: Int = 0
     @Published var count1: Bool = false
     
-    var cActions = CAction()
-    struct CAction: EZUIPacActionProviderProtocol{
+    var iActions = IAction()
+    struct IAction: EZUIPackActionProviderProtocol{
         var next = {}
         var back = {}
+        var close = {}
     }
     
     var vActions = VAction()
-    struct VAction: EZUIPacActionProviderProtocol{
-        
+    struct VAction: EZUIPackActionProviderProtocol{
+        var next = {}
     }
 }
 
-class SecondPacV: EZUIPacV{
-    var router: SecondPacR!
+class SecondPacV: EZUIPackV{
+    var supportedInterfaceOrientations: UIInterfaceOrientationMask? { .all }
+    
+    var mediator: SecondPacM!
+    
+    func animateOpen() {
+        print("aaaaa")
+    }
     
     func create() {
+        print("huh", frame,  UIView.inheritedAnimationDuration)
         createSelf()
+    }
+    
+    func didOpen() {
+        print("huh1", frame)
+        print()
     }
     
     private func createSelf(){
@@ -95,58 +141,114 @@ class MyViewStates: ObservableObject{
     }
 }
 
-struct SecondPacSV: EZUIPacSV{
-    var supportedOrientations: UIInterfaceOrientationMask { .all }
-    var router: SecondPacR!
+class SecondPacSV1: UIView, EZUIPackSV{
+    var mediator: SecondPacM!
+    
     var viewStorage = MyViewStates()
+    var additionalObservableObjects: [any ObservableObject] {[viewStorage]}
+    
+    var body: some View{
+        ZStack{
+            mediator.color
+            VStack{
+                Button{[mediator] in
+                    mediator?.count += 1
+                } label: {
+                    Text("up")
+                }
+                Text("hello \(mediator.count)")
+                
+                Button{[viewStorage] in
+                    viewStorage.test += 1
+                } label: {
+                    Text("up 1")
+                }
+                Text("hello1 \(viewStorage.test)")
+            }
+        }
+    }
+}
+
+struct SecondPacSV: View, EZUIPackSV{
+    var supportedInterfaceOrientations: UIInterfaceOrientationMask? { .all }
+    var mediator: SecondPacM!
+    
+    @ObservedObject var viewStorage1 = MyViewStates()
     
     @Environment(\.colorScheme) var color
     @State var count: Int = 0
-
-    func didRotate(oldOrientation: UIInterfaceOrientation, newOrientation: UIInterfaceOrientation) {
-        viewStorage.isPortrait = newOrientation.isPortrait
+    
+    func create() {
+        print("create", uiView?.bounds, parentShered[.mainPackMChain.test])
+        print("huh", UIView.inheritedAnimationDuration)
     }
     
-    func open() {
-        viewStorage.isPortrait = stateStorage.currentOrientation?.isPortrait ?? true
+    func willOpen() {
+        print("willOpen", uiView?.bounds)
     }
-
+    
+    func animateOpen() {
+        print("animateOpen", uiView?.bounds)
+        print("huh1", UIView.inheritedAnimationDuration)
+    }
+    
+    func didOpen() {
+        print("didOpen", uiView?.bounds)
+    }
+    
+    func gsdg() -> Bool{
+        return uiView?.isPortrait ?? false
+    }
+    
     var body: some View{
 //        ContentView(content: "Test")
             
         ZStack {
-            router.color
-            TestR(bool: viewStorage.isPortrait){
+            mediator.color
+            TestR(bool: gsdg()){
                 Spacer()
+            
                 Button{
-                    cActions.next()
-                } label: {
-                    Text("Next")
-                }
-
-                Button{
-                    cActions.back()
+                    iActions.back()
                 } label: {
                     Text("Back")
+                }
+                
+                Button{
+                    print("tut")
+                    iActions.next()
+                } label: {
+                    Text("Next")
                 }
                 Spacer()
         //                MyView(router: router).id(router.count1)
                     //.onReceive(router.$count1, perform: {_ in})
                 //.update(count: router.count)
                 Button{
-                    stateStorage.pack?.rootWindow?.windowScene?.requestGeometryUpdate(.iOS(interfaceOrientations: .portrait))
+                    iActions.close()
+                    //packBridge.pack?.rootWindow?.windowScene?.requestGeometryUpdate(.iOS(interfaceOrientations: .portrait))
                 } label: {
                     Text("Test")
                 }
                 Button{
-                    viewStorage.placeTocken.view = AnyView(ContentView(content: "Test"))
+                    viewStorage1.placeTocken.view = AnyView(ContentView(content: "Test"))
                 } label: {
                     Text("Change Place")
                 }
                 Text(String("\(color)"))
-                TestView()
-                ContentView(content: "Test")
-//                Place(viewStorage.placeTocken)
+                Button{
+                    viewStorage1.test += 1
+                } label: {
+                    Text("\(viewStorage1.test)")
+                }
+                
+                Button{
+                    viewStorage1.test += 1
+                } label: {
+                    Text("\(viewStorage1.test)")
+                }
+//                ContentView(content: "Test")
+                Place(viewStorage1.placeTocken)
                 Spacer()
 
 
@@ -156,7 +258,7 @@ struct SecondPacSV: EZUIPacSV{
         
     }
     
-
+    init(){}
 }
 
 struct TestR<V: View>: View{
@@ -175,7 +277,6 @@ struct TestR<V: View>: View{
     }
 }
 
-var couter: Int = 0
 struct TestView: View{
 //    @Environment(\.colorScheme) var color
     
@@ -191,7 +292,6 @@ struct TestView: View{
         }
     }
 }
-
 
 class PlaceTocken: ObservableObject{
     @Published var view: AnyView?

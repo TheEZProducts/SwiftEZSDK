@@ -6,14 +6,14 @@
 //
 
 import UIKit
-import EZUIPacKit
+import EZUIPackKit
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         
-        EZUIPacWindow.needToPerform = .init(FirstPac())
+        //EZUIPackWindow.needToPerform = .init(FirstPac())
         
         return true
     }

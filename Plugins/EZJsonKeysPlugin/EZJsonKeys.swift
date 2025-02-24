@@ -14,20 +14,20 @@ struct EZJsonKeysPlugin: BuildToolPlugin {
     func createBuildCommands(context: PluginContext, target: Target) async throws -> [Command] {
         guard let target = target as? SourceModuleTarget else { return [] }
 
-        let outputDirectoryPath = context.pluginWorkDirectory.appending(subpath: target.name)
-        try FileManager.default.createDirectory(atPath: outputDirectoryPath.string, withIntermediateDirectories: true)
-        let filePath = outputDirectoryPath.appending(subpath: "EZJsonKeysPlugin.generated.swift")
+        let outputDirectoryPath = context.pluginWorkDirectoryURL.appending(path: target.name)
+        try FileManager.default.createDirectory(atPath: outputDirectoryPath.path(), withIntermediateDirectories: true)
+        let filePath = outputDirectoryPath.appending(path: "EZJsonKeysPlugin.generated.swift")
         
        
         let sourceFiles = target.sourceFiles
-            .filter { $0.path.string.hasSuffix(".ez.json") }
-            .map(\.path)
+            .filter { $0.url.path().hasSuffix(".ez.json") }
+            .map{ $0.url.path() }
 
         return [
             .buildCommand(
                 displayName: "Generate Code",
-                executable: try context.tool(named: "EZJsonKeysGenerator").path,
-                arguments: [filePath] + sourceFiles,
+                executable: try context.tool(named: "EZJsonKeysGenerator").url,
+                arguments: [filePath.path()] + sourceFiles,
                 environment: [:],
                 inputFiles: [],
                 outputFiles: [filePath])
@@ -41,26 +41,27 @@ import XcodeProjectPlugin
 @available(macOS 13.0, *)
 extension EZJsonKeysPlugin: XcodeBuildToolPlugin {
     func createBuildCommands(context: XcodePluginContext, target: XcodeTarget) throws -> [Command] {
-        let outputDirectoryPath = context.pluginWorkDirectory
-            .appending(subpath: target.displayName)
-            .appending(subpath: "Resources")
+        let outputDirectoryPath = context.pluginWorkDirectoryURL
+            .appending(path: target.displayName)
+            .appending(path: "Resources")
 
-        try FileManager.default.createDirectory(atPath: outputDirectoryPath.string, withIntermediateDirectories: true)
-        let filePath = outputDirectoryPath.appending(subpath: "EZJsonKeysPlugin.generated.swift")
+        try FileManager.default.createDirectory(atPath: outputDirectoryPath.path(), withIntermediateDirectories: true)
+        let filePath = outputDirectoryPath.appending(path: "EZJsonKeysPlugin.generated.swift")
         
        
         let sourceFiles = target.inputFiles
-            .filter { $0.path.string.hasSuffix(".ez.json") }
-            .map(\.path)
+            .filter { $0.url.path().hasSuffix(".ez.json") }
+            .map{ $0.url.path() }
 
         return [
             .buildCommand(
                 displayName: "Generate Code",
-                executable: try context.tool(named: "EZJsonKeysGenerator").path,
-                arguments: [filePath] + sourceFiles,
+                executable: try context.tool(named: "EZJsonKeysGenerator").url,
+                arguments: [filePath.path()] + sourceFiles,
                 environment: [:],
                 inputFiles: [],
-                outputFiles: [filePath])
+                outputFiles: [filePath]
+            )
         ]
     }
 }

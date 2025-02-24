@@ -8,7 +8,7 @@
 import XCTest
 import EZThreadSafetyKit
 
-final class EZThreadSafetyTest: XCTestCase {
+final class EZThreadSafetyTest: XCTestCase, @unchecked Sendable {
     @EZThreadSafety var testValue: String = "Hello"
     
     @available(iOS 13.0.0, *)
