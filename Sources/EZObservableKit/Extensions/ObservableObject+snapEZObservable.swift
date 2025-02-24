@@ -22,5 +22,12 @@ extension ObservableObject{
     public func snapEZObservable(_ observers: EZObservableProtocol...){
         snapEZObservable(observers)
     }
+    
+    public func snapEZObservable(){
+        let mirror = Mirror(reflecting: self)
+        snapEZObservable(
+            mirror.children.compactMap{ $0.value as? EZObservableProtocol }
+        )
+    }
 }
 #endif
