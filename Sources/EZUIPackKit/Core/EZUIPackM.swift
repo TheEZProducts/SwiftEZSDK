@@ -63,6 +63,7 @@ extension EZUIPackWithMediatorProtocol{
     }
 }
 
+@MainActor
 open class EZUIPackMediator{
     required public init(){}
 }
