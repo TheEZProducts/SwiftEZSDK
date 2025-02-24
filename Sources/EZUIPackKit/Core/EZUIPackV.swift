@@ -118,38 +118,6 @@ extension EZUIPackUIViewProtocol{
 public typealias EZUIPackV = EZView & EZUIPackUIViewProtocol
 #endif
 
-//#if canImport(SwiftUI)
-//@MainActor
-//@available(macOS 10.15, iOS 13.0, tvOS 13.0, *)
-//public protocol EZUIPackSViewProtocol: View, EZUIPackViewProtocol, Equatable{
-//
-//    init()
-//}
-//
-//@available(macOS 10.15, iOS 13.0, tvOS 13.0, *)
-//extension EZUIPackSViewProtocol{
-//    nonisolated
-//    public static func ==(l: Self, r: Self) -> Bool{ false }
-//    
-//    public var bMediator: Binding<Mediator> { .constant(mediator) }
-//}
-// 
-//@available(macOS 10.15, iOS 13.0, tvOS 13.0, *)
-//extension EZUIPackSViewProtocol {
-//    public var uiView: EZView? { packBridge.pack?.view }
-//    
-//    public func getView() -> EZView {
-//        if let observObj = mediator as? (any ObservableObject){
-//            return .ezWrap(EZObservableObjectGroup(observObj)){ self }
-//        }else{
-//            return .ezWrap(view: self)
-//        }
-//    }
-//}
-//
-//@available(macOS 10.15, iOS 13.0, tvOS 13.0, *)
-//public typealias EZUIPackSV = EZUIPackSViewProtocol
-//#endif
 
 #if canImport(SwiftUI)
 @MainActor
@@ -229,13 +197,10 @@ extension EZUIPackSViewProtocol where Self: EZView {
 }
 
 @available(macOS 10.15, iOS 13.0, tvOS 13.0, *)
-public typealias EZUIPackSV = EZUIPackSViewProtocol
+public typealias EZUIPackSV = View & EZUIPackSViewProtocol
 
 @available(macOS 10.15, iOS 13.0, tvOS 13.0, *)
-public typealias EZUIPackSView = View & EZUIPackSV
-
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, *)
-public typealias EZUIPackSUIView = UIView & EZUIPackSV
+public typealias EZUIPackSUIV = UIView & EZUIPackSViewProtocol
 #endif
 
 
