@@ -6,7 +6,6 @@
 //
 
 import UIKit
-import EZAssociatedKit
 
 extension EZTransition<UIViewController>{
     public func custom() -> EZCustomTransition {

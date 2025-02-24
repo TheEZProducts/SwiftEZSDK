@@ -140,10 +140,28 @@ extension EZSharedKey{
     static var mainPackMChain: EZSharedKeyChain<MainPackM> { .init() }
 }
 
+@MainActor
+struct DGsg{
+    var test: Int = 10
+}
+
 class MainPackM: EZUIPackM{
     var packBridge = EZUIPackBridge()
     
     var test: Int = 10
+    
+    var sdf: DGsg
+    
+    
+    init(test: DGsg){
+        self.sdf = test
+        super.init()
+    }
+    
+    required init() {
+        sdf = .init()
+        super.init()
+    }
     
     weak var iActions: IActionProvider?
     @MainActor protocol IActionProvider: AnyObject{
