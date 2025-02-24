@@ -163,62 +163,62 @@ extension FirstPacI: EZTransitionControllerProtocol{
     
     private func transitNavigation(context: EZCustomTransitionContext) -> Bool{
         if context.transitionType == .ezNext{
-            return context.fromController.transit
+            return context.fromController?.transit
                 .navigationPush(SecondPac())
                 .animate()
                 .completion {
                     context.completion?()
                     print("next completion")
                 }
-                .transit()
+                .transit() ?? false
         }else if context.transitionType == .ezBack{
-            return context.fromController.transit
+            return context.fromController?.transit
                 .navigationPop()
                 .animate()
                 .completion {
                     context.completion?()
                     print("back completion")
                 }
-                .transit()
+                .transit() ?? false
         }else if context.transitionType == .ezClose{
-            return context.fromController.transit
+            return context.fromController?.transit
                 .dismiss()
                 .completion {
                     context.completion?()
                     print("close completion")
                 }
-                .transit()
+                .transit() ?? false
         }else{ return false }
     }
     
     private func transitTabBar(context: EZCustomTransitionContext) -> Bool{
         if context.transitionType == .ezNext{
-            return context.fromController.transit
+            return context.fromController?.transit
                 .tabBarNext()
                 .animation(.ezShift(direction: .up))
                 .completion {
                     context.completion?()
                     print("next completion")
                 }
-                .transit()
+                .transit() ?? false
         }else if context.transitionType == .ezBack{
-            return context.fromController.transit
+            return context.fromController?.transit
                 .tabBarBack()
                 .animation(.ezShift(direction: .down))
                 .completion {
                     context.completion?()
                     print("back completion")
                 }
-                .transit()
+                .transit() ?? false
         }else if context.transitionType == .ezClose{
-            return context.fromController.transit
+            return context.fromController?.transit
                 .dismiss()
                 .animation(.ezDisappearance(duration: 1))
                 .completion {
                     context.completion?()
                     print("close completion")
                 }
-                .transit()
+                .transit() ?? false
         }else{ return false }
     }
 }

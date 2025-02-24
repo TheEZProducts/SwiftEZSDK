@@ -11,12 +11,38 @@ extension EZTransition<UIViewController>{
     public func custom() -> EZCustomTransition {
         .init(container: container)
     }
+    
+    public func customTo(controller: UIViewController) -> EZCustomTransition {
+        .init(container: container, toController: controller)
+    }
+    
+    public func customTo(index: Int) -> EZCustomTransition {
+        .init(container: container, toIndex: index)
+    }
+}
+
+extension EZTransition where Container: EZTransitionControllerProtocol{
+    public func custom() -> EZCustomTransition {
+        .init(transitionController: container)
+    }
+    
+    public func customTo(controller: UIViewController) -> EZCustomTransition {
+        .init(transitionController: container, toController: controller)
+    }
+    
+    public func customTo(index: Int) -> EZCustomTransition {
+        .init(transitionController: container, toIndex: index)
+    }
 }
 
 @MainActor
 public protocol EZTransitionControllerProtocol: AnyObject{
     @discardableResult
     func transit(context: EZCustomTransitionContext) -> Bool
+}
+
+extension EZTransitionControllerProtocol{
+    public var transition: EZTransition<Self> { .init(container: self) }
 }
 
 @MainActor
@@ -124,7 +150,8 @@ public enum EZTransitionControllerDelegateSearchType{
 
 //MARK: - EZNavigationTransitionContext
 public struct EZCustomTransitionContext: EZTransitionContextProtocol{
-    public var fromController: UIViewController
+    public var transitionController: EZTransitionControllerProtocol?
+    public var fromController: UIViewController?
     public var toController: UIViewController?
     public var toIndex: Int?
     
@@ -234,7 +261,14 @@ public struct EZCustomTransition: EZTransitionProtocol{
         container: UIViewController,
         toController: UIViewController? = nil
     ) {
-        self.context = .init(fromController: container, toController: container)
+        self.context = .init(fromController: container, toController: toController)
+    }
+    
+    public init(
+        transitionController: EZTransitionControllerProtocol,
+        toController: UIViewController? = nil
+    ) {
+        self.context = .init(transitionController: transitionController, toController: toController)
     }
     
     @_disfavoredOverload
@@ -245,11 +279,25 @@ public struct EZCustomTransition: EZTransitionProtocol{
         self.context = .init(fromController: container, toIndex: toIndex)
     }
     
+    @_disfavoredOverload
+    public init(
+        transitionController: EZTransitionControllerProtocol,
+        toIndex: Int? = nil
+    ) {
+        self.context = .init(transitionController: transitionController, toIndex: toIndex)
+    }
+    
     @MainActor
     @discardableResult
     public func transit() -> Bool {
-        context.transitionDelegateSearchType
-            .search(to: context.fromController)?
-            .transit(context: context) ?? false
+        if let transitionController = context.transitionController{
+            return transitionController.transit(context: context)
+        }else if let fromController = context.fromController{
+            return context.transitionDelegateSearchType
+                .search(to: fromController)?
+                .transit(context: context) ?? false
+        }else {
+            return false
+        }
     }
 }
