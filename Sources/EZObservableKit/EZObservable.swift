@@ -8,14 +8,16 @@
 import Foundation
 import Combine
 
-public protocol EZObservableProtocol{
+public protocol EZObservableProtocol<Value>{
+    associatedtype Value
+    
     @discardableResult
     func signal(_ type: EZSetType) -> Self
     
     @discardableResult
     func unknownAdd(
         wrapper: EZObserverWrapperProtocol?,
-        action: @escaping (EZObserverValueProtocol) -> ()
+        action: @escaping (any EZObserverValueProtocol<Value>) -> ()
     ) -> EZObserverTokenProtocol
 }
 
@@ -64,7 +66,7 @@ public struct EZObservable<Value>: Sendable, EZObservableProtocol{
     @discardableResult
     public func unknownAdd(
         wrapper: EZObserverWrapperProtocol? = nil,
-        action: @escaping (EZObserverValueProtocol) -> ()
+        action: @escaping (any EZObserverValueProtocol<Value>) -> ()
     ) -> EZObserverTokenProtocol{
         add(wrapper: wrapper) { action($0) }
     }

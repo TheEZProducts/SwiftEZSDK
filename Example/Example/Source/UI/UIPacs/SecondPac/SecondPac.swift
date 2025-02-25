@@ -141,7 +141,7 @@ class MyViewStates: ObservableObject{
     }
 }
 
-class SecondPacSV1: UIView, EZUIPackSV{
+class SecondPacSV1: EZUIPackSUIV{
     var mediator: SecondPacM!
     
     var viewStorage = MyViewStates()
@@ -169,7 +169,7 @@ class SecondPacSV1: UIView, EZUIPackSV{
     }
 }
 
-struct SecondPacSV: View, EZUIPackSV{
+struct SecondPacSV: EZUIPackSV{
     var supportedInterfaceOrientations: UIInterfaceOrientationMask? { .all }
     var mediator: SecondPacM!
     

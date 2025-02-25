@@ -7,7 +7,11 @@
 
 import Foundation
 
-public protocol EZObserverValueProtocol{
+public protocol EZObserverValueProtocol<Value>{
+    associatedtype Value
+    var old: Value { get }
+    var new: Value { get }
+    
     var wrapper: EZObserverWrapperProtocol? { get }
 }
 

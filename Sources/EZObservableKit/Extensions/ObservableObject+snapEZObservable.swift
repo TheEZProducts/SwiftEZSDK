@@ -11,22 +11,23 @@ import Combine
 
 @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension ObservableObject{
-    public func snapEZObservable(_ observers: [EZObservableProtocol]){
+    public func snapEZObservable(_ observers: [any EZObservableProtocol]){
+        guard let objectWillChange = objectWillChange as? ObservableObjectPublisher else { return }
         observers.forEach {
-            $0.unknownAdd(wrapper: nil) {[weak self] _ in
-                (self?.objectWillChange as? ObservableObjectPublisher)?.send()
+            $0.unknownAdd(wrapper: nil) {_ in
+                objectWillChange.send()
             }.snapToObject(self)
         }
     }
     
-    public func snapEZObservable(_ observers: EZObservableProtocol...){
+    public func snapEZObservable(_ observers: any EZObservableProtocol...){
         snapEZObservable(observers)
     }
     
     public func snapEZObservable(){
         let mirror = Mirror(reflecting: self)
         snapEZObservable(
-            mirror.children.compactMap{ $0.value as? EZObservableProtocol }
+            mirror.children.compactMap{ $0.value as? (any EZObservableProtocol) }
         )
     }
 }
