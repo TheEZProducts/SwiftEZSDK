@@ -21,6 +21,8 @@ public protocol EZUIPackProtocol: UIViewController, EZTransitionControlledProtoc
     var storage: EZUIPackStorage<Controller, Mediator, View> { get set }
     
     func didInitialize()
+    
+    init(mediator: Mediator)
 }
 
 extension EZUIPackProtocol{
@@ -194,7 +196,7 @@ open class EZUIPack<
         storage.interactor.keyCommands
     }
     
-    public init(mediator: M) {
+    required public init(mediator: M) {
         storage = .init(mediator: mediator)
         super.init(nibName: nil, bundle: nil)
         storage.setupPack(pack: self)

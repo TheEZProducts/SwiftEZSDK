@@ -101,7 +101,7 @@ open class EZUITabBarPack<
         }
     }
     
-    public init(mediator: M) {
+    required public init(mediator: M) {
         storage = .init(mediator: mediator)
         super.init(nibName: nil, bundle: nil)
         storage.setupPack(pack: self)

@@ -62,6 +62,16 @@ open class EZUIPagePack<
         storage.interactor.keyCommands
     }
     
+    required public init(mediator: M) {
+        storage = .init(mediator: mediator)
+        super.init(
+            transitionStyle: .scroll,
+            navigationOrientation: .horizontal,
+            options: nil
+        )
+        storage.setupPack(pack: self)
+    }
+    
     public init(
         transitionStyle style: UIPageViewController.TransitionStyle,
         navigationOrientation: UIPageViewController.NavigationOrientation,
