@@ -83,20 +83,31 @@ open class EZUITabBarPack<
         storage.interactor.keyCommands
     }
     
-    public var delegateWrapperBySelectedIndex: Bool = false
-    open override var selectedIndex: Int {
+    private var delegateWrapper: EZUITabBarControllerDelegate?
+    open override var selectedViewController: UIViewController? {
         willSet{
             if delegate is EZUITabBarControllerDelegate { return }
-            delegateWrapperBySelectedIndex = true
             let wrapper = EZUITabBarControllerDelegate(delegate: delegate)
+            delegateWrapper = wrapper
             delegate = wrapper
         }
         didSet{
-            guard
-                let wrapper = delegate as? EZUITabBarControllerDelegate,
-                delegateWrapperBySelectedIndex
-            else { return }
-            delegateWrapperBySelectedIndex = false
+            guard let wrapper = delegateWrapper else { return }
+            delegateWrapper = nil
+            delegate = wrapper.delegate
+        }
+    }
+    
+    open override var selectedIndex: Int {
+        willSet{
+            if delegate is EZUITabBarControllerDelegate { return }
+            let wrapper = EZUITabBarControllerDelegate(delegate: delegate)
+            delegateWrapper = wrapper
+            delegate = wrapper
+        }
+        didSet{
+            guard let wrapper = delegateWrapper else { return }
+            delegateWrapper = nil
             delegate = wrapper.delegate
         }
     }
