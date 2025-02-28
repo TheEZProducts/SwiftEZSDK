@@ -97,7 +97,7 @@ protocol EZNavigationTransitionProtocol: EZTransitionProtocol<EZChildTransitionC
 extension EZTransitionProtocol<EZChildTransitionContext>{
     @MainActor
     @discardableResult
-    public func transit() async -> Bool {
+    public func asyncTransit() async -> Bool {
         await withCheckedContinuation { continuation in
             var continuation = Optional(continuation)
             let transition = completion {[completion = context._completion] in

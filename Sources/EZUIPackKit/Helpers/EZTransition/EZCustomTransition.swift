@@ -237,7 +237,7 @@ protocol EZCustomTransitionProtocol: EZTransitionProtocol<EZCustomTransitionCont
 extension EZTransitionProtocol<EZCustomTransitionContext>{
     @MainActor
     @discardableResult
-    public func transit() async -> Bool {
+    public func asyncTransit() async -> Bool {
         await withCheckedContinuation { continuation in
             var continuation = Optional(continuation)
             let transition = completion {[completion = context.completion] in

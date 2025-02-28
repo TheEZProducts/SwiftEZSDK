@@ -90,7 +90,7 @@ protocol EZBaseTransitionProtocol: EZTransitionProtocol<EZBaseTransitionContext>
 extension EZTransitionProtocol<EZBaseTransitionContext>{
     @MainActor
     @discardableResult
-    public func transit() async -> Bool {
+    public func asyncTransit() async -> Bool {
         await withCheckedContinuation { continuation in
             var continuation = Optional(continuation)
             let transition = completion {[completion = context._completion] in
