@@ -85,7 +85,7 @@ extension EZObservable{
     public func handler<NewValue>(wrapper: EZObserverWrapperProtocol? = nil, handler: @escaping (Value) -> (NewValue)) -> EZObservable<NewValue>{
         let hand = EZObserversStorage(value: handler(wrappedValue))
         let token = add(wrapper: nil) {[weak hand] in hand?.set(value: handler($0.new), .common) }
-        hand.anchor = token.anchorObject
+        hand.anchor.update { $0 = token.anchorObject }
         return .init(storage: hand)
     }
 }

@@ -7,7 +7,7 @@
 
 import XCTest
 import EZChannelKit
-import EZThreadSafetyKit
+import EZAsyncKit
 
 final class EZChannelKitTest: XCTestCase {
     @available(watchOS 6.0, *)

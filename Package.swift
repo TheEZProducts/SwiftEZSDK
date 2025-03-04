@@ -9,7 +9,7 @@ let package = Package(
         //MARK: - Stable
         .library(name: "All", targets: [EZKit.name]),
         .library(name: EZAssociatedKit.name, targets: [EZAssociatedKit.name]),
-        .library(name: EZThreadSafetyKit.name, targets: [EZThreadSafetyKit.name]),
+        .library(name: EZAsyncKit.name, targets: [EZAsyncKit.name]),
         .library(name: EZObservableKit.name, targets: [EZObservableKit.name]),
         .library(name: EZBuilderKit.name, targets: [EZBuilderKit.name]),
         .library(name: EZSwiftUIBridgeKit.name, targets: [EZSwiftUIBridgeKit.name]),
@@ -25,7 +25,7 @@ let package = Package(
             name: EZKit.name,
             dependencies: [
                 .target(name: EZAssociatedKit.name, condition: EZAssociatedKit.condition),
-                .target(name: EZThreadSafetyKit.name, condition: EZThreadSafetyKit.condition),
+                .target(name: EZAsyncKit.name, condition: EZAsyncKit.condition),
                 .target(name: EZObservableKit.name, condition: EZObservableKit.condition),
                 .target(name: EZBuilderKit.name, condition: EZBuilderKit.condition),
                 .target(name: EZSwiftUIBridgeKit.name, condition: EZSwiftUIBridgeKit.condition),
@@ -44,15 +44,15 @@ let package = Package(
             ]
         ),
         
-        //MARK: - EZThreadSafetyKit
+        //MARK: - EZAsyncKit
         .target(
-            name: EZThreadSafetyKit.name,
+            name: EZAsyncKit.name,
             dependencies: []
         ),
         .testTarget(
-            name: EZThreadSafetyKit.testName,
+            name: EZAsyncKit.testName,
             dependencies: [
-                .target(name: EZThreadSafetyKit.name)
+                .target(name: EZAsyncKit.name)
             ]
         ),
         
@@ -61,7 +61,7 @@ let package = Package(
             name: EZObservableKit.name,
             dependencies: [
                 .target(name: EZAssociatedKit.name, condition: EZAssociatedKit.condition),
-                .target(name: EZThreadSafetyKit.name, condition: EZThreadSafetyKit.condition)
+                .target(name: EZAsyncKit.name, condition: EZAsyncKit.condition)
             ]
         ),
         .testTarget(
@@ -146,8 +146,8 @@ struct EZAssociatedKit: EZTargetProtocol{
     static var condition: TargetDependencyCondition? {.when(platforms: [.iOS, .macCatalyst, .macOS, .tvOS, .watchOS])}
 }
 
-//MARK: EZThreadSafetyKit
-struct EZThreadSafetyKit: EZTargetProtocol{}
+//MARK: EZAsyncKit
+struct EZAsyncKit: EZTargetProtocol{}
 
 //MARK: EZObservableKit
 struct EZObservableKit: EZTargetProtocol{}

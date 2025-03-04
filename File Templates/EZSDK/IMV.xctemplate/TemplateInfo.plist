@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>SupportsSwiftPackage</key>
+	<true/>
+	<key>Kind</key>
+	<string>Xcode.IDEFoundation.TextSubstitutionFileTemplateKind</string>
+	<key>Description</key>
+	<string>An empty Swift file.</string>
+	<key>Summary</key>
+	<string>An empty Swift file</string>
+	<key>SortOrder</key>
+	<string>1</string>
+	<key>AllowedTypes</key>
+	<array>
+		<string>public.swift-source</string>
+	</array>
+	<key>Platforms</key>
+	<array/>
+	<key>Options</key>
+	<array>
+		<dict>
+			<key>Identifier</key>
+			<string>productName</string>
+			<key>Required</key>
+			<true/>
+			<key>Name</key>
+			<string>Module:</string>
+			<key>Description</key>
+			<string>The name of the IMV Pack</string>
+			<key>Type</key>
+			<string>text</string>
+			<key>Default</key>
+			<string>IMVPack</string>
+		</dict>
+		<dict>
+			<key>Identifier</key>
+			<string>IPhone</string>
+			<key>Name</key>
+			<string>iOSV</string>
+			<key>Description</key>
+			<string>Create IPhone view</string>
+			<key>Type</key>
+			<string>checkbox</string>
+			<key>RequiredOptions</key>
+			<dict>
+				<key>type</key>
+				<array>
+					<string>IPad</string>
+					<string>Mac</string>
+					<string>Non</string>
+				</array>
+			</dict>
+		</dict>
+		<dict>
+			<key>Identifier</key>
+			<string>IPad</string>
+			<key>Name</key>
+			<string>iPadOSV</string>
+			<key>Description</key>
+			<string>Create IPad view</string>
+			<key>Type</key>
+			<string>checkbox</string>
+			<key>RequiredOptions</key>
+			<dict>
+				<key>type</key>
+				<array>
+					<string>Mac</string>
+					<string>IPhone</string>
+					<string>Non</string>
+				</array>
+			</dict>
+		</dict>
+		<dict>
+			<key>Identifier</key>
+			<string>Mac</string>
+			<key>Name</key>
+			<string>MacCatalystV</string>
+			<key>Description</key>
+			<string>Create mac view</string>
+			<key>Type</key>
+			<string>checkbox</string>
+			<key>RequiredOptions</key>
+			<dict>
+				<key>type</key>
+				<array>
+					<string>IPad</string>
+					<string>IPhone</string>
+					<string>Non</string>
+				</array>
+			</dict>
+		</dict>
+	</array>
+</dict>
+</plist>

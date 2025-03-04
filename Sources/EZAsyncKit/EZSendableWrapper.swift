@@ -1,18 +1,28 @@
 //
-//  File.swift
-//  
+//  EZSendableWrapper.swift
+//  EZSDK
 //
-//  Created by Александр Сенин on 29.05.2023.
+//  Created by Александр Сенин on 04.03.2025.
 //
 
 import Foundation
 
+public struct EZUnsafeSendableWrapper<Value>: @unchecked Sendable {
+    public var value: Value
+    
+    public init(_ value: Value) {
+        self.value = value
+    }
+}
+
 @propertyWrapper
-public class EZThreadSafety<T>: @unchecked Sendable{
+public final class EZSendableWrapper<T>: Sendable {
     private let semaphore = DispatchSemaphore(value: 1)
+    
+    nonisolated(unsafe)
     private var value: T
     
-    public var projectedValue: EZThreadSafety<T> { self }
+    public var projectedValue: EZSendableWrapper<T> { self }
     
     public var wrappedValue: T{
         set(value){
@@ -36,3 +46,4 @@ public class EZThreadSafety<T>: @unchecked Sendable{
         self.value = wrappedValue
     }
 }
+

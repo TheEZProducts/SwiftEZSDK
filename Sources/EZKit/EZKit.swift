@@ -11,8 +11,8 @@ import Foundation
 @_exported import EZAssociatedKit
 #endif
 
-#if canImport(EZThreadSafetyKit)
-@_exported import EZThreadSafetyKit
+#if canImport(EZAsyncKit)
+@_exported import EZAsyncKit
 #endif
 
 #if canImport(EZObservableKit)

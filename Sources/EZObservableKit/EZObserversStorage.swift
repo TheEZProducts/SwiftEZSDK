@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import EZThreadSafetyKit
+import EZAsyncKit
 
 public enum EZSetType{
     case common
@@ -30,53 +30,57 @@ protocol EZObserversStorageProtocol<Value>: AnyObject, Sendable{
     func breakParentDependansy()
 }
 
-class EZObserversStorage<Value>: EZObserversStorageProtocol, @unchecked Sendable{
-    @EZThreadSafety private var tokens = [EZObserverToken<Value>]()
-    @EZThreadSafety private var idCounter: UInt = 0
-    private var defaultWrapper: EZObserverWrapperProtocol?
+final class EZObserversStorage<Value>: EZObserversStorageProtocol, Sendable{
+    private let tokens = EZSendableWrapper<[EZObserverToken<Value>]>(wrappedValue: [])
+    private let idCounter = EZSendableWrapper<UInt>(wrappedValue: 0)
+    private let defaultWrapper: EZObserverWrapperProtocol?
     
-    private var parent: (any EZObserversStorageProtocol)?
-    var anchor: EZObserveAnchorObject?
+    private let parent: EZSendableWrapper<(any EZObserversStorageProtocol)?>
+    let anchor = EZSendableWrapper<EZObserveAnchorObject?>(wrappedValue: nil)
     
-    @EZThreadSafety private var value: Value
+    private let value: EZSendableWrapper<Value>
     
-    func get() -> Value { value }
+    func get() -> Value { value.wrappedValue }
     func set(value: Value, _ type: EZSetType) {
-        let old = self.value
-        self.value = value
+        let old = self.value.wrappedValue
+        self.value.update{ $0 = value }
         if case .silent = type { return }
         useAll(old: old, type)
     }
-    func signal(_ type: EZSetType) { set(value: value, type)  }
+    
+    func signal(_ type: EZSetType) { set(value: value.wrappedValue, type)  }
     
     @discardableResult
     func add(wrapper: EZObserverWrapperProtocol?, action: @escaping (EZObserverValue<Value>) -> ()) -> EZObserverToken<Value> {
-        let token = EZObserverToken(
-            id: idCounter,
-            storage: self,
-            action: .init(action: action),
-            wrapper: wrapper ?? defaultWrapper
-        )
-        tokens.append(token)
-        idCounter += 1
+        let token = idCounter.update{
+            let token = EZObserverToken(
+                id: $0,
+                storage: self,
+                action: .init(action: action),
+                wrapper: wrapper ?? defaultWrapper
+            )
+            $0 += 1
+            return token
+        }
+        tokens.update{ $0.append(token) }
         return token
     }
     
     private func useAll(old: Value, _ type: EZSetType){
-        tokens.forEach{ $0.use(old: old, new: value, type) }
+        tokens.wrappedValue.forEach{ $0.use(old: old, new: value.wrappedValue, type) }
     }
     
     func remove(id: UInt) {
-        tokens.binaryRemove(keyPath: \.id, value: id)
+        tokens.update{ $0.binaryRemove(keyPath: \.id, value: id) }
     }
     
     func removeAll(){
-        tokens = []
+        tokens.update{ $0 = [] }
     }
     
     func breakParentDependansy() {
-        parent = nil
-        anchor = nil
+        parent.update{ $0 = nil }
+        anchor.update{ $0 = nil }
     }
     
     init(
@@ -84,8 +88,8 @@ class EZObserversStorage<Value>: EZObserversStorageProtocol, @unchecked Sendable
         defaultWrapper: EZObserverWrapperProtocol? = nil,
         parent: (any EZObserversStorageProtocol)? = nil
     ) {
-        self.value = value
+        self.value = .init(wrappedValue: value)
         self.defaultWrapper = defaultWrapper
-        self.parent = parent
+        self.parent = .init(wrappedValue: parent)
     }
 }

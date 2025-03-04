@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import EZAsyncKit
 
 #if canImport(SwiftUI)
 import SwiftUI
@@ -13,7 +14,7 @@ import SwiftUI
 @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension EZObservable{
     func binding<BindingValue>(keyPath: ReferenceWritableKeyPath<Value, BindingValue>) -> Binding<BindingValue?>{
-        let wrapper = EZSendableWrapper(keyPath)
+        let wrapper = EZUnsafeSendableWrapper(keyPath)
         return .init {[weak storage] in
             storage?.get()[keyPath: wrapper.value]
         } set: {[weak storage] newValue in
@@ -25,7 +26,7 @@ extension EZObservable{
     }
     
     func binding<BindingValue>(keyPath: WritableKeyPath<Value, BindingValue>) -> Binding<BindingValue?>{
-        let wrapper = EZSendableWrapper(keyPath)
+        let wrapper = EZUnsafeSendableWrapper(keyPath)
         return .init {[weak storage] in
             storage?.get()[keyPath: wrapper.value]
         } set: {[weak storage] newValue in
