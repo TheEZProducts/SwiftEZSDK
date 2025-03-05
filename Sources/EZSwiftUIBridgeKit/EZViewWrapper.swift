@@ -54,7 +54,12 @@ extension EZView{
     ) -> EZView{
         if #available(iOS 16.0, tvOS 16.0, *) {
 #if canImport(UIKit)
-            return UIHostingConfiguration{ EZObserveView(observable, view) }.makeContentView()
+            return UIHostingConfiguration{
+                EZObserveView(observable, view)
+                    .ignoresSafeArea()
+            }
+            .margins(.all, .zero)
+            .makeContentView()
 #elseif canImport(Cocoa)
             return NSHostingView(rootView: EZObserveView(observable, view))
 #endif
