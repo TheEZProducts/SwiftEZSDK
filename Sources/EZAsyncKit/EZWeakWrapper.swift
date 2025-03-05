@@ -11,7 +11,7 @@ public struct EZWeakWrapper<Value: AnyObject>{
     nonisolated(unsafe)
     public private(set) weak var value: Value?
     
-    public init(value: Value) {
+    public init(value: Value?) {
         self.value = value
     }
 }
