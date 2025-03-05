@@ -11,6 +11,9 @@ import SwiftUI
 #if canImport(Combine)
 import Combine
 #endif
+#if canImport(Cocoa)
+import Cocoa
+#endif
 
 #if canImport(Combine)
 @available(macOS 10.15, iOS 13.0, tvOS 13.0, *)
@@ -49,17 +52,25 @@ extension EZView{
         _ observable: ObservObj = EZViewWraperObservable(),
         @ViewBuilder view: @escaping (ObservObj)->V
     ) -> EZView{
-        let ezController = EZHostingController(rootView: EZObserveView(observable, view))
-        
+        if #available(iOS 16.0, tvOS 16.0, *) {
 #if canImport(UIKit)
-        ezController._disableSafeArea = true
-        ezController.view?.backgroundColor = .clear
-        let view = ezController.view ?? EZView()
-#else
-        let view = ezController.view
+            return UIHostingConfiguration{ EZObserveView(observable, view) }.makeContentView()
+#elseif canImport(Cocoa)
+            return NSHostingView(rootView: EZObserveView(observable, view))
 #endif
-        ezController.view = EZView()
-        return view
+        }else{
+            let ezController = EZHostingController(rootView: EZObserveView(observable, view))
+            
+#if canImport(UIKit)
+            ezController._disableSafeArea = true
+            ezController.view?.backgroundColor = .clear
+            let view = ezController.view ?? EZView()
+#else
+            let view = ezController.view
+#endif
+            ezController.view = EZView()
+            return view
+        }
     }
 }
 
