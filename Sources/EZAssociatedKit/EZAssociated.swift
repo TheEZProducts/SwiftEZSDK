@@ -7,6 +7,7 @@
 
 import Foundation
 
+#if canImport(ObjectiveC)
 public struct EZAssociated{
     public enum SetKey {
         case random
@@ -61,3 +62,4 @@ public struct EZAssociated{
         return pointerKey
     }
 }
+#endif

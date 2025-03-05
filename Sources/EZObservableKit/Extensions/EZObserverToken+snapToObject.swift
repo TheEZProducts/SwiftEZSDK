@@ -7,7 +7,7 @@
 
 import Foundation
 
-#if canImport(EZAssociatedKit)
+#if canImport(EZAssociatedKit) && canImport(ObjectiveC)
 import EZAssociatedKit
 
 extension EZObserverTokenProtocol{

@@ -47,7 +47,9 @@ let package = Package(
         //MARK: - EZAsyncKit
         .target(
             name: EZAsyncKit.name,
-            dependencies: []
+            dependencies: [
+                .target(name: EZAssociatedKit.name, condition: EZAssociatedKit.condition)
+            ]
         ),
         .testTarget(
             name: EZAsyncKit.testName,
