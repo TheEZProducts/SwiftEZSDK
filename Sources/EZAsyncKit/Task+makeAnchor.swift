@@ -11,6 +11,7 @@ import Foundation
 import EZAssociatedKit
 #endif
 
+@available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
 public final class EZTaskAnchor: Sendable{
     private let cancelAction: @Sendable () -> ()
     
@@ -27,6 +28,7 @@ public final class EZTaskAnchor: Sendable{
     }
 }
 
+@available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
 extension Task {
     public func ezMakeAnchor() -> EZTaskAnchor { .init(task: self) }
     
