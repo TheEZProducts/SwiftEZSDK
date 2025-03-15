@@ -14,7 +14,7 @@ extension ObservableObject{
     public func snapEZObservable(_ observers: [any EZObservableProtocol]){
         guard let objectWillChange = objectWillChange as? ObservableObjectPublisher else { return }
         observers.forEach {
-            $0.unknownAdd(wrapper: nil) {_ in
+            $0.unknownAddWithIsolation(isolation: MainActor.shared, wrapper: nil) {_ in
                 objectWillChange.send()
             }.snapToObject(self)
         }

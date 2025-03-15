@@ -32,7 +32,7 @@ final class EZObservableKitTest: XCTestCase, @unchecked Sendable {
         @EZObservable var value: String = "Hello"
         
         var testBuffer: String = ""
-        $value.add { testBuffer = $0.new }
+        $value.addWithIsolation { testBuffer = $0.new }
         
         value = "Test"
         XCTAssertEqual(testBuffer, value, "Set Value")
@@ -65,7 +65,7 @@ final class EZObservableKitTest: XCTestCase, @unchecked Sendable {
         
         var wrapper = TestWrapper { flag = true; $0() }
         @EZObservable(defaultWrapper: wrapper) var value: String = "Hello"
-        $value.add { testBuffer = $0.new }
+        $value.addWithIsolation { testBuffer = $0.new }
         
         value = "Test"
         XCTAssertEqual(testBuffer, value, "Wrapper Worked")
@@ -101,10 +101,10 @@ final class EZObservableKitTest: XCTestCase, @unchecked Sendable {
         var testBuffer3: String = ""
         
         @EZObservable var value: String = "Hello"
-        let token = $value.add{ testBuffer = $0.new }
-        let token1 = $value.add{ testBuffer1 = $0.new }
-        let token2 = $value.add{ testBuffer2 = $0.new }
-        let token3 = $value.add{ testBuffer3 = $0.new }
+        let token = $value.addWithIsolation { testBuffer = $0.new }
+        let token1 = $value.addWithIsolation { testBuffer1 = $0.new }
+        let token2 = $value.addWithIsolation { testBuffer2 = $0.new }
+        let token3 = $value.addWithIsolation { testBuffer3 = $0.new }
         
         value = "Test"
         XCTAssertEqual(testBuffer, value, "Set Value")
@@ -130,7 +130,7 @@ final class EZObservableKitTest: XCTestCase, @unchecked Sendable {
         testBuffer2 = ""
         testBuffer3 = ""
         
-        var anchor: EZObserveAnchorObject? = $value.add{ testBuffer = $0.new }.anchorObject
+        var anchor: EZObserveAnchorObject? = $value.addWithIsolation { testBuffer = $0.new }.anchorObject
         value = "\(anchor as Any)"
         XCTAssertEqual(testBuffer, value, "Set Value")
         testBuffer = ""
@@ -142,7 +142,7 @@ final class EZObservableKitTest: XCTestCase, @unchecked Sendable {
         
 #if canImport(EZAssociatedKit)
         var obj: Obj? = .init()
-        $value.add{ testBuffer = $0.new }.snapToObject(obj!)
+        $value.addWithIsolation { testBuffer = $0.new }.snapToObject(obj!)
         value = "Test"
         XCTAssertEqual(testBuffer, value, "Set Value")
         testBuffer = ""
@@ -157,7 +157,7 @@ final class EZObservableKitTest: XCTestCase, @unchecked Sendable {
     func test_ObservableCopy(){
         var testBuffer: String = ""
         @EZObservable var value: String = "Hello"
-        $value.add{ testBuffer = $0.new }
+        $value.addWithIsolation { testBuffer = $0.new }
         
         @EZObservable var value1: String = "Hello1"
         $value1 = $value
@@ -168,7 +168,7 @@ final class EZObservableKitTest: XCTestCase, @unchecked Sendable {
         value1 = ""
         
         var testBuffer1: String = ""
-        $value1.add{ testBuffer1 = $0.new }
+        $value1.addWithIsolation { testBuffer1 = $0.new }
         value = "Test"
         XCTAssertEqual(testBuffer, value, "Set Copy Value")
         XCTAssertEqual(testBuffer1, value1, "Set Copy Value")
@@ -180,7 +180,7 @@ final class EZObservableKitTest: XCTestCase, @unchecked Sendable {
         @EZObservable var value: Int = 0
         @EZObservable var value1: String = "Hello"
         $value1 = $value.handler{"\($0)"}
-        $value1.add{ testBuffer = $0.new }
+        $value1.addWithIsolation { testBuffer = $0.new }
         
         value = 10
         XCTAssertEqual(testBuffer, "\(value)", "Set Child Value")
@@ -198,7 +198,7 @@ final class EZObservableKitTest: XCTestCase, @unchecked Sendable {
         @EZObservable var value1: String = ""
         
         if let valueL = $value.switcher("Hello", "World", "Test"){ $value1 = valueL }
-        $value1.add{ testBuffer = $0.new }.use()
+        $value1.addWithIsolation { testBuffer = $0.new }.use()
         XCTAssertEqual(testBuffer, "Hello", "Set Int Switcher Value")
         value = 1
         XCTAssertEqual(testBuffer, "World", "Set Int Switcher Value")
@@ -210,7 +210,7 @@ final class EZObservableKitTest: XCTestCase, @unchecked Sendable {
         
         @EZObservable var value2: Bool = true
         $value1 = $value2.switcher("Hello", "World")
-        $value1.add{ testBuffer = $0.new }.use()
+        $value1.addWithIsolation { testBuffer = $0.new }.use()
         XCTAssertEqual(testBuffer, "Hello", "Set Bool Switcher Value")
         value2 = false
         XCTAssertEqual(testBuffer, "World", "Set Bool Switcher Value")
@@ -218,7 +218,7 @@ final class EZObservableKitTest: XCTestCase, @unchecked Sendable {
         
         @EZObservable var value3: String = "0"
         if let valueL = $value3.switcher(defaultValue: "Hello", ["0": "Hello", "1": "World", "2": "Test"]){ $value1 = valueL }
-        $value1.add{ testBuffer = $0.new }.use()
+        $value1.addWithIsolation { testBuffer = $0.new }.use()
         XCTAssertEqual(testBuffer, "Hello", "Set Int Switcher Value")
         value3 = "1"
         XCTAssertEqual(testBuffer, "World", "Set Int Switcher Value")
@@ -233,7 +233,7 @@ final class EZObservableKitTest: XCTestCase, @unchecked Sendable {
         var testBuffer: String = ""
         @EZObservable var value: String = "Hello"
         
-        $value.add{testBuffer = $0.new}.use()
+        $value.addWithIsolation {testBuffer = $0.new}.use()
         XCTAssertEqual(testBuffer, "\(value)", "Set Value")
         testBuffer = ""
     }

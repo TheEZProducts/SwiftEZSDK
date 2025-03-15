@@ -8,7 +8,7 @@
 import Foundation
 
 public struct EZObserverAction<Value>: @unchecked Sendable{
-    private(set) var action: (EZObserverValue<Value>) -> ()
+    private(set) var action: @Sendable (EZObserverValue<Value>) -> ()
     func use(value: EZObserverValue<Value>){
         if let wrapper = value.wrapper {
             wrapper.use { action(value) }

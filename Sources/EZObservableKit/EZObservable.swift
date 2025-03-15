@@ -7,6 +7,7 @@
 
 import Foundation
 import Combine
+import EZAsyncKit
 
 public protocol EZObservableProtocol<Value>{
     associatedtype Value
@@ -16,6 +17,20 @@ public protocol EZObservableProtocol<Value>{
     
     @discardableResult
     func unknownAdd(
+        wrapper: EZObserverWrapperProtocol?,
+        action: @Sendable @escaping (any EZObserverValueProtocol<Value>) -> ()
+    ) -> EZObserverTokenProtocol
+    
+    @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
+    @discardableResult
+    func unknownAddWithIsolation(
+        isolation: (any Actor)?,
+        wrapper: EZObserverWrapperProtocol?,
+        action: @escaping (any EZObserverValueProtocol<Value>) -> ()
+    ) -> EZObserverTokenProtocol
+    
+    @discardableResult
+    func unknownAddWithUnsafeIsolation(
         wrapper: EZObserverWrapperProtocol?,
         action: @escaping (any EZObserverValueProtocol<Value>) -> ()
     ) -> EZObserverTokenProtocol
@@ -56,22 +71,6 @@ public struct EZObservable<Value>: Sendable, EZObservableProtocol{
     }
     
     @discardableResult
-    public func add(
-        wrapper: EZObserverWrapperProtocol? = nil,
-        action: @escaping (EZObserverValue<Value>) -> ()
-    ) -> EZObserverToken<Value>{
-        storage.add(wrapper: wrapper, action: action)
-    }
-    
-    @discardableResult
-    public func unknownAdd(
-        wrapper: EZObserverWrapperProtocol? = nil,
-        action: @escaping (any EZObserverValueProtocol<Value>) -> ()
-    ) -> EZObserverTokenProtocol{
-        add(wrapper: wrapper) { action($0) }
-    }
-    
-    @discardableResult
     public func remove(id: UInt) -> Self { storage.remove(id: id); return self }
     
     @discardableResult
@@ -82,11 +81,100 @@ public struct EZObservable<Value>: Sendable, EZObservableProtocol{
 }
 
 extension EZObservable{
-    public func handler<NewValue>(wrapper: EZObserverWrapperProtocol? = nil, handler: @escaping (Value) -> (NewValue)) -> EZObservable<NewValue>{
+    public func handler<NewValue>(wrapper: EZObserverWrapperProtocol? = nil, handler: @Sendable @escaping (Value) -> (NewValue)) -> EZObservable<NewValue>{
         let hand = EZObserversStorage(value: handler(wrappedValue))
         let token = add(wrapper: nil) {[weak hand] in hand?.set(value: handler($0.new), .common) }
         hand.anchor.update { $0 = token.anchorObject }
         return .init(storage: hand)
+    }
+}
+
+extension EZObservable {
+    @discardableResult
+    public func add(
+        wrapper: EZObserverWrapperProtocol? = nil,
+        action: @Sendable @escaping (EZObserverValue<Value>) -> ()
+    ) -> EZObserverToken<Value>{
+        storage.add(wrapper: wrapper, action: action)
+    }
+    
+    @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
+    @discardableResult
+    public func addWithIsolation(
+        isolation: (any Actor)? = #isolation,
+        wrapper: EZObserverWrapperProtocol? = nil,
+        action: @escaping (EZObserverValue<Value>) -> ()
+    ) -> EZObserverToken<Value>{
+        if let isolation {
+            return add(wrapper: wrapper, action: wrappAction(isolation: isolation, action: action))
+        }else{
+            return addWithUnsafeIsolation(wrapper: wrapper, action: action)
+        }
+    }
+    
+    @discardableResult
+    public func addWithUnsafeIsolation(
+        wrapper: EZObserverWrapperProtocol? = nil,
+        action: @escaping (EZObserverValue<Value>) -> ()
+    ) -> EZObserverToken<Value>{
+        let action = EZUnsafeSendableWrapper(action)
+        return storage.add(wrapper: wrapper){ action.value($0) }
+    }
+    
+    @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
+    private func wrappAction(
+        isolation: (any Actor),
+        action: @escaping (EZObserverValue<Value>) -> ()
+    ) -> @Sendable (EZObserverValue<Value>) -> () {
+        let isoletedAction = EZActorIsolator(isolation: isolation, value: action)
+        if isolation is MainActor {
+            return { value in
+                if Thread.isMainThread {
+                    isoletedAction.unsafeUpdate{ $0(value) }
+                }else{
+                    isoletedAction.update{ $0(value) }
+                }
+            }
+        }else{
+            return { value in
+                isoletedAction.update{ $0(value) }
+            }
+        }
+    }
+}
+
+extension EZObservable {
+    @discardableResult
+    public func unknownAdd(
+        wrapper: EZObserverWrapperProtocol? = nil,
+        action: @Sendable @escaping (any EZObserverValueProtocol<Value>) -> ()
+    ) -> EZObserverTokenProtocol{
+        add(wrapper: wrapper) { action($0) }
+    }
+    
+    @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
+    @discardableResult
+    public func unknownAddWithIsolation(
+        isolation: (any Actor)? = #isolation,
+        wrapper: EZObserverWrapperProtocol? = nil,
+        action: @escaping (any EZObserverValueProtocol<Value>) -> ()
+    ) -> EZObserverTokenProtocol {
+        addWithIsolation(
+            isolation: isolation,
+            wrapper: wrapper,
+            action: action
+        )
+    }
+    
+    @discardableResult
+    public func unknownAddWithUnsafeIsolation(
+        wrapper: EZObserverWrapperProtocol? = nil,
+        action: @escaping (any EZObserverValueProtocol<Value>) -> ()
+    ) -> EZObserverTokenProtocol {
+        addWithUnsafeIsolation(
+            wrapper: wrapper,
+            action: action
+        )
     }
 }
 
@@ -97,8 +185,11 @@ extension EZObservable where Value: Hashable{
         _ map: [Value: NewValue]
     ) -> EZObservable<NewValue>?{
         if map.count == 0 {return nil}
-        let defaultValue = defaultValue ?? map.first!.value
-        return handler(wrapper: wrapper) { map[$0] ?? defaultValue }
+        let map = EZUnsafeSendableWrapper(map)
+        let defaultValue = EZUnsafeSendableWrapper(defaultValue ?? map.value.first!.value)
+        return handler(wrapper: wrapper) {
+            map.value[$0] ?? defaultValue.value
+        }
     }
 }
 
@@ -109,8 +200,9 @@ extension EZObservable where Value == Int{
         _ map: [NewValue]
     ) -> EZObservable<NewValue>?{
         if map.count == 0 {return nil}
-        let defaultValue = defaultValue ?? map.first!
-        return handler(wrapper: wrapper) { map[safe: $0] ?? defaultValue }
+        let map = EZUnsafeSendableWrapper(map)
+        let defaultValue = EZUnsafeSendableWrapper(defaultValue ?? map.value.first!)
+        return handler(wrapper: wrapper) { map.value[safe: $0] ?? defaultValue.value }
     }
     
     public func switcher<NewValue>(
@@ -128,7 +220,9 @@ extension EZObservable where Value == Bool{
         _ tValue: NewValue,
         _ fValue: NewValue
     ) -> EZObservable<NewValue>{
-        return handler(wrapper: wrapper) { $0 ? tValue : fValue }
+        let tValue = EZUnsafeSendableWrapper(tValue)
+        let fValue = EZUnsafeSendableWrapper(fValue)
+        return handler(wrapper: wrapper) { $0 ? tValue.value : fValue.value }
     }
 }
 

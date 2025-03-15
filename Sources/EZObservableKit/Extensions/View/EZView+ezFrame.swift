@@ -62,7 +62,7 @@ class EZUIViewFrameObserve{
                 self?.ezBounds = view.bounds
             }
         })
-        $ezFrame.add {[weak self] value in
+        $ezFrame.addWithUnsafeIsolation {[weak self] value in
             if value.new.minX != self?.ezX        {self?.ezX = value.new.minX}
             if value.new.minY != self?.ezY        {self?.ezY = value.new.minY}
             if value.new.width != self?.ezWidth   {self?.ezWidth = value.new.width}
@@ -93,12 +93,12 @@ extension EZView{
     
     @discardableResult
     public func scaleLike(bounds view: EZView) -> EZObserverToken<CGRect>{
-        view.ezBounds.add {[weak self] in self?.frame.size = $0.new.size}.use()
+        view.ezBounds.addWithUnsafeIsolation {[weak self] in self?.frame.size = $0.new.size }.use()
     }
     
     @discardableResult
     public func scaleLike(frame view: EZView) -> EZObserverToken<CGRect>{
-        view.ezFrame.add {[weak self] in self?.frame.size = $0.new.size }.use()
+        view.ezFrame.addWithUnsafeIsolation {[weak self] in self?.frame.size = $0.new.size }.use()
     }
 }
 #endif

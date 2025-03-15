@@ -22,7 +22,7 @@ protocol EZObserversStorageProtocol<Value>: AnyObject, Sendable{
     func signal(_ type: EZSetType)
     
     @discardableResult
-    func add(wrapper: EZObserverWrapperProtocol?, action: @escaping (EZObserverValue<Value>) -> ()) -> EZObserverToken<Value>
+    func add(wrapper: EZObserverWrapperProtocol?, action: @Sendable @escaping (EZObserverValue<Value>) -> ()) -> EZObserverToken<Value>
     
     func remove(id: UInt)
     func removeAll()
@@ -51,7 +51,7 @@ final class EZObserversStorage<Value>: EZObserversStorageProtocol, Sendable{
     func signal(_ type: EZSetType) { set(value: value.wrappedValue, type)  }
     
     @discardableResult
-    func add(wrapper: EZObserverWrapperProtocol?, action: @escaping (EZObserverValue<Value>) -> ()) -> EZObserverToken<Value> {
+    func add(wrapper: EZObserverWrapperProtocol?, action: @Sendable @escaping (EZObserverValue<Value>) -> ()) -> EZObserverToken<Value> {
         let token = idCounter.update{
             let token = EZObserverToken(
                 id: $0,
