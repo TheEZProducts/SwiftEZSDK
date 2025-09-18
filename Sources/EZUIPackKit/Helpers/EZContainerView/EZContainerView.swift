@@ -11,13 +11,7 @@ import UIKit
 import Cocoa
 #endif
 
-//extension UIView{
-//    public var window: UIWindow? {
-//        (superview as? UIWindow) ?? superview?.window
-//    }
-//}
-
-open class EZDummyNavigationController: UINavigationController{
+open class EZDummyTabBarController: UITabBarController {
     var viewDidAppearAction: (() -> ())?
     
     open override func viewDidAppear(_ animated: Bool) {
@@ -27,7 +21,7 @@ open class EZDummyNavigationController: UINavigationController{
 
 open class EZContainerView: UIView{
     public weak var currentViewController: UIViewController?
-    public var dummyController: EZDummyNavigationController?
+    public var dummyController: EZDummyTabBarController?
     public var presentationStatusDidUpdateAction: ((_ container: EZContainerView, _ isPresenting: Bool) -> ())?
     
     open var parentViewController: UIViewController? {
@@ -58,9 +52,9 @@ open class EZContainerView: UIView{
     open func setDummyController() {
         guard dummyController == nil else { return }
         presentationStatusDidUpdateAction?(self, true)
-        let dummy = EZDummyNavigationController()
+        let dummy = EZDummyTabBarController()
         dummy.view.alpha = 0
-        dummy.navigationBar.isHidden = true
+        dummy.tabBar.isHidden = true
         dummyController = dummy
     }
     
