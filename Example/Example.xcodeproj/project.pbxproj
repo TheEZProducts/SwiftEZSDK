@@ -9,6 +9,11 @@
 /* Begin PBXBuildFile section */
 		514585CE2D625C1800C1241B /* MainPackI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 514585CD2D625C1300C1241B /* MainPackI.swift */; };
 		514585D02D625C2600C1241B /* MainPack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 514585CF2D625C2500C1241B /* MainPack.swift */; };
+		5147410D2E81EBCA00270B84 /* NSWindowConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5147410C2E81EBCA00270B84 /* NSWindowConfig.swift */; };
+		514741132E81EC3D00270B84 /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 514741102E81EC3D00270B84 /* Logger.swift */; };
+		514741142E81EC3D00270B84 /* TypeMapping.swift in Sources */ = {isa = PBXBuildFile; fileRef = 514741112E81EC3D00270B84 /* TypeMapping.swift */; };
+		514741152E81EC3D00270B84 /* Invocation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5147410F2E81EC3D00270B84 /* Invocation.swift */; };
+		514741162E81EC3D00270B84 /* Dynamic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5147410E2E81EC3D00270B84 /* Dynamic.swift */; };
 		515023D52A2C87E3008255CA /* All in Frameworks */ = {isa = PBXBuildFile; productRef = 515023D42A2C87E3008255CA /* All */; };
 		515023DA2A2C8865008255CA /* FirstPac.swift in Sources */ = {isa = PBXBuildFile; fileRef = 515023D92A2C8865008255CA /* FirstPac.swift */; };
 		515023DD2A2C8FB2008255CA /* SecondPac.swift in Sources */ = {isa = PBXBuildFile; fileRef = 515023DC2A2C8FB2008255CA /* SecondPac.swift */; };
@@ -21,6 +26,11 @@
 /* Begin PBXFileReference section */
 		514585CD2D625C1300C1241B /* MainPackI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainPackI.swift; sourceTree = "<group>"; };
 		514585CF2D625C2500C1241B /* MainPack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainPack.swift; sourceTree = "<group>"; };
+		5147410C2E81EBCA00270B84 /* NSWindowConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSWindowConfig.swift; sourceTree = "<group>"; };
+		5147410E2E81EC3D00270B84 /* Dynamic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Dynamic.swift; sourceTree = "<group>"; };
+		5147410F2E81EC3D00270B84 /* Invocation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Invocation.swift; sourceTree = "<group>"; };
+		514741102E81EC3D00270B84 /* Logger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
+		514741112E81EC3D00270B84 /* TypeMapping.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TypeMapping.swift; sourceTree = "<group>"; };
 		515023D92A2C8865008255CA /* FirstPac.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirstPac.swift; sourceTree = "<group>"; };
 		515023DC2A2C8FB2008255CA /* SecondPac.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecondPac.swift; sourceTree = "<group>"; };
 		516035DF2A2C82C600349188 /* Example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Example.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -52,6 +62,17 @@
 				514585CF2D625C2500C1241B /* MainPack.swift */,
 			);
 			path = MainPack;
+			sourceTree = "<group>";
+		};
+		514741122E81EC3D00270B84 /* Dynamic */ = {
+			isa = PBXGroup;
+			children = (
+				5147410E2E81EC3D00270B84 /* Dynamic.swift */,
+				5147410F2E81EC3D00270B84 /* Invocation.swift */,
+				514741102E81EC3D00270B84 /* Logger.swift */,
+				514741112E81EC3D00270B84 /* TypeMapping.swift */,
+			);
+			path = Dynamic;
 			sourceTree = "<group>";
 		};
 		515023D32A2C87E3008255CA /* Frameworks */ = {
@@ -153,8 +174,10 @@
 		516035F92A2C836200349188 /* App */ = {
 			isa = PBXGroup;
 			children = (
+				5147410C2E81EBCA00270B84 /* NSWindowConfig.swift */,
 				516035E22A2C82C600349188 /* AppDelegate.swift */,
 				516035E42A2C82C600349188 /* SceneDelegate.swift */,
+				514741122E81EC3D00270B84 /* Dynamic */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -243,8 +266,13 @@
 				516035E32A2C82C600349188 /* AppDelegate.swift in Sources */,
 				516035E52A2C82C600349188 /* SceneDelegate.swift in Sources */,
 				515023DD2A2C8FB2008255CA /* SecondPac.swift in Sources */,
+				514741132E81EC3D00270B84 /* Logger.swift in Sources */,
+				514741142E81EC3D00270B84 /* TypeMapping.swift in Sources */,
+				514741152E81EC3D00270B84 /* Invocation.swift in Sources */,
+				514741162E81EC3D00270B84 /* Dynamic.swift in Sources */,
 				514585D02D625C2600C1241B /* MainPack.swift in Sources */,
 				514585CE2D625C1800C1241B /* MainPackI.swift in Sources */,
+				5147410D2E81EBCA00270B84 /* NSWindowConfig.swift in Sources */,
 				515023DA2A2C8865008255CA /* FirstPac.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -387,7 +415,7 @@
 				CODE_SIGN_ENTITLEMENTS = Example/Example.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 353NG464Z6;
+				DEVELOPMENT_TEAM = XKSTMW7C69;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Example/Other/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -420,7 +448,7 @@
 				CODE_SIGN_ENTITLEMENTS = Example/Example.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 353NG464Z6;
+				DEVELOPMENT_TEAM = XKSTMW7C69;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Example/Other/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;

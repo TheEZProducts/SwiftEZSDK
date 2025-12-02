@@ -59,8 +59,14 @@ class FirstPacI: EZUIPackI{
     }
     
     func didCreate() {
+//        packBridge.tabBarPack?.toolbarItems = []
+//        packBridge.tabBarPack?.tabBar.isHidden = true
         transit
-            .tabBarSet([UIViewController().apply(template: .custom{ $0.view.backgroundColor = .init(red: .random(in: 0...1), green: .random(in: 0...1), blue: .random(in: 0...1), alpha: 1) })])
+            .tabBarSet(
+                [
+                    UIViewController().apply(template: .custom{ $0.view.backgroundColor = .init(red: .random(in: 0...1), green: .random(in: 0...1), blue: .random(in: 0...1), alpha: 1) }),
+                    UIViewController().apply(template: .custom{ $0.view.backgroundColor = .init(red: .random(in: 0...1), green: .random(in: 0...1), blue: .random(in: 0...1), alpha: 1) })
+                ])
             .transit()
         
 //        DispatchQueue.main.asyncAfter(deadline: .now() + 2){
@@ -74,7 +80,7 @@ class FirstPacI: EZUIPackI{
     }
     
     func didInstall() {
-        transit()
+//        transit()
     }
     
     func willOpen() {

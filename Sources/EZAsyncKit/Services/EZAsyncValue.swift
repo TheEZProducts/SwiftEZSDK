@@ -50,7 +50,7 @@ final public class EZAsyncValue<Value: Sendable>: Sendable {
     }
     
     public init(action: (EZActionContinuation<Value>) -> ()) {
-        let continuation = EZActionContinuation{[weak self] in
+        let continuation = EZActionContinuation {[weak self] in
             await self?.storage.set(result: $0)
         }
     
@@ -59,9 +59,7 @@ final public class EZAsyncValue<Value: Sendable>: Sendable {
     
     public static func makeValue() -> (value: EZAsyncValue, continuation: EZActionContinuation<Value>) {
         var continuation: EZActionContinuation<Value>!
-        let value = Self{
-            continuation = $0
-        }
+        let value = Self { continuation = $0 }
         return (value, continuation)
     }
 }

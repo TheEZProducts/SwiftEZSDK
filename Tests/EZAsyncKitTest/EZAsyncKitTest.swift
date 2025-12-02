@@ -175,6 +175,7 @@ final class EZAsyncKitTest: XCTestCase, @unchecked Sendable {
             XCTAssertEqual(value, i, "Для итерации \(i) канал должен корректно передать и вернуть число \(i)")
         }
     }
+
     
     func testConcurrentStress() async throws {
         let channel = EZChannel<Int>()

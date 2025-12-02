@@ -28,7 +28,7 @@ public final class EZActorIsolator<Value>: Sendable {
         _ action: @Sendable @escaping (inout Value) throws -> (R),
         result: @Sendable @escaping (Result<R, Error>) -> () = {_ in}
     ) {
-        Task{
+        Task {
             do{
                 result(.success(try await update(isolation: isolation, action)))
             }catch {

@@ -27,7 +27,14 @@ class Obj1{
     var value: Int = 0
 }
 
+@globalActor
+actor MyActor: GlobalActor {
+    static let shared = MyActor()
+    private init() {} // часто делают приватным, чтобы никто не создавал лишние инстансы
+}
+
 final class EZObservableKitTest: XCTestCase, @unchecked Sendable {
+    @MainActor
     func test_ObservableSet(){
         @EZObservable var value: String = "Hello"
         
@@ -57,6 +64,22 @@ final class EZObservableKitTest: XCTestCase, @unchecked Sendable {
         XCTAssert(flag, "Set Value ChangeWrapper")
         testBuffer = ""
         flag = false
+    }
+    
+    @MainActor
+    func test_ObservableStream() async {
+        @EZObservable var value: Int = 0
+        
+        let stream = $value.makeStream()
+        Task.detached {
+            while value < 5 {
+                value += 1
+            }
+        }
+        
+        for await value in stream {
+            if value.new == 5 { value.removeObserver() }
+        }
     }
     
     func test_ObservableWrapper(){

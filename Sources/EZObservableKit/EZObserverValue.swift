@@ -19,5 +19,15 @@ public struct EZObserverValue<Value>: @unchecked Sendable, EZObserverValueProtoc
     public private(set) var old: Value
     public private(set) var new: Value
     public private(set) var wrapper: EZObserverWrapperProtocol?
+    private var removeObserverAction: () -> ()
+    
+    init(old: Value, new: Value, wrapper: EZObserverWrapperProtocol? = nil, removeObserverAction: @escaping () -> Void) {
+        self.old = old
+        self.new = new
+        self.wrapper = wrapper
+        self.removeObserverAction = removeObserverAction
+    }
+    
+    public func removeObserver() { removeObserverAction() }
 }
 

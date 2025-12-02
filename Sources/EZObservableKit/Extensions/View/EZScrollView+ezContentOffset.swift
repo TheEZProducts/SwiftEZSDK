@@ -30,7 +30,7 @@ class EZUIScrollViewContentOffSetObserve{
 #if canImport(UIKit)
         ezContentOffSet = view.contentOffset
         key = view.observe(\.contentOffset) {[weak self] (scroll, _) in
-            EZUnsafeMainWrapper.run{
+            MainActor.ezUnsafeRun {
                 if self?.ezContentOffSet != scroll.contentOffset{
                     self?.ezContentOffSet = scroll.contentOffset
                 }
@@ -39,7 +39,7 @@ class EZUIScrollViewContentOffSetObserve{
 #elseif canImport(Cocoa)
         ezContentOffSet = view.contentView.bounds.origin
         key = view.contentView.observe(\.bounds) {[weak self] (scroll, _) in
-            EZUnsafeMainWrapper.run{
+            MainActor.ezUnsafeRun {
                 if self?.ezContentOffSet != scroll.bounds.origin{
                     self?.ezContentOffSet = scroll.bounds.origin
                 }

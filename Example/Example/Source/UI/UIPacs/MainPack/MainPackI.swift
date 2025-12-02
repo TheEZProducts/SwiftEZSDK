@@ -24,6 +24,7 @@ class MainPackI: EZUIPackI{
             .navigationSet([FirstPac()])
             .animation(.ezOpen)
             .transit()
+        
 //        let r = self.transit
 //            .tabBarSet([self.firstPac])
 //            .unsafeTransition()

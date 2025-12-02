@@ -12,28 +12,18 @@ import EZAssociatedKit
 #endif
 
 @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
-public final class EZTaskAnchor: Sendable{
-    private let cancelAction: @Sendable () -> ()
-    
-    public init<Success, Failure>(task: Task<Success, Failure>) {
-        self.cancelAction = { task.cancel() }
-    }
-    
-    public func cancel(){
-        cancelAction()
-    }
-    
-    deinit{
-        cancel()
+extension EZDeinitAnchor {
+    public convenience init<Success, Failure>(task: Task<Success, Failure>) {
+        self.init { task.cancel() }
     }
 }
 
 @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
 extension Task {
-    public func ezMakeAnchor() -> EZTaskAnchor { .init(task: self) }
+    public func ezMakeAnchor() -> EZDeinitAnchor { .init(task: self) }
     
     @discardableResult
-    public func ezMakeAnchor(_ action: (EZTaskAnchor) -> ()) -> Self {
+    public func ezMakeAnchor(_ action: (EZDeinitAnchor) -> ()) -> Self {
         action(ezMakeAnchor())
         return self
     }

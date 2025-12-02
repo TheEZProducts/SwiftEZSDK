@@ -93,9 +93,10 @@ extension EZObservable {
     @discardableResult
     public func add(
         wrapper: EZObserverWrapperProtocol? = nil,
-        action: @Sendable @escaping (EZObserverValue<Value>) -> ()
+        action: @Sendable @escaping (EZObserverValue<Value>) -> (),
+        removeAction: (@Sendable (EZObserverValue<Value>) -> ())? = nil
     ) -> EZObserverToken<Value>{
-        storage.add(wrapper: wrapper, action: action)
+        storage.add(wrapper: wrapper, action: action, removeAction: removeAction)
     }
     
     @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
@@ -103,22 +104,40 @@ extension EZObservable {
     public func addWithIsolation(
         isolation: (any Actor)? = #isolation,
         wrapper: EZObserverWrapperProtocol? = nil,
-        action: @escaping (EZObserverValue<Value>) -> ()
+        action: @escaping (EZObserverValue<Value>) -> (),
+        removeAction: ((EZObserverValue<Value>) -> ())? = nil
     ) -> EZObserverToken<Value>{
         if let isolation {
-            return add(wrapper: wrapper, action: wrappAction(isolation: isolation, action: action))
-        }else{
-            return addWithUnsafeIsolation(wrapper: wrapper, action: action)
+            add(
+                wrapper: wrapper,
+                action: wrappAction(isolation: isolation, action: action),
+                removeAction: removeAction.map { wrappAction(isolation: isolation, action: $0) }
+            )
+        } else {
+            addWithUnsafeIsolation(
+                wrapper: wrapper,
+                action: action,
+                removeAction: removeAction
+            )
         }
     }
     
     @discardableResult
     public func addWithUnsafeIsolation(
         wrapper: EZObserverWrapperProtocol? = nil,
-        action: @escaping (EZObserverValue<Value>) -> ()
+        action: @escaping (EZObserverValue<Value>) -> (),
+        removeAction: ((EZObserverValue<Value>) -> ())? = nil
     ) -> EZObserverToken<Value>{
         let action = EZUnsafeSendableWrapper(action)
-        return storage.add(wrapper: wrapper){ action.value($0) }
+        let removeAction: (@Sendable (EZObserverValue<Value>) -> ())? = removeAction.map {
+            let action = EZUnsafeSendableWrapper($0)
+            return { action.value($0) }
+        }
+        return storage.add(
+            wrapper: wrapper,
+            action: { action.value($0) },
+            removeAction: removeAction
+        )
     }
     
     @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
@@ -126,18 +145,25 @@ extension EZObservable {
         isolation: (any Actor),
         action: @escaping (EZObserverValue<Value>) -> ()
     ) -> @Sendable (EZObserverValue<Value>) -> () {
-        let isoletedAction = EZActorIsolator(isolation: isolation, value: action)
-        if isolation is MainActor {
+        if #available(macOS 26.0, iOS 26.0, watchOS 26.0, tvOS 26.0, *) {
+            let action = EZUnsafeSendableWrapper(action)
             return { value in
-                if Thread.isMainThread {
-                    isoletedAction.unsafeUpdate{ $0(value) }
-                }else{
+                isolation.ezTaskImmediate { _ in action.value(value) }
+            }
+        } else {
+            let isoletedAction = EZActorIsolator(isolation: isolation, value: action)
+            if isolation is MainActor {
+                return { value in
+                    if Thread.isMainThread {
+                        isoletedAction.unsafeUpdate{ $0(value) }
+                    }else{
+                        isoletedAction.update{ $0(value) }
+                    }
+                }
+            } else {
+                return { value in
                     isoletedAction.update{ $0(value) }
                 }
-            }
-        }else{
-            return { value in
-                isoletedAction.update{ $0(value) }
             }
         }
     }
@@ -226,3 +252,18 @@ extension EZObservable where Value == Bool{
     }
 }
 
+extension EZObservable {
+    public func makeStream(
+        wrapper: EZObserverWrapperProtocol? = nil,
+        result: (EZObserverToken<Value>) -> () = {_ in}
+    ) -> AsyncStream<EZObserverValue<Value>> {
+        let (stream, continuation) = AsyncStream<EZObserverValue<Value>>.makeStream()
+        let resultValue = add(wrapper: wrapper) { value in
+            continuation.yield(value)
+        } removeAction: { _ in
+            continuation.finish()
+        }
+        result(resultValue)
+        return stream
+    }
+}

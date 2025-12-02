@@ -54,7 +54,12 @@ open class EZContainerView: UIView{
         presentationStatusDidUpdateAction?(self, true)
         let dummy = EZDummyTabBarController()
         dummy.view.alpha = 0
-        dummy.tabBar.isHidden = true
+        if #available(macCatalyst 18.0, *) {
+            dummy.mode = .tabBar
+            dummy.setTabBarHidden(true, animated: false)
+        } else {
+            dummy.tabBar.isHidden = true
+        }
         dummyController = dummy
     }
     
