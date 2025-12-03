@@ -37,3 +37,13 @@ extension Task {
     }
 #endif
 }
+
+extension Task {
+    public func ezSnapToCurrentTask(isolation: isolated (any Actor)? = #isolation) async throws -> Success {
+        try await withTaskCancellationHandler(
+            operation: { try await result.get() },
+            onCancel: { cancel() },
+            isolation: isolation
+        )
+    }
+}

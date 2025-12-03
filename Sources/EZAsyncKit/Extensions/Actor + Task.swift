@@ -16,30 +16,42 @@ extension Actor {
         return isIsolated.wrappedValue
     }
     
-    public func ezWithIsolation<T>(_ body: @Sendable (isolated Self) throws -> T) rethrows -> T {
-        try body(self)
+    public func ezWithIsolation<T>(_ body: @Sendable (isolated Self) async throws -> T) async rethrows -> T {
+        try await body(self)
     }
     
     @discardableResult
     nonisolated
-    public func ezTask<R>(_ body: @escaping (isolated Self) throws -> R) -> Task<R, Error> {
-        let body = EZUnsafeSendableWrapper(body)
-        return ezUnsafeRun { $0.makeTask(body.value) }
+    public func ezTask<R>(
+        name: String? = nil,
+        priority: TaskPriority? = nil,
+        operation: @escaping (isolated Self) async throws -> R
+    ) -> Task<R, Error> {
+        let body = EZUnsafeSendableWrapper(operation)
+        return ezUnsafeRun { $0.makeTask(name: name, priority: priority, operation: body.value) }
     }
     
     @available(macOS 26.0, iOS 26.0, watchOS 26.0, tvOS 26.0, *)
     @discardableResult
     nonisolated
-    public func ezTaskImmediate<R>(_ body: @escaping (isolated Self) throws -> R) -> Task<R, Error> {
-        let body = EZUnsafeSendableWrapper(body)
-        return ezUnsafeRun { $0.makeTaskImmediate(body.value) }
+    public func ezTaskImmediate<R>(
+        name: String? = nil,
+        priority: TaskPriority? = nil,
+        operation: @escaping (isolated Self) async throws -> R
+    ) -> Task<R, Error> {
+        let body = EZUnsafeSendableWrapper(operation)
+        return ezUnsafeRun { $0.makeTaskImmediate(name: name, priority: priority, operation: body.value) }
     }
     
     @discardableResult
     nonisolated
-    public func ezTaskDetached<R>(_ body: @Sendable @escaping (isolated Self) throws -> R) -> Task<R, Error> {
-        let body = EZUnsafeSendableWrapper(body)
-        return ezUnsafeRun { $0.makeTaskDetached(body.value) }
+    public func ezTaskDetached<R>(
+        name: String? = nil,
+        priority: TaskPriority? = nil,
+        operation: @Sendable @escaping (isolated Self) async throws -> R
+    ) -> Task<R, Error> {
+        let body = EZUnsafeSendableWrapper(operation)
+        return ezUnsafeRun { $0.makeTaskDetached(name: name, priority: priority, operation: body.value) }
     }
     
     nonisolated
@@ -54,18 +66,30 @@ extension Actor {
         return unsafeAction(self)
     }
         
-    private func makeTask<R>(_ body: @escaping (isolated Self) throws -> R) -> Task<R, Error> {
-        .init { try body(self) }
+    private func makeTask<R>(
+        name: String? = nil,
+        priority: TaskPriority? = nil,
+        operation: @escaping (isolated Self) async throws -> R
+    ) -> Task<R, Error> {
+        .init(name: name, priority: priority) { try await operation(self) }
     }
     
     @available(macOS 26.0, iOS 26.0, watchOS 26.0, tvOS 26.0, *)
-    private func makeTaskImmediate<R>(_ body: @escaping (isolated Self) throws -> R) -> Task<R, Error> {
-        .immediate { try body(self) }
+    private func makeTaskImmediate<R>(
+        name: String? = nil,
+        priority: TaskPriority? = nil,
+        operation: @escaping (isolated Self) async throws -> R
+    ) -> Task<R, Error> {
+        .immediate(name: name, priority: priority) { try await operation(self) }
     }
     
-    private func makeTaskDetached<R>(_ body: @Sendable @escaping (isolated Self) throws -> R) -> Task<R, Error> {
-        .detached { try await self.ezWithIsolation {
-            try body($0)
+    private func makeTaskDetached<R>(
+        name: String? = nil,
+        priority: TaskPriority? = nil,
+        operation: @Sendable @escaping (isolated Self) async throws -> R
+    ) -> Task<R, Error> {
+        .detached(name: name, priority: priority) { try await self.ezWithIsolation {
+            try await operation($0)
         }}
     }
 }

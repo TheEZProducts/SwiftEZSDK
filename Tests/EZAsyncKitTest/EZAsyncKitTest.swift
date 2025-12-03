@@ -126,7 +126,7 @@ final class EZAsyncKitTest: XCTestCase, @unchecked Sendable {
         
         // Запускаем set в отдельном таске, чтобы он не блокировал текущий поток
         let setTask = Task {
-            await channel.set(42)
+            try await channel.set(42)
         }
         
         // Дальше сразу вызываем get — он должен получить 42 без ожидания
@@ -134,7 +134,7 @@ final class EZAsyncKitTest: XCTestCase, @unchecked Sendable {
         XCTAssertEqual(value, 42, "get() должен сразу вернуть значение, установленное ранее через set()")
         
         // Ждём, чтобы set-таск корректно завершился
-        _ = await setTask.value
+        _ = try await setTask.value
     }
     
     /// 2) Сценарий: сначала get, затем set.
@@ -150,7 +150,7 @@ final class EZAsyncKitTest: XCTestCase, @unchecked Sendable {
         try await Task.sleep(nanoseconds: 100_000_000) // 0.1 с
         
         // Теперь устанавливаем значение
-        await channel.set("hello")
+        try await channel.set("hello")
         
         // getTask должен вернуться сразу после set
         let result = try await getTask.value
@@ -169,7 +169,7 @@ final class EZAsyncKitTest: XCTestCase, @unchecked Sendable {
             // чуть задержимся, имитируя асинхронность
             try await Task.sleep(nanoseconds: 50_000_000) // 0.05 с
             
-            await channel.set(i)
+            try await channel.set(i)
             
             let value = try await getTask.value
             XCTAssertEqual(value, i, "Для итерации \(i) канал должен корректно передать и вернуть число \(i)")
@@ -179,7 +179,7 @@ final class EZAsyncKitTest: XCTestCase, @unchecked Sendable {
     
     func testConcurrentStress() async throws {
         let channel = EZChannel<Int>()
-        let totalPairs = 10_000
+        let totalPairs = 100_000
         
         // Актор-коллектор для безопасного накопления результатов
         actor Collector {
@@ -189,12 +189,26 @@ final class EZAsyncKitTest: XCTestCase, @unchecked Sendable {
         }
         let collector = Collector()
         
+//        let t = Task.detached {
+//            for i in (0..<totalPairs) {
+//                let v = try await channel.get()
+//                await collector.append(v)
+//                print(i, v)
+//            }
+//            print("end")
+//        }
+        
+//        let t = Task.detached {
+//            for i in (0..<totalPairs) {
+//                try await channel.set(i)
+//            }
+//        }
         // Запускаем 2*totalPairs тасков: попарно set(i) и get()->i
-        let tasks: [Task<Void, Error>] = (0..<totalPairs).flatMap { i in
+        var tasks: [Task<Void, Error>] = (0..<totalPairs).flatMap { i in
             [
                 // producer
                 Task.detached {
-                    await channel.set(i)
+                    try await channel.set(i)
                 },
                 // consumer
                 Task.detached {
@@ -203,6 +217,7 @@ final class EZAsyncKitTest: XCTestCase, @unchecked Sendable {
                 }
             ]
         }
+//        tasks.append(t)
         
         // Ждём завершения всех тасков
         for task in tasks {
@@ -230,7 +245,7 @@ final class EZAsyncKitTest: XCTestCase, @unchecked Sendable {
             for i in 0..<totalOps {
                 group.enter()
                 Task.detached {
-                    await channel.set(i)
+                    try await channel.set(i)
                     group.leave()
                 }
                 group.enter()
