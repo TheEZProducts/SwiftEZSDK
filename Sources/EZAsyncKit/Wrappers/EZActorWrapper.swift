@@ -12,6 +12,7 @@ public actor EZActorWrapper<Value>{
     private var value: Value
     
     public func get() -> Value { value }
+    public func set(_ value: Value) { self.value = value }
     
     @discardableResult
     public func update<Result>(_ action: (inout Value) throws -> (Result)) rethrows -> Result {

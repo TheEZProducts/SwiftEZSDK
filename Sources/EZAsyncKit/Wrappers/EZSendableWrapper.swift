@@ -25,15 +25,12 @@ public final class EZSendableWrapper<T>: Sendable {
     public var projectedValue: EZSendableWrapper<T> { self }
     
     public var wrappedValue: T{
-        set(value){
-            semaphore.wait(); defer { semaphore.signal() }
-            self.value = value
-        }
-        get{
-            semaphore.wait(); defer { semaphore.signal() }
-            return value
-        }
+        set(value){ set(value) }
+        get { get() }
     }
+    
+    public func get() -> T { update { $0 } }
+    public func set(_ value: T) { update { $0 = value } }
     
     @discardableResult
     public func update<Value>(_ clusure: (inout T) throws -> (Value)) rethrows -> Value{

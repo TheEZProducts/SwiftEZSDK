@@ -1,0 +1,111 @@
+# Small utilities: Array / Optional / Equatable
+
+Небольшие утилиты для более удобной работы с коллекциями и проверками:
+- безопасное извлечение первого элемента массива;
+- `unwrap` для `Optional` с информативной ошибкой;
+- проверка равенства для `Equatable` с удобной ошибкой.
+
+> Доступность: macOS 10.15+, iOS 13+, watchOS 6+, tvOS 13+
+
+---
+
+## Array
+
+### `ezSafeRemoveFirst()`
+
+```swift
+extension Array {
+    public mutating func ezSafeRemoveFirst() -> Element?
+}
+```
+
+Удаляет и возвращает первый элемент массива или `nil`, если массив пустой.
+
+**Пример:**
+```swift
+var items = [1, 2, 3]
+print(items.ezSafeRemoveFirst()) // Optional(1)
+print(items) // [2, 3]
+
+var empty: [Int] = []
+print(empty.ezSafeRemoveFirst()) // nil
+```
+
+---
+
+## Optional
+
+### `EZOptionalError`
+
+```swift
+public struct EZOptionalError: LocalizedError, Sendable, Equatable
+```
+
+Ошибка для случая, когда `Optional` оказался `nil`.  
+По умолчанию включает информацию о файле/функции/строке.
+
+### `ezUnwrap(...)`
+
+```swift
+extension Optional {
+    public func ezUnwrap(
+        file: StaticString = #file,
+        functionName: StaticString = #function,
+        line: UInt = #line,
+        _ customError: Error? = nil
+    ) throws -> Wrapped
+}
+```
+
+Возвращает значение, если оно не `nil`, иначе бросает:
+- `customError`, если он передан;
+- либо `EZOptionalError.isNil(...)`.
+
+**Пример:**
+```swift
+let value: Int? = 10
+let v = try value.ezUnwrap()
+print(v) // 10
+
+let missing: String? = nil
+do {
+    _ = try missing.ezUnwrap()
+} catch {
+    print(error) // EZOptionalError: Value is nil, file:..., function:..., line:...
+}
+```
+
+---
+
+## Equatable
+
+### `EZEquatableError`
+
+```swift
+public struct EZEquatableError: LocalizedError, Sendable, Equatable
+```
+
+Ошибка для случая, когда значения не равны (`a != b`).
+
+### `ezEquals(with:_:)`
+
+```swift
+extension Equatable {
+    public func ezEquals(with value: Self, _ customError: Error? = nil) throws
+}
+```
+
+Проверяет `self == value`. Если не равно — бросает:
+- `customError`, если он передан;
+- либо `EZEquatableError.isNotEqual(v:v1:)`.
+
+**Пример:**
+```swift
+try 5.ezEquals(with: 5) // ok
+
+do {
+    try "a".ezEquals(with: "b")
+} catch {
+    print(error) // EZEquatableError: a != b
+}
+```

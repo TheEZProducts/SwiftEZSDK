@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct EZWeakWrapper<Value: AnyObject>{
+public struct EZWeakWrapper<Value: AnyObject> {
     nonisolated(unsafe)
     public private(set) weak var value: Value?
     
@@ -16,6 +16,6 @@ public struct EZWeakWrapper<Value: AnyObject>{
     }
 }
 
-extension EZWeakWrapper: Sendable where Value: Sendable{}
+extension EZWeakWrapper: Sendable where Value: Sendable {}
 
 

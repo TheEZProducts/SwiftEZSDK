@@ -7,6 +7,10 @@
 
 import Foundation
 
+#if canImport(EZAssociatedKit)
+import EZAssociatedKit
+#endif
+
 @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
 public final class EZDeinitAnchor: Sendable {
     private let deinitAction: EZSendableWrapper<@Sendable () -> ()>
@@ -24,3 +28,13 @@ public final class EZDeinitAnchor: Sendable {
     
     deinit { performAction() }
 }
+
+#if canImport(EZAssociatedKit) && canImport(ObjectiveC)
+extension EZDeinitAnchor {
+    @discardableResult
+    public func ezSnapToObject(_ object: AnyObject) -> Self {
+        EZAssociated(object).set(self, .random, .OBJC_ASSOCIATION_RETAIN)
+        return self
+    }
+}
+#endif

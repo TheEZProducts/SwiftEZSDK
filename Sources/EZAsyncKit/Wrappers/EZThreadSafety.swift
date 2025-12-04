@@ -77,7 +77,6 @@ final class SemaphoreIsolatedValue<Value>: EZThreadSafetyIsolatedValueProtocol{
     }
 }
 
- 
 @propertyWrapper
 public struct EZThreadSafety<Value: Sendable>: Sendable {
     private let value: (any EZThreadSafetyIsolatedValueProtocol<Value>)

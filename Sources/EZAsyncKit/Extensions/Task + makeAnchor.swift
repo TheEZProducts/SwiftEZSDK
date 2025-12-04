@@ -31,9 +31,7 @@ extension Task {
 #if canImport(EZAssociatedKit) && canImport(ObjectiveC)
     @discardableResult
     public func ezSnapToObject(_ object: AnyObject) -> Self {
-        ezMakeAnchor{
-            EZAssociated(object).set($0, .random, .OBJC_ASSOCIATION_RETAIN)
-        }
+        ezMakeAnchor { $0.ezSnapToObject(object) }
     }
 #endif
 }
