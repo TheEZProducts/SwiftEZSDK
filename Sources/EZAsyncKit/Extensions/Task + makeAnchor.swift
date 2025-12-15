@@ -7,6 +7,8 @@
 
 import Foundation
 
+import EZHelpersKit
+
 #if canImport(EZAssociatedKit)
 import EZAssociatedKit
 #endif
@@ -77,6 +79,7 @@ extension Task {
 #endif
 }
 
+@available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
 extension Task {
     /// Awaits this task's result, and cancels this task if the *current* task is cancelled.
     ///

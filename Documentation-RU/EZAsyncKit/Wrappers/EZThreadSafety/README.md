@@ -5,12 +5,10 @@
 
 Ключевая идея реализации:
 
-- **Синхронизация всегда завязана на `DispatchSemaphore`**.
-- На платформах с Swift Concurrency (macOS 10.15+, iOS 13+ и т.д.) асинхронные операции дополнительно
-  выполняются **в изоляции `actor`**, поэтому **если ты используешь только async-API**, семафор фактически
-  не конкурирует (захватывается сразу).
-- Семафор нужен в первую очередь, чтобы корректно синхронизировать **пересечение sync и async режимов**
-  (когда синхронные `update/get/set` вызываются одновременно с асинхронными).
+- В синхронном режиме (`$value.get()/set()/update()` без `await`) всё сериализуется через `EZRecursiveMutex` из `EZHelpersKit`.
+- В асинхронном режиме (`await $value.get()/set()/update()`) основную изоляцию даёт `actor` (`ActorIsolatedValue`): все async-обращения заходят последовательно.
+- Тот же `EZRecursiveMutex` дополнительно прикрывает доступ из async-кода, чтобы не было гонок, если параллельно идут синхронные вызовы.
+- На старых системах без `async/await` используется `EZSendableWrapper`, который тоже основан на `EZRecursiveMutex`, поэтому sync-доступ остаётся потокобезопасным.
 
 ---
 
@@ -23,20 +21,41 @@ public struct EZThreadSafety<Value: Sendable>: Sendable {
     public var projectedValue: EZThreadSafety<Value> { get }
 
     // Async API (рекомендуемый в async-коде)
-    public func update<Result: Sendable>(
-        _ closure: @Sendable (inout Value) throws -> Result
-    ) async rethrows -> Result
+
+    /// Устаревший вариант: inout-доступ к значению.
+    @available(*, deprecated,
+               message: "Use update(_ closure: @Sendable (borrowing EZAccess<Value>) throws -> R) async rethrows -> R instead")
+    public func update<R: Sendable>(
+        _ closure: @Sendable (inout Value) throws -> R
+    ) async rethrows -> R
+
+    /// Предпочтительный вариант: через EZAccess<Value>, хорошо работает с некопируемыми значениями.
+    public func update<R: Sendable>(
+        _ closure: @Sendable (borrowing EZAccess<Value>) throws -> R
+    ) async rethrows -> R where R: ~Copyable
+
     public func get() async -> Value
     public func set(_ value: Value) async
 
     // Sync API (для не-async контекста)
-    public func update<Result>(
-        _ closure: @Sendable (inout Value) throws -> Result
-    ) rethrows -> Result
+
+    /// Устаревший вариант: inout-доступ к значению.
+    @available(*, deprecated,
+               message: "Use update(_ closure: @Sendable (borrowing EZAccess<Value>) throws -> R) instead")
+    public func update<R>(
+        _ closure: @Sendable (inout Value) throws -> R
+    ) rethrows -> R
+
+    /// Предпочтительный sync-вариант: через EZAccess<Value>.
+    public func update<R>(
+        _ closure: @Sendable (borrowing EZAccess<Value>) throws -> R
+    ) rethrows -> R where R: ~Copyable
+
     public func get() -> Value
     public func set(_ value: Value)
 
-    // wrappedValue помечен как noasync, чтобы не использовать его в async-коде
+    public init(wrappedValue: Value)
+    public init(_ value: Value)
 }
 ```
 
@@ -44,13 +63,16 @@ public struct EZThreadSafety<Value: Sendable>: Sendable {
 
 ## Поведение
 
-- Все операции (`get/set/update`) атомарны относительно друг друга.
-- **Async режим:** вызовы `await $property.update/get/set` выполняются в изоляции `actor`.
-  Между async-вызовами нет гонок, а семафор обычно не блокирует (нет конкуренции).
-- **Sync режим:** вызовы `$property.update/get/set` (без `await`) защищены семафором и могут безопасно
-  вызываться из любого потока.
-- **Смешанный режим:** когда sync и async операции идут параллельно, семафор обеспечивает корректную
-  взаимную блокировку между ними.
+- Все операции (`get/set/update`) атомарны относительно друг друга: каждое обращение полностью выполняется до начала следующего.
+- **Async режим:**
+  - `await $property.update/get/set` заходят на `ActorIsolatedValue`, поэтому сами по себе async-вызовы выполняются последовательно (актерная изоляция).
+  - внутри актора доступ к данным дополнительно проходит через `EZRecursiveMutex`, чтобы не конфликтовать с возможными синхронными обращениями.
+- **Sync режим:**
+  - `$property.update/get/set` (без `await`) работают поверх `EZRecursiveMutex` (через `EZSendableWrapper` или ту же mutex-базу),
+  - их безопасно вызывать с любого потока, они просто берут лок и выполняют переданный блок.
+- **Смешанный режим (sync + async):**
+  - async-код сериализуется актором, sync-код — мутексом,
+  - оба режима используют один и тот же `EZRecursiveMutex` для самого значения, поэтому гонок между sync и async доступом нет.
 
 > В `async` коде используй `$property` и `await`. Прямой доступ через `wrappedValue` помечен как `noasync`
 > и нужен в основном для синхронного окружения.
@@ -66,7 +88,9 @@ struct Metrics: Sendable {
     @EZThreadSafety var count: Int = 0
 
     func inc() async {
-        await $count.update { $0 += 1 }
+        await $count.update { access in
+            access.value += 1
+        }
     }
 
     func value() async -> Int {
@@ -83,7 +107,9 @@ final class Store: @unchecked Sendable {
 
     // async путь
     func addAsync(_ x: Int) async {
-        await $items.update { $0.append(x) }
+        await $items.update { access in
+            access.value.append(x)
+        }
     }
 
     // sync путь (например, из не-async кода)

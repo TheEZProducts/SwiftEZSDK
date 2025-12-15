@@ -24,7 +24,6 @@ import Foundation
 /// // When `owner` deallocates, `weakOwner.value` becomes nil.
 /// ```
 public struct EZWeakWrapper<Value: AnyObject> {
-    nonisolated(unsafe)
     /// The weakly-held object (nil after deallocation).
     public private(set) weak var value: Value?
     
@@ -36,4 +35,3 @@ public struct EZWeakWrapper<Value: AnyObject> {
 
 /// Conforms to `Sendable` when `Value` is `Sendable`.
 extension EZWeakWrapper: Sendable where Value: Sendable {}
-

@@ -7,6 +7,8 @@
 
 import Foundation
 
+import EZHelpersKit
+
 /// A small buffered async channel for passing values between tasks.
 ///
 /// `EZBufferedChannel` is like a rendezvous channel (`EZChannel`), but with an in-memory buffer:
@@ -66,8 +68,8 @@ public actor EZBufferedChannel<T: Sendable> {
     }
     
     private var continuations = (
-        setContinuations: [(value: T, continuation: EZSafeContinuation<Void>)](),
-        getContinuations: [EZSafeContinuation<T>]()
+        setContinuations: EZHeadQueue<(value: T, continuation: EZSafeContinuation<Void>)>(),
+        getContinuations: EZHeadQueue<EZSafeContinuation<T>>()
     )
     
     /// Receives the next value from the channel.
@@ -82,13 +84,14 @@ public actor EZBufferedChannel<T: Sendable> {
     /// let v = try await ch.get() // 123
     /// ```
     public func get() async throws -> T {
+        try Task.checkCancellation()
         try checkIsClosed()
         if let value = buffer.ezSafeRemoveFirst() {
             setNextValue()
             return value
         } else {
             return try await ezWithCheckedStoppableContinuation { getContinuation in
-                continuations.getContinuations.append(getContinuation)
+                continuations.getContinuations.enqueue(getContinuation)
             }
         }
     }
@@ -107,14 +110,15 @@ public actor EZBufferedChannel<T: Sendable> {
     /// // A second send may suspend until someone calls `get()`.
     /// ```
     public func set(_ value: T) async throws {
+        try Task.checkCancellation()
         try checkIsClosed()
-        if let getContinuation = continuations.getContinuations.ezSafeRemoveFirst() {
+        if let getContinuation = continuations.getContinuations.dequeueThroughFirst(where: { $0.result == nil }) {
             getContinuation.resume(returning: value)
         } else if buffer.count < bufferSize {
             buffer.append(value)
         } else {
             try await ezWithCheckedStoppableContinuation { continuation in
-                continuations.setContinuations.append((value, continuation))
+                continuations.setContinuations.enqueue((value, continuation))
             }
         }
     }
@@ -134,12 +138,15 @@ public actor EZBufferedChannel<T: Sendable> {
         isClosed = true
         continuations.getContinuations.forEach { $0.resume(throwing: EZChannelError.closed) }
         continuations.setContinuations.forEach { $0.continuation.resume(throwing: EZChannelError.closed) }
+        continuations = ([], [])
     }
     
     private func setNextValue() {
         guard
             buffer.count < bufferSize,
-            let (value, continuation) = continuations.setContinuations.ezSafeRemoveFirst()
+            let (value, continuation) = continuations.setContinuations.dequeueThroughFirst(
+                where: { $0.continuation.result == nil }
+            )
         else { return }
         buffer.append(value)
         continuation.resume()

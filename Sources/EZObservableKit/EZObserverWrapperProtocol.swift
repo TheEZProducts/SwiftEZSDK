@@ -7,6 +7,6 @@
 
 import Foundation
 
-public protocol EZObserverWrapperProtocol: Sendable{
+public protocol EZObserverWrapperProtocol: Sendable {
     func use(action: @escaping () -> ())
 }

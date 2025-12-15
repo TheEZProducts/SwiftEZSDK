@@ -1,3 +1,4 @@
 # EZSDK
 
-1. [EZAsyncKit](EZAsyncKit/README.md) - Модуль облегчающий работу с async/await
+1. [EZHelpersKit](EZHelpersKit/README.md) - Набор полезных инструментов
+2. [EZAsyncKit](EZAsyncKit/README.md) - Модуль облегчающий работу с async/await

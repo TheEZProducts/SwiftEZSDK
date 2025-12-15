@@ -7,6 +7,8 @@
 
 import Foundation
 
+import EZHelpersKit
+
 #if canImport(EZAssociatedKit)
 import EZAssociatedKit
 #endif

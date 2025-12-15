@@ -7,6 +7,7 @@
 
 import Foundation
 
+@available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
 extension Actor {
     /// Returns `true` when accessed while already running on this actor's executor.
     ///

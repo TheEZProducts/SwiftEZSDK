@@ -7,12 +7,15 @@
 
 import Foundation
 
-/// Small wrappers to make values easier to pass across concurrency boundaries.
+import EZHelpersKit
+
+/// Small helpers to make values easier to pass across concurrency boundaries.
 ///
 /// - `EZUnsafeSendableWrapper` is **@unchecked Sendable**: you are responsible for thread-safety.
-/// - `EZSendableWrapper` is a `@propertyWrapper` that serializes access with a `DispatchSemaphore`.
+/// - `EZSendableWrapper` is a `@propertyWrapper` that serializes access with `EZRecursiveMutex`
+///   from `EZHelpersKit`.
 ///
-/// Prefer `EZSendableWrapper` when you need safe, mutable shared state with low ceremony.
+
 
 /// A minimal **@unchecked Sendable** box.
 ///
@@ -32,10 +35,12 @@ public struct EZUnsafeSendableWrapper<Value>: @unchecked Sendable {
     }
 }
 
-/// Thread-safe `@propertyWrapper` that serializes `get / set / update` with a semaphore.
+/// Thread-safe `@propertyWrapper` that serializes `get / set / update` with `EZRecursiveMutex`.
 ///
-/// `wrappedValue` provides convenience access, but for read-modify-write operations prefer `update(_:)`
-/// to keep the whole mutation atomic.
+/// `wrappedValue` provides convenient access, but for read-modify-write operations prefer `update(_:)`
+/// to keep the whole mutation atomic. There are two overloads:
+/// - a deprecated `(inout T) -> R` variant, and
+/// - the recommended overload that takes `EZAccess<T>` and works well with noncopyable values.
 ///
 /// ### Example
 /// ```swift
@@ -43,16 +48,16 @@ public struct EZUnsafeSendableWrapper<Value>: @unchecked Sendable {
 ///     @EZSendableWrapper var value: Int = 0
 ///
 ///     func inc() {
-///         $value.update { $0 += 1 }
+///         $value.update { access in
+///             access.value += 1
+///         }
 ///     }
 /// }
 /// ```
 @propertyWrapper
 public final class EZSendableWrapper<T>: Sendable {
-    private let semaphore = DispatchSemaphore(value: 1)
-    
     nonisolated(unsafe)
-    private var value: T
+    private let _value: EZRecursiveMutex<T>
     
     /// Projected value (`$property`) exposing the explicit `get / set / update` API.
     public var projectedValue: EZSendableWrapper<T> { self }
@@ -64,18 +69,22 @@ public final class EZSendableWrapper<T>: Sendable {
     /// ```swift
     /// $value.update { $0 += 1 }
     /// ```
-    public var wrappedValue: T{
+    public var wrappedValue: T {
         set(value){ set(value) }
-        get { get() }
+        consuming get { update { $0.value } }
     }
     
     /// Returns the current value (synchronously, under the lock).
-    public func get() -> T { update { $0 } }
+    @inline(__always)
+    public func get() -> T where T: Copyable { _value.get() }
     
     /// Replaces the current value (synchronously, under the lock).
-    public func set(_ value: T) { update { $0 = value } }
+    @inline(__always)
+    public func set(_ value: consuming T) { _value.set(value) }
     
     /// Runs `closure` while holding the lock, allowing atomic read/modify/write.
+    ///
+    /// Deprecated: prefer the overload that takes `EZAccess<T>` instead, especially for noncopyable values.
     ///
     /// ### Example
     /// ```swift
@@ -84,15 +93,37 @@ public final class EZSendableWrapper<T>: Sendable {
     ///     return current
     /// }
     /// ```
+    @available(*, deprecated, message: "Use update(_ closure: (borrowing EZAccess<T>) throws -> R) instead")
+    @inline(__always)
     @discardableResult
-    public func update<Value>(_ clusure: (inout T) throws -> (Value)) rethrows -> Value{
-        semaphore.wait(); defer { semaphore.signal() }
-        return try clusure(&value)
+    public func update<R>(_ closure: (inout T) throws -> (R)) rethrows -> R where R: ~Copyable  {
+        try update { try closure(&$0.value) }
+    }
+    
+    /// Preferred `update` overload that exposes the underlying value via `EZAccess<T>`.
+    ///
+    /// This works well with noncopyable values and keeps the whole mutation atomic.
+    ///
+    /// ### Example
+    /// ```swift
+    /// let old = $value.update { access in
+    ///     defer { access.value += 1 }
+    ///     return access.value
+    /// }
+    /// ```
+    @inline(__always)
+    @discardableResult
+    public func update<R>(_ closure: (borrowing EZAccess<T>) throws -> (R)) rethrows -> R where R: ~Copyable {
+        try _value.withLock(closure)
     }
     
     /// Creates the wrapper with an initial value.
-    public init(wrappedValue: T){
-        semaphore.wait(); defer { semaphore.signal() }
-        self.value = wrappedValue
+    public init(wrappedValue: consuming T) {
+        _value = .init(wrappedValue)
+    }
+    
+    @inline(__always)
+    public convenience init(_ value: consuming T) {
+        self.init(wrappedValue: value)
     }
 }

@@ -26,22 +26,22 @@ import EZAssociatedKit
 /// ```
 @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
 public final class EZDeinitAnchor: Sendable {
-    private let deinitAction: EZSendableWrapper<@Sendable () -> ()>
+    private let deinitAction: EZMutex<@Sendable () -> ()>
     
     /// Creates an anchor that will execute `deinitAction` when the anchor is deallocated.
     ///
     /// The action is stored in a thread-safe box so that it can be consumed safely.
     public init(deinitAction: @Sendable @escaping () -> ()) {
-        self.deinitAction = .init(wrappedValue: deinitAction)
+        self.deinitAction = .init(deinitAction)
     }
     
     /// Executes the action immediately (if it hasn't run yet) and disables further execution.
     ///
     /// Calling this is optional—`deinit` will call it automatically.
     public func performAction() {
-        deinitAction.update {
-            $0()
-            $0 = {}
+        deinitAction.withLock {
+            $0.value()
+            $0.value = {}
         }
     }
     

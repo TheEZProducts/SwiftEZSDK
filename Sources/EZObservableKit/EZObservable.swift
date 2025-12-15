@@ -7,9 +7,11 @@
 
 import Foundation
 import Combine
-import EZAsyncKit
 
-public protocol EZObservableProtocol<Value>{
+import EZAsyncKit
+import EZHelpersKit
+
+public protocol EZObservableProtocol<Value> {
     associatedtype Value
     
     @discardableResult
@@ -59,9 +61,14 @@ public struct EZObservable<Value>: Sendable, EZObservableProtocol{
     }
     
     @discardableResult
-    public func set(value: Value, _ type: EZSetType = .common) -> Self{
+    public func set(value: Value, _ type: EZSetType = .common) -> Self {
         storage.set(value: value, type)
         return self
+    }
+    
+    @discardableResult
+    public func update<R>(type: EZSetType = .common, _ closure: (borrowing EZAccess<Value>) throws -> (R)) rethrows -> R {
+        try storage.update(type: type, closure)
     }
     
     @discardableResult
@@ -81,10 +88,13 @@ public struct EZObservable<Value>: Sendable, EZObservableProtocol{
 }
 
 extension EZObservable{
-    public func handler<NewValue>(wrapper: EZObserverWrapperProtocol? = nil, handler: @Sendable @escaping (Value) -> (NewValue)) -> EZObservable<NewValue>{
+    public func handler<NewValue>(
+        wrapper: EZObserverWrapperProtocol? = nil,
+        handler: @Sendable @escaping (Value) -> (NewValue)
+    ) -> EZObservable<NewValue> {
         let hand = EZObserversStorage(value: handler(wrappedValue))
         let token = add(wrapper: nil) {[weak hand] in hand?.set(value: handler($0.new), .common) }
-        hand.anchor.update { $0 = token.anchorObject }
+        hand.setAnchor(token.anchorObject)
         return .init(storage: hand)
     }
 }
@@ -95,7 +105,7 @@ extension EZObservable {
         wrapper: EZObserverWrapperProtocol? = nil,
         action: @Sendable @escaping (EZObserverValue<Value>) -> (),
         removeAction: (@Sendable (EZObserverValue<Value>) -> ())? = nil
-    ) -> EZObserverToken<Value>{
+    ) -> EZObserverToken<Value> {
         storage.add(wrapper: wrapper, action: action, removeAction: removeAction)
     }
     
@@ -106,7 +116,7 @@ extension EZObservable {
         wrapper: EZObserverWrapperProtocol? = nil,
         action: @escaping (EZObserverValue<Value>) -> (),
         removeAction: ((EZObserverValue<Value>) -> ())? = nil
-    ) -> EZObserverToken<Value>{
+    ) -> EZObserverToken<Value> {
         if let isolation {
             add(
                 wrapper: wrapper,
@@ -127,7 +137,7 @@ extension EZObservable {
         wrapper: EZObserverWrapperProtocol? = nil,
         action: @escaping (EZObserverValue<Value>) -> (),
         removeAction: ((EZObserverValue<Value>) -> ())? = nil
-    ) -> EZObserverToken<Value>{
+    ) -> EZObserverToken<Value> {
         let action = EZUnsafeSendableWrapper(action)
         let removeAction: (@Sendable (EZObserverValue<Value>) -> ())? = removeAction.map {
             let action = EZUnsafeSendableWrapper($0)
@@ -204,17 +214,17 @@ extension EZObservable {
     }
 }
 
-extension EZObservable where Value: Hashable{
+extension EZObservable where Value: Hashable & Sendable {
     public func switcher<NewValue>(
         wrapper: EZObserverWrapperProtocol? = nil,
         defaultValue: NewValue? = nil,
         _ map: [Value: NewValue]
-    ) -> EZObservable<NewValue>?{
-        if map.count == 0 {return nil}
+    ) -> EZObservable<NewValue>? {
+        if map.count == 0 { return nil }
         let map = EZUnsafeSendableWrapper(map)
         let defaultValue = EZUnsafeSendableWrapper(defaultValue ?? map.value.first!.value)
         return handler(wrapper: wrapper) {
-            map.value[$0] ?? defaultValue.value
+            (map.value[$0] ?? defaultValue.value)
         }
     }
 }
@@ -224,7 +234,7 @@ extension EZObservable where Value == Int{
         wrapper: EZObserverWrapperProtocol? = nil,
         defaultValue: NewValue? = nil,
         _ map: [NewValue]
-    ) -> EZObservable<NewValue>?{
+    ) -> EZObservable<NewValue>? {
         if map.count == 0 {return nil}
         let map = EZUnsafeSendableWrapper(map)
         let defaultValue = EZUnsafeSendableWrapper(defaultValue ?? map.value.first!)
@@ -235,7 +245,7 @@ extension EZObservable where Value == Int{
         wrapper: EZObserverWrapperProtocol? = nil,
         defaultValue: NewValue? = nil,
         _ map: NewValue...
-    ) -> EZObservable<NewValue>?{
+    ) -> EZObservable<NewValue>? {
         switcher(wrapper: wrapper, defaultValue: defaultValue, map)
     }
 }
@@ -245,7 +255,7 @@ extension EZObservable where Value == Bool{
         wrapper: EZObserverWrapperProtocol? = nil,
         _ tValue: NewValue,
         _ fValue: NewValue
-    ) -> EZObservable<NewValue>{
+    ) -> EZObservable<NewValue> {
         let tValue = EZUnsafeSendableWrapper(tValue)
         let fValue = EZUnsafeSendableWrapper(fValue)
         return handler(wrapper: wrapper) { $0 ? tValue.value : fValue.value }

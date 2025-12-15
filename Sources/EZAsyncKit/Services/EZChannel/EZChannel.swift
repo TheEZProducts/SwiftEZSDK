@@ -7,6 +7,8 @@
 
 import Foundation
 
+import EZHelpersKit
+
 /// A tiny async channel for passing values between tasks.
 ///
 /// `EZChannel` lets one task `set(_:)` a value while another task `get()`s it.
@@ -58,8 +60,8 @@ public actor EZChannel<T: Sendable> {
     public private(set) var isClosed: Bool = false
     
     private var continuations = (
-        setContinuations: [EZSafeContinuation<EZSafeContinuation<T>>](),
-        getContinuations: [EZSafeContinuation<T>]()
+        setContinuations: EZHeadQueue<EZSafeContinuation<EZSafeContinuation<T>>>(),
+        getContinuations: EZHeadQueue<EZSafeContinuation<T>>()
     )
     
     /// Receives the next value from the channel.
@@ -74,12 +76,13 @@ public actor EZChannel<T: Sendable> {
     /// let s = try await ch.get() // "hi"
     /// ```
     public func get() async throws -> T {
+        try Task.checkCancellation()
         try checkIsClosed()
         return try await ezWithCheckedStoppableContinuation { getContinuation in
-            if let continuation = continuations.setContinuations.ezSafeRemoveFirst() {
+            if let continuation = continuations.setContinuations.dequeueThroughFirst(where: { $0.result == nil }) {
                 continuation.resume(returning: getContinuation)
             }else{
-                continuations.getContinuations.append(getContinuation)
+                continuations.getContinuations.enqueue(getContinuation)
             }
         }
     }
@@ -96,12 +99,13 @@ public actor EZChannel<T: Sendable> {
     /// try await ch.set(123)
     /// ```
     public func set(_ value: T) async throws {
+        try Task.checkCancellation()
         try checkIsClosed()
         try await ezWithCheckedStoppableContinuation { continuation in
-            if let getContinuation = continuations.getContinuations.ezSafeRemoveFirst() {
+            if let getContinuation = continuations.getContinuations.dequeueThroughFirst(where: { $0.result == nil }) {
                 continuation.resume(returning: getContinuation)
             } else {
-                continuations.setContinuations.append(continuation)
+                continuations.setContinuations.enqueue(continuation)
             }
         }.resume(returning: value)
     }
@@ -121,6 +125,7 @@ public actor EZChannel<T: Sendable> {
         isClosed = true
         continuations.getContinuations.forEach { $0.resume(throwing: EZChannelError.closed) }
         continuations.setContinuations.forEach { $0.resume(throwing: EZChannelError.closed) }
+        continuations = ([], [])
     }
     
     /// Throws `EZChannelError.closed` if the channel is already closed.

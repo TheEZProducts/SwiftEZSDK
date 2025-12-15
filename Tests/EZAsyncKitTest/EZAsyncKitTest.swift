@@ -6,11 +6,12 @@
 //
 
 import XCTest
+
 import EZAsyncKit
 
 final class EZAsyncKitTest: XCTestCase, @unchecked Sendable {
     @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
-    func test_ThreadSafety_Async() async{
+    func test_ThreadSafety_Async() async {
         @EZThreadSafety var testValue: String = "Hello"
         
         print("test_ThreadSafety_Async start")
@@ -43,7 +44,7 @@ final class EZAsyncKitTest: XCTestCase, @unchecked Sendable {
     }
     
     private func addTestValueAsync(value: EZThreadSafety<String>, i: Int) async {
-        await value.update{ $0 + "\(i)" }
+        await value.update { $0.value + "\(i)" }
     }
     
     @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
@@ -80,7 +81,7 @@ final class EZAsyncKitTest: XCTestCase, @unchecked Sendable {
     }
 
     private func addTestValueSync(value: EZThreadSafety<String>, i: Int) {
-        value.update{ $0 + "\(i)" }
+        value.update { $0.value + "\(i)" }
     }
     
     
@@ -204,7 +205,7 @@ final class EZAsyncKitTest: XCTestCase, @unchecked Sendable {
 //            }
 //        }
         // Запускаем 2*totalPairs тасков: попарно set(i) и get()->i
-        var tasks: [Task<Void, Error>] = (0..<totalPairs).flatMap { i in
+        let tasks: [Task<Void, Error>] = (0..<totalPairs).flatMap { i in
             [
                 // producer
                 Task.detached {
@@ -258,4 +259,71 @@ final class EZAsyncKitTest: XCTestCase, @unchecked Sendable {
             group.wait()
         }
     }
+    
+    func testM() {
+        let a = EZSendableWrapper(wrappedValue: 0)
+        for _ in 0..<10_000_000 {
+            a.update { $0.value += 1 }
+        }
+    }
+    
+    func testGroup1() async {
+        let t = Task {
+            let result = await ezWithTaskGroup(result: .results) {
+                EZTaskItem {
+                    try await Task.sleep(for: .seconds(0.5))
+                    return 10
+                }
+                EZTaskItem {
+                    try await Task.sleep(for: .seconds(0.5))
+                    return "Hello"
+                }
+            }
+            print(result)
+        }
+        t.cancel()
+        await t.result.get()
+    }
+    
+    func testGroup2() async {
+        let t = Task {
+            let result = await ezWithUnstructuredTaskGroup(result: .results) {
+                Task {
+                    try? await Task.sleep(for: .seconds(0.5))
+                    return 10
+                }
+                
+                Task {
+                    try await Task.sleep(for: .seconds(0.5))
+                    return "Hello"
+                }
+            }
+            print(result)
+        }
+        t.cancel()
+        await t.result.get()
+    }
+    
+        
+//    @available(iOS 18.0, *)
+//    func testM7() async {
+//        let a = EZRecursiveMutex([0])
+//        var t = [Task<Void, Never>]()
+//        
+//        for i in 0..<10 {
+//            t.append(
+//                Task {
+//                    for _ in 0..<1_000_000 {
+//                        a.withLock {
+//                            a.withLock { $0.value.append(2) }
+//                            $0.value.append(1)
+//                        }
+//                    }
+//                }
+//            )
+//        }
+//        for task in t { await _ = task.value }
+//        a.withLock { print($0.value.count) }
+//    }
+    
 }

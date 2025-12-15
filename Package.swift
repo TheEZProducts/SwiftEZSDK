@@ -8,6 +8,7 @@ let package = Package(
     products: [
         //MARK: - Stable
         .library(name: "All", targets: [EZKit.name]),
+        .library(name: EZHelpersKit.name, targets: [EZHelpersKit.name]),
         .library(name: EZAssociatedKit.name, targets: [EZAssociatedKit.name]),
         .library(name: EZAsyncKit.name, targets: [EZAsyncKit.name]),
         .library(name: EZObservableKit.name, targets: [EZObservableKit.name]),
@@ -44,11 +45,27 @@ let package = Package(
             ]
         ),
         
+        //MARK: - EZHelpersKit
+        .target(
+            name: EZHelpersKit.name,
+            dependencies: [
+                .target(name: EZAssociatedKit.name)
+            ],
+            swiftSettings: [.enableExperimentalFeature("Lifetimes")]
+        ),
+        .testTarget(
+            name: EZHelpersKit.testName,
+            dependencies: [
+                .target(name: EZHelpersKit.name)
+            ]
+        ),
+        
         //MARK: - EZAsyncKit
         .target(
             name: EZAsyncKit.name,
             dependencies: [
-                .target(name: EZAssociatedKit.name, condition: EZAssociatedKit.condition)
+                .target(name: EZAssociatedKit.name, condition: EZAssociatedKit.condition),
+                .target(name: EZHelpersKit.name, condition: EZHelpersKit.condition)
             ]
         ),
         .testTarget(
@@ -155,6 +172,8 @@ struct EZAsyncKit: EZTargetProtocol{}
 struct EZObservableKit: EZTargetProtocol{}
 
 struct EZBuilderKit: EZTargetProtocol {}
+
+struct EZHelpersKit: EZTargetProtocol {}
 
 //MARK: EZUIPackKit
 struct EZUIPackKit: EZTargetProtocol {

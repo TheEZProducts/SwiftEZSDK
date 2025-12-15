@@ -6,17 +6,20 @@
 //
 
 import Foundation
-import EZAsyncKit
 
-public enum EZSetType{
+import EZAsyncKit
+import EZHelpersKit
+
+public enum EZSetType: Sendable {
     case common
     case silent
     case changeWrapper(EZObserverWrapperProtocol?)
 }
 
-protocol EZObserversStorageProtocol<Value>: AnyObject, Sendable{
+protocol EZObserversStorageProtocol<Value>: AnyObject, Sendable {
     associatedtype Value
     
+    func update<R>(type: EZSetType, _ closure: (borrowing EZAccess<Value>) throws -> (R)) rethrows -> R
     func get() -> Value
     func set(value: Value, _ type: EZSetType)
     func signal(_ type: EZSetType)
@@ -34,25 +37,41 @@ protocol EZObserversStorageProtocol<Value>: AnyObject, Sendable{
     func breakParentDependansy()
 }
 
+extension EZObserversStorage {
+    fileprivate struct Storage: ~Copyable {
+        fileprivate var tokens = [EZObserverToken<Value>]()
+        fileprivate var idCounter: UInt = 0
+        
+        fileprivate var parent: (any EZObserversStorageProtocol)? = nil
+        fileprivate var anchor: EZObserveAnchorObject?
+    }
+}
+
 final class EZObserversStorage<Value>: EZObserversStorageProtocol, Sendable {
-    private let tokens = EZSendableWrapper<[EZObserverToken<Value>]>(wrappedValue: [])
-    private let idCounter = EZSendableWrapper<UInt>(wrappedValue: 0)
+    private let storage = EZMutex(Storage())
+    
     private let defaultWrapper: EZObserverWrapperProtocol?
     
-    private let parent: EZSendableWrapper<(any EZObserversStorageProtocol)?>
-    let anchor = EZSendableWrapper<EZObserveAnchorObject?>(wrappedValue: nil)
+    nonisolated(unsafe)
+    private let value: EZRecursiveMutex<Value>
     
-    private let value: EZSendableWrapper<Value>
     
-    func get() -> Value { value.wrappedValue }
+    func get() -> Value { value.get() }
     func set(value: Value, _ type: EZSetType) {
-        let old = self.value.wrappedValue
-        self.value.update { $0 = value }
-        if case .silent = type { return }
-        useAll(old: old, type)
+        update(type: type, { $0.value = value })
     }
     
-    func signal(_ type: EZSetType) { set(value: value.wrappedValue, type)  }
+    func update<R>(type: EZSetType, _ closure: (borrowing EZAccess<Value>) throws -> (R)) rethrows -> R {
+        let (old, result) = try value.withLock {
+            let old = $0.value
+            return (old, try closure($0))
+        }
+        if case .silent = type { return result }
+        useAll(old: old, type)
+        return result
+    }
+    
+    func signal(_ type: EZSetType) { set(value: value.get(), type)  }
     
     @discardableResult
     func add(
@@ -60,44 +79,67 @@ final class EZObserversStorage<Value>: EZObserversStorageProtocol, Sendable {
         action: @Sendable @escaping (EZObserverValue<Value>) -> (),
         removeAction: (@Sendable (EZObserverValue<Value>) -> ())? = nil
     ) -> EZObserverToken<Value> {
-        let token = idCounter.update{
+        storage.withLock {
             let token = EZObserverToken(
-                id: $0,
+                id: $0.value.idCounter,
                 storage: self,
                 action: .init(action: action),
                 removeAction: removeAction.map { .init(action: $0) },
                 wrapper: wrapper ?? defaultWrapper
             )
-            $0 += 1
+            $0.value.idCounter += 1
+            $0.value.tokens.append(token)
             return token
         }
-        tokens.update{ $0.append(token) }
-        return token
     }
     
-    private func useAll(old: Value, _ type: EZSetType){
-        tokens.wrappedValue.forEach{ $0.use(old: old, new: value.wrappedValue, type) }
+    private func useAll(old: Value, _ type: EZSetType) {
+        let value = value.get()
+        storage
+            .withLock { $0.value.tokens }
+            .forEach { $0.use(old: old, new: value, type) }
     }
     
     func remove(id: UInt) {
-        tokens.update {
-            guard let token = $0.binaryRemove(keyPath: \.id, value: id) else { return }
-            token.removeAction?.use(value: .init(
-                old: value.wrappedValue,
-                new: value.wrappedValue,
-                wrapper: token.wrapper,
+        guard
+            let tocken = storage.withLock({
+                $0.value.tokens.binaryRemove(keyPath: \.id, value: id)
+            })
+        else { return }
+        let value = self.value.get()
+        tocken.removeAction?.use(value: .init(
+            old: value,
+            new: value,
+            wrapper: tocken.wrapper,
+            removeObserverAction: {}
+        ))
+    }
+    
+    func removeAll() {
+        let old = storage.withLock { access in
+            defer { access.value.tokens = [] }
+            return access.value.tokens
+        }
+        let value = self.value.get()
+        old.forEach {
+            $0.removeAction?.use(value: .init(
+                old: value,
+                new: value,
+                wrapper: $0.wrapper,
                 removeObserverAction: {}
             ))
         }
     }
     
-    func removeAll() {
-        tokens.update { $0 = [] }
+    func breakParentDependansy() {
+        storage.withLock {
+            $0.value.parent = nil
+            $0.value.anchor = nil
+        }
     }
     
-    func breakParentDependansy() {
-        parent.update { $0 = nil }
-        anchor.update { $0 = nil }
+    func setAnchor(_ anchor: EZObserveAnchorObject) {
+        storage.withLock { $0.value.anchor = anchor }
     }
     
     init(
@@ -105,8 +147,8 @@ final class EZObserversStorage<Value>: EZObserversStorageProtocol, Sendable {
         defaultWrapper: EZObserverWrapperProtocol? = nil,
         parent: (any EZObserversStorageProtocol)? = nil
     ) {
-        self.value = .init(wrappedValue: value)
+        self.value = .init(value)
         self.defaultWrapper = defaultWrapper
-        self.parent = .init(wrappedValue: parent)
+        storage.withLock { $0.value.parent = parent }
     }
 }
