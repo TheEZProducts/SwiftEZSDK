@@ -28,6 +28,7 @@ import Foundation
 ///
 /// let first = await ezWithTaskGroupFirstCompleted(result: .results, tasks)
 /// ```
+@available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
 @discardableResult
 public func ezWithTaskGroupFirstCompleted<T: Sendable>(
     isolation: isolated (any Actor)? = #isolation,
@@ -68,6 +69,7 @@ public func ezWithTaskGroupFirstCompleted<T: Sendable>(
 ///     EZTaskItem { try await slowTask() }
 /// )
 /// ```
+@available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
 @discardableResult
 public func ezWithTaskGroupFirstCompleted<T: Sendable>(
     isolation: isolated (any Actor)? = #isolation,
@@ -89,6 +91,7 @@ public func ezWithTaskGroupFirstCompleted<T: Sendable>(
 ///     EZTaskItem { try await slowTask() }
 /// }
 /// ```
+@available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
 @discardableResult
 public func ezWithTaskGroupFirstCompleted<T: Sendable>(
     isolation: isolated (any Actor)? = #isolation,
@@ -124,6 +127,7 @@ public func ezWithTaskGroupFirstCompleted<T: Sendable>(
 ///
 /// let value = try await ezWithTaskGroupFirstCompleted(tasks)
 /// ```
+@available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
 @discardableResult
 public func ezWithTaskGroupFirstCompleted<T: Sendable>(
     isolation: isolated (any Actor)? = #isolation,
@@ -150,6 +154,7 @@ public func ezWithTaskGroupFirstCompleted<T: Sendable>(
 ///     EZTaskItem { try await slowTask() }
 /// )
 /// ```
+@available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
 @discardableResult
 public func ezWithTaskGroupFirstCompleted<T: Sendable>(
     isolation: isolated (any Actor)? = #isolation,
@@ -171,6 +176,7 @@ public func ezWithTaskGroupFirstCompleted<T: Sendable>(
 ///     EZTaskItem { try await slowTask() }
 /// }
 /// ```
+@available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
 @discardableResult
 public func ezWithTaskGroupFirstCompleted<T: Sendable>(
     isolation: isolated (any Actor)? = #isolation,

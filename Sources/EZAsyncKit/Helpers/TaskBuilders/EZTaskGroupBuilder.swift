@@ -21,8 +21,10 @@ import Foundation
 ///
 /// The builder supports both non-throwing (`Task<Success, Never>`) and throwing
 /// (`Task<Success, Failure>`) tasks via overloaded `buildBlock` methods.
+@available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
 @resultBuilder public struct EZTaskGroupBuilder {
     /// Collects a variadic tuple of non-throwing tasks into a single tuple.
+    @_documentation(visibility: private)
     public static func buildBlock<each T>(
         _ components: repeat Task<each T, Never>
     ) -> (repeat Task<each T, Never>) {
@@ -30,6 +32,7 @@ import Foundation
     }
 
     /// Collects a variadic tuple of possibly-throwing tasks into a single tuple.
+    @_documentation(visibility: private)
     @_disfavoredOverload
     public static func buildBlock<each T, each Err>(
         _ components: repeat Task<each T, each Err>

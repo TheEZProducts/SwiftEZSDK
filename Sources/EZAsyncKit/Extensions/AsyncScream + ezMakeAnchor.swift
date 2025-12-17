@@ -13,13 +13,14 @@ import EZHelpersKit
 import EZAssociatedKit
 #endif
 
+@available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
 extension EZDeinitAnchor {
     convenience init<Element>(continuation: AsyncStream<Element>.Continuation) {
         self.init { continuation.finish() }
     }
 }
 
-
+@available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
 extension AsyncStream.Continuation {
     /// Finishes the stream after `duration`.
     ///

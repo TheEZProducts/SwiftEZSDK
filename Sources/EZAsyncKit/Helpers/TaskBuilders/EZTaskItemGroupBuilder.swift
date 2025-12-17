@@ -23,6 +23,7 @@ import Foundation
 /// task items via overloaded `buildBlock` methods.
 @resultBuilder public struct EZTaskItemGroupBuilder {
     /// Collects a variadic tuple of non-throwing `EZTaskItem` values into a single tuple.
+    @_documentation(visibility: private)
     public static func buildBlock<each T>(
         _ components: repeat EZTaskItem<each T, Never>
     ) -> (repeat EZTaskItem<each T, Never>) {
@@ -30,6 +31,7 @@ import Foundation
     }
 
     /// Collects a variadic tuple of possibly-throwing `EZTaskItem` values into a single tuple.
+    @_documentation(visibility: private)
     @_disfavoredOverload
     public static func buildBlock<each T, each Err>(
         _ components: repeat EZTaskItem<each T, each Err>

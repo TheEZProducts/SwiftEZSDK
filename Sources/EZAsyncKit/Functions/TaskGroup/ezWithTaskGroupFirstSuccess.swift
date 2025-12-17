@@ -29,6 +29,7 @@ import Foundation
 ///
 /// let firstSuccess = await ezWithTaskGroupFirstSuccess(items)
 /// ```
+@available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
 @discardableResult
 public func ezWithTaskGroupFirstSuccess<T: Sendable>(
     isolation: isolated (any Actor)? = #isolation,
@@ -74,6 +75,7 @@ public func ezWithTaskGroupFirstSuccess<T: Sendable>(
 ///     EZTaskItem { try await slowFallbackCall() }
 /// }
 /// ```
+@available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
 @discardableResult
 public func ezWithTaskGroupFirstSuccess<T: Sendable>(
     isolation: isolated (any Actor)? = #isolation,
@@ -93,6 +95,7 @@ public func ezWithTaskGroupFirstSuccess<T: Sendable>(
 ///     EZTaskItem { try await slowFallbackCall() }
 /// )
 /// ```
+@available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
 @discardableResult
 public func ezWithTaskGroupFirstSuccess<T: Sendable>(
     isolation: isolated (any Actor)? = #isolation,

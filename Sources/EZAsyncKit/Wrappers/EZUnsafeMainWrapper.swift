@@ -15,13 +15,13 @@ public struct EZUnsafeMainWrapper {
     /// Runs a non-throwing `@MainActor` closure synchronously by delegating to `MainActor.ezUnsafeRun`.
     ///
     /// Deprecated: call `MainActor.ezUnsafeRun` directly instead.
-    @available(*, deprecated, message: "use MainActor.ezUnsafeRun instead")
     @discardableResult
     public static func run<Result>(
         @_implicitSelfCapture
         action: @MainActor @escaping @Sendable () -> (Result)
     ) -> Result {
-        MainActor.ezUnsafeRun(action: action)
+        let action = unsafeBitCast(action, to: (() -> (Result)).self)
+        return action()
     }
     
     /// Runs a throwing `@MainActor` closure synchronously by delegating to `MainActor.ezUnsafeRun`.
@@ -33,7 +33,8 @@ public struct EZUnsafeMainWrapper {
         @_implicitSelfCapture
         action: @MainActor @escaping @Sendable () throws -> (Result)
     ) throws -> Result {
-        try MainActor.ezUnsafeRun(action: action)
+        let action = unsafeBitCast(action, to: (() throws -> (Result)).self)
+        return try action()
     }
 }
 

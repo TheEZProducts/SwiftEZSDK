@@ -86,7 +86,7 @@ extension CheckedContinuation: EZContinuationProtocol {}
 @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
 extension UnsafeContinuation: EZContinuationProtocol {}
 
-
+@available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
 extension EZActionContinuation {
     struct Storage: Sendable {
         var action: (@Sendable (Result<T, Error>) async -> Void)?
@@ -177,6 +177,7 @@ public final class EZActionContinuation<T: Sendable>: Sendable, EZContinuationPr
     }
 }
 
+@available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
 extension EZSafeContinuation {
     struct Storage: Sendable {
         var continuation: CheckedContinuation<T, Error>?

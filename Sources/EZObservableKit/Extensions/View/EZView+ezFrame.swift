@@ -42,7 +42,7 @@ class EZUIViewFrameObserve{
     private func setObserve(_ view: EZView){
         keys.append(view.observe(\.frame, options: [.old, .new]) {[weak self] (view, value) in
             if value.oldValue == value.newValue {return}
-            MainActor.ezUnsafeRun {
+            EZUnsafeMainWrapper.run {
                 self?.ezFrame = view.frame
                 if self?.ezBounds != view.bounds { self?.ezBounds = view.bounds }
             }
@@ -50,14 +50,14 @@ class EZUIViewFrameObserve{
 #if canImport(UIKit)
         keys.append(view.observe(\.center, options: [.old, .new]) {[weak self] (view, value) in
             if value.oldValue == value.newValue {return}
-            MainActor.ezUnsafeRun {
+            EZUnsafeMainWrapper.run {
                 self?.ezFrame = view.frame
             }
         })
 #endif
         keys.append(view.observe(\.bounds, options: [.old, .new]) {[weak self] (view, value) in
             if value.oldValue == value.newValue {return}
-            MainActor.ezUnsafeRun {
+            EZUnsafeMainWrapper.run {
                 if self?.ezFrame != view.frame { self?.ezFrame = view.frame }
                 self?.ezBounds = view.bounds
             }

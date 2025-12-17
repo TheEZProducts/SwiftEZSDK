@@ -49,6 +49,7 @@ public final class EZDeinitAnchor: Sendable {
 }
 
 #if canImport(EZAssociatedKit) && canImport(ObjectiveC)
+@available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
 extension EZDeinitAnchor {
     /// Attaches this anchor to an Objective-C object using associated objects.
     ///

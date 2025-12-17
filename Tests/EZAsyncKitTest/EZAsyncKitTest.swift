@@ -327,3 +327,13 @@ final class EZAsyncKitTest: XCTestCase, @unchecked Sendable {
 //    }
     
 }
+
+enum RequestContext {
+  @TaskLocal static var id: String?
+}
+
+func fsdfsd() {
+    RequestContext.$id.withValue("Hello") {
+        
+    }
+}

@@ -19,7 +19,7 @@ open class EZDummyTabBarController: UITabBarController {
     }
 }
 
-open class EZContainerView: UIView{
+open class EZContainerView: UIView {
     public weak var currentViewController: UIViewController?
     public var dummyController: EZDummyTabBarController?
     public var presentationStatusDidUpdateAction: ((_ container: EZContainerView, _ isPresenting: Bool) -> ())?
@@ -54,7 +54,7 @@ open class EZContainerView: UIView{
         presentationStatusDidUpdateAction?(self, true)
         let dummy = EZDummyTabBarController()
         dummy.view.alpha = 0
-        if #available(macCatalyst 18.0, *) {
+        if #available(iOS 18.0, *) {
             dummy.mode = .tabBar
             dummy.setTabBarHidden(true, animated: false)
         } else {

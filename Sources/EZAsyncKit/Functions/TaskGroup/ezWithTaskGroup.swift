@@ -28,6 +28,7 @@ import EZHelpersKit
 ///     EZTaskItem { "two" }
 /// )
 /// ```
+@available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
 public func ezWithTaskGroup<each T: Sendable>(
     isolation: isolated (any Actor)? = #isolation,
     result: EZTaskGroupResultValuesType = .values,
@@ -67,6 +68,7 @@ public func ezWithTaskGroup<each T: Sendable>(
 ///     EZTaskItem { "two" }
 /// }
 /// ```
+@available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
 public func ezWithTaskGroup<each T: Sendable>(
     isolation: isolated (any Actor)? = #isolation,
     result: EZTaskGroupResultValuesType = .values,
@@ -90,6 +92,8 @@ public func ezWithTaskGroup<each T: Sendable>(
 ///   - ops: A variadic list of `EZTaskItem` operations to run in parallel.
 /// - Throws: `EZGroupError` wrapping a tuple of `Result` values for each task.
 /// - Returns: A tuple of all successful values, in the same order as `ops`.
+@available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
+@_documentation(visibility: private)
 @_disfavoredOverload
 public func ezWithTaskGroup<each T: Sendable, each Err>(
     isolation: isolated (any Actor)? = #isolation,
@@ -126,6 +130,8 @@ public func ezWithTaskGroup<each T: Sendable, each Err>(
 ///     EZTaskItem { try await loadPosts() }
 /// }
 /// ```
+@available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
+@_documentation(visibility: private)
 @_disfavoredOverload
 public func ezWithTaskGroup<each T: Sendable, each Err>(
     isolation: isolated (any Actor)? = #isolation,
@@ -156,6 +162,8 @@ public func ezWithTaskGroup<each T: Sendable, each Err>(
 ///         EZTaskItem { try await loadPosts() }
 ///     )
 /// ```
+@available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
+@_documentation(visibility: private)
 @_disfavoredOverload
 public func ezWithTaskGroup<each T: Sendable, each Err>(
     isolation: isolated (any Actor)? = #isolation,
@@ -203,6 +211,8 @@ public func ezWithTaskGroup<each T: Sendable, each Err>(
 ///     EZTaskItem { try await loadPosts() }
 /// }
 /// ```
+@available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
+@_documentation(visibility: private)
 @_disfavoredOverload
 public func ezWithTaskGroup<each T: Sendable, each Err: Error>(
     isolation: isolated (any Actor)? = #isolation,
@@ -226,6 +236,8 @@ public func ezWithTaskGroup<each T: Sendable, each Err: Error>(
 ///   - result: Use `.optionals` to make the intent explicit.
 ///   - ops: A variadic list of `EZTaskItem` operations to run in parallel.
 /// - Returns: A tuple of optional values in the same order as `ops`.
+@available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
+@_documentation(visibility: private)
 @_disfavoredOverload
 public func ezWithTaskGroup<each T: Sendable, each Err: Error>(
     isolation: isolated (any Actor)? = #isolation,
@@ -258,6 +270,8 @@ public func ezWithTaskGroup<each T: Sendable, each Err: Error>(
 ///     EZTaskItem { try await loadPosts() }
 /// }
 /// ```
+@available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
+@_documentation(visibility: private)
 @_disfavoredOverload
 public func ezWithTaskGroup<each T: Sendable, each Err>(
     isolation: isolated (any Actor)? = #isolation,
@@ -268,6 +282,8 @@ public func ezWithTaskGroup<each T: Sendable, each Err>(
 }
 
 // MARK: - Private helpers
+@available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
+@_documentation(visibility: private)
 private func _ezWithTaskGroup_makeResults<each T, each R: Error>(
     isolation: isolated (any Actor)? = #isolation,
     cortege: repeat (Optional<each T>, Optional<each R>)

@@ -27,6 +27,7 @@ import EZHelpersKit
 /// let (a, b) = await ezWithUnstructuredTaskGroup(t1, t2)
 /// // a == 1, b == 2
 /// ```
+@available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
 @discardableResult
 public func ezWithUnstructuredTaskGroup<each T>(
     result: EZTaskGroupResultValuesType = .values,
@@ -50,6 +51,7 @@ public func ezWithUnstructuredTaskGroup<each T>(
 ///     Task { "two" }
 /// }
 /// ```
+@available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
 @discardableResult
 public func ezWithUnstructuredTaskGroup<each T>(
     result: EZTaskGroupResultValuesType = .values,
@@ -78,6 +80,8 @@ public func ezWithUnstructuredTaskGroup<each T>(
 ///
 /// let (user, posts) = try await ezWithUnstructuredTaskGroup(t1, t2)
 /// ```
+@available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
+@_documentation(visibility: private)
 @_disfavoredOverload
 @discardableResult
 public func ezWithUnstructuredTaskGroup<each T, each Err>(
@@ -112,6 +116,8 @@ public func ezWithUnstructuredTaskGroup<each T, each Err>(
 ///     Task { try await loadPosts() }
 /// }
 /// ```
+@available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
+@_documentation(visibility: private)
 @_disfavoredOverload
 @discardableResult
 public func ezWithUnstructuredTaskGroup<each T, each Err>(
@@ -140,6 +146,8 @@ public func ezWithUnstructuredTaskGroup<each T, each Err>(
 /// let (userResult, postsResult): (Result<User, Error>, Result<[Post], Error>) =
 ///     await ezWithUnstructuredTaskGroup(result: .results, t1, t2)
 /// ```
+@available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
+@_documentation(visibility: private)
 @_disfavoredOverload
 @discardableResult
 public func ezWithUnstructuredTaskGroup<each T, each Err>(
@@ -164,6 +172,8 @@ public func ezWithUnstructuredTaskGroup<each T, each Err>(
 ///     Task { try await loadPosts() }
 /// }
 /// ```
+@available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
+@_documentation(visibility: private)
 @_disfavoredOverload
 @discardableResult
 public func ezWithUnstructuredTaskGroup<each T, each Err>(
@@ -193,6 +203,8 @@ public func ezWithUnstructuredTaskGroup<each T, each Err>(
 /// let (user, posts): (User?, [Post]?) =
 ///     await ezWithUnstructuredTaskGroup(result: .optionals, t1, t2)
 /// ```
+@available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
+@_documentation(visibility: private)
 @_disfavoredOverload
 @discardableResult
 public func ezWithUnstructuredTaskGroup<each T, each Err>(
@@ -217,6 +229,8 @@ public func ezWithUnstructuredTaskGroup<each T, each Err>(
 ///     Task { try await loadPosts() }
 /// }
 /// ```
+@available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
+@_documentation(visibility: private)
 @_disfavoredOverload
 @discardableResult
 public func ezWithUnstructuredTaskGroup<each T, each Err>(

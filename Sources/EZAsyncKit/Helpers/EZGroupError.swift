@@ -34,6 +34,7 @@ extension EZGroupError {
     /// success or failure types.
     ///
     /// The method is available when `T` is a variadic tuple of `Result<Success, Failure>` values.
+    @_documentation(visibility: private)
     public func getResults<each Value, each Err>() -> [Result<Any, any Error>] where T == (repeat Result<each Value, each Err>) {
         var array = [Result<Any, any Error>]()
         for result in repeat each results {
@@ -50,6 +51,7 @@ extension EZGroupError {
     /// Collects only the errors from all stored `Result` values.
     ///
     /// Returns an array of the failure values for every `.failure` case in `results`.
+    @_documentation(visibility: private)
     public func getErrors<each Value, each Err>() -> [any Error] where T == (repeat Result<each Value, each Err>) {
         return Array(group: (repeat (each results).ezGetError()))
     }
@@ -57,6 +59,7 @@ extension EZGroupError {
     /// Collects only the successful values from all stored `Result` values.
     ///
     /// Returns an array of the success values for every `.success` case in `results`.
+    @_documentation(visibility: private)
     public func getValues<each Value, each Err>() -> [Any] where T == (repeat Result<each Value, each Err>) {
         var array = [Any]()
         for result in repeat each results {
