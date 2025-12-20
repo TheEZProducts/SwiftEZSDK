@@ -596,7 +596,7 @@ extension EZObservable {
         /// $value.signal(.changeWrapper(MyWrapper()))
         /// ```
         @discardableResult
-        public func signal(_ type: EZSetType) -> Self { _mainObservable.signal(type); return self }
+        public func signal(_ type: EZSetType = .common) -> Self { _mainObservable.signal(type); return self }
         
         /// Removes an observer/subscription by its identifier.
         ///
