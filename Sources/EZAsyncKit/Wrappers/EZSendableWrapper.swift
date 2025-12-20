@@ -35,7 +35,7 @@ import EZMacrosKit
 ///         _modify { yield &_text.wrappedValue }
 ///     }
 ///
-///     public var $text: EZSendableWrapper<String>.ProjectedValue {
+///     public var $text: EZSendableWrapper<String>.Projection {
 ///         _read { yield _text.projectedValue }
 ///     }
 ///
@@ -122,7 +122,7 @@ public final class EZSendableWrapper<Value>: EZConstantPropertyWrapperProtocol, 
     ///
     /// In typical usage you read through `$property` and perform mutations via the backing
     /// `_property` wrapper on the owning type.
-    public var projectedValue: ProjectedValue { .init(_main: self) }
+    public var projectedValue: Projection { .init(_main: self) }
     
     /// Convenient access to the value.
     ///
@@ -204,6 +204,15 @@ public final class EZSendableWrapper<Value>: EZConstantPropertyWrapperProtocol, 
     }
 }
 
+@attached(accessor)
+@attached(peer, names: prefixed(`$`), prefixed(`_`))
+public macro EZSendableWrapperProjection() = #externalMacro(module: "EZMacros", type: "EZConstantPropertyWrapperMacro")
+
+@attached(accessor)
+@attached(peer, names: prefixed(`$`), prefixed(`_`))
+public macro EZSendableWrapperProjection<T>() = #externalMacro(module: "EZMacros", type: "EZConstantPropertyWrapperMacro")
+
+public typealias EZSendableWrapperProjection<Value> = EZSendableWrapper<Value>.Projection
 
 extension EZSendableWrapper {
     /// Synchronous view of the projected value exposed as `$property`.
@@ -215,7 +224,7 @@ extension EZSendableWrapper {
     /// Calling `update` here passes the current `Value` into the closure; for value types this
     /// does not replace the stored value, while for reference types you may mutate the referenced
     /// object.
-    public struct ProjectedValue: Sendable {
+    public struct Projection: EZConstantPropertyWrapperProtocol, Sendable {
         let _main: EZSendableWrapper<Value>
         
         /// Synchronous access to the wrapped value.
@@ -228,7 +237,10 @@ extension EZSendableWrapper {
         /// ```
         public var wrappedValue: Value {
             _read { yield _main.wrappedValue }
+            nonmutating set {}
         }
+        
+        public var projectedValue: Self { self }
         
         /// Computes a result under the same lock by passing the current `Value` into `closure`.
         ///

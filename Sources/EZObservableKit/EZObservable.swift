@@ -110,7 +110,7 @@ public struct EZObservable<Value>: EZConstantPropertyWrapperProtocol, EZObservab
     ///
     /// The projected value exposes the subscription API and read/derive helpers.
     /// Mutations should be done through the backing `_property` wrapper.
-    public var projectedValue: ProjectedValue {
+    public var projectedValue: Projection {
         get { .init(observable: self) }
     }
     
@@ -155,7 +155,7 @@ public struct EZObservable<Value>: EZConstantPropertyWrapperProtocol, EZObservab
     
     /// Same as `attach(_:)`, but takes a projected value (`$property`).
     @discardableResult
-    public mutating func attach(_ observable: EZObservable<Value>.ProjectedValue) -> Self {
+    public mutating func attach(_ observable: EZObservable<Value>.Projection) -> Self {
         storage = observable._mainObservable.storage
         return self
     }
@@ -397,6 +397,16 @@ extension EZObservable {
 }
 
 
+@attached(accessor)
+@attached(peer, names: prefixed(`$`), prefixed(`_`))
+public macro EZObservableProjection() = #externalMacro(module: "EZMacros", type: "EZConstantPropertyWrapperMacro")
+
+@attached(accessor)
+@attached(peer, names: prefixed(`$`), prefixed(`_`))
+public macro EZObservableProjection<T>() = #externalMacro(module: "EZMacros", type: "EZConstantPropertyWrapperMacro")
+
+public typealias EZObservableProjection<Value> = EZObservable<Value>.Projection
+
 extension EZObservable {
     /// Projected value exposed as `$property`.
     ///
@@ -407,7 +417,7 @@ extension EZObservable {
     ///
     /// Note: `update` here receives a plain `Value` (by value). For value types it does not replace
     /// the stored value; for mutations use the backing `_property.update` / `_property.set` APIs.
-    public struct ProjectedValue: EZObservableProtocol, Sendable {
+    public struct Projection: EZObservableProtocol, EZConstantPropertyWrapperProtocol, Sendable {
         let _mainObservable: EZObservable<Value>
         
         /// Read-only access to the current stored value.
@@ -418,7 +428,10 @@ extension EZObservable {
         /// ```
         public var wrappedValue: Value {
             _read { yield _mainObservable.wrappedValue }
+            nonmutating set {}
         }
+        
+        public var projectedValue: Projection { self }
         
         /// Computes a derived result under the same lock by passing the current value into `closure`.
         ///

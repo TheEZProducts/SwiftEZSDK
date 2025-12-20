@@ -40,7 +40,7 @@ protocol EZThreadSafetyIsolatedValueProtocol<Value>: Sendable {
 ///         _modify { yield &_text.wrappedValue }
 ///     }
 ///
-///     public var $text: EZThreadSafety<String>.ProjectedValue {
+///     public var $text: EZThreadSafety<String>.Projection {
 ///         _read { yield _text.projectedValue }
 ///     }
 ///
@@ -142,7 +142,7 @@ public struct EZThreadSafety<Value: Sendable>: EZConstantPropertyWrapperProtocol
     /// Projected value (`$property`) intended primarily for reading in user code.
     ///
     /// For mutations use the backing `_property` wrapper (`_name.update` / `_name.set`).
-    public var projectedValue: ProjectedValue {
+    public var projectedValue: Projection {
         .init(_main: self)
     }
     
@@ -256,12 +256,22 @@ public struct EZThreadSafety<Value: Sendable>: EZConstantPropertyWrapperProtocol
     }
 }
 
+@attached(accessor)
+@attached(peer, names: prefixed(`$`), prefixed(`_`))
+public macro EZThreadSafetyProjection() = #externalMacro(module: "EZMacros", type: "EZConstantPropertyWrapperMacro")
+
+@attached(accessor)
+@attached(peer, names: prefixed(`$`), prefixed(`_`))
+public macro EZThreadSafetyProjection<T>() = #externalMacro(module: "EZMacros", type: "EZConstantPropertyWrapperMacro")
+
+public typealias EZThreadSafetyProjection<Value: Sendable> = EZThreadSafety<Value>.Projection
+
 extension EZThreadSafety {
     /// Synchronous view of the projected value exposed as `$property`.
     ///
     /// The main intent is reading the current value (or computing a derived result) under the same lock.
     /// Mutating the stored value should be done through the backing `_property` wrapper.
-    public struct ProjectedValue: Sendable {
+    public struct Projection: EZConstantPropertyWrapperProtocol, Sendable {
         let _main: EZThreadSafety<Value>
         
         /// Synchronous read-only access to the current stored value.
@@ -272,7 +282,10 @@ extension EZThreadSafety {
         /// ```
         public var wrappedValue: Value {
             _read { yield _main.wrappedValue }
+            nonmutating set {}
         }
+        
+        public var projectedValue: Self { self }
         
         /// Computes a result under the same lock by passing the current `Value` into `closure` (async).
         ///
