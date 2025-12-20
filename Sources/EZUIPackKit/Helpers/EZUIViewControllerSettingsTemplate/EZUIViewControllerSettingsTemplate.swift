@@ -5,6 +5,7 @@
 //  Created by Александр Сенин on 17.02.2025.
 //
 
+#if canImport(UIKit) && !os(watchOS)
 import UIKit
 
 @MainActor
@@ -72,3 +73,4 @@ extension EZUIViewControllerSettingsTemplate where Controller: EZUITabBarPackPro
         }
     }
 }
+#endif

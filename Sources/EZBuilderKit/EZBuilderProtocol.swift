@@ -7,23 +7,23 @@
 
 import Foundation
 
-public protocol EZBuilderProtocol<V>{
+public protocol EZBuilderProtocol<V> {
     associatedtype V
     var value: V { get set }
     
     init(_ value: V)
 }
  
-public struct EZBuilderScript<V>{
+public struct EZBuilderScript<V> {
     public var action: (V) -> ()
     public init(action: @escaping (V) -> Void) {
         self.action = action
     }
 }
 
-extension EZBuilderProtocol{
-    public static func callAsFunction(_ action: @escaping (Self) -> ()) -> EZBuilderScript<V>{
-        .init{ action(Self($0)) }
+extension EZBuilderProtocol {
+    public static func callAsFunction(_ action: @escaping (Self) -> ()) -> EZBuilderScript<V> {
+        .init { action(Self($0)) }
     }
 }
 

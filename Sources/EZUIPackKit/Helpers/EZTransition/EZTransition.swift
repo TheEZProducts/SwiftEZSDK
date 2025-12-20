@@ -5,6 +5,7 @@
 //  Created by Александр Сенин on 15.02.2025.
 //
 
+#if canImport(UIKit) && !os(watchOS)
 import Foundation
 import UIKit
 
@@ -35,4 +36,4 @@ extension EZTransition<EZContainerView>{
         self.container = container
     }
 }
-
+#endif

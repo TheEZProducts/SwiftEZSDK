@@ -5,11 +5,8 @@
 //  Created by Александр Сенин on 16.02.2025.
 //
 
-#if canImport(UIKit)
+#if canImport(UIKit) && !os(watchOS)
 import UIKit
-#elseif canImport(Cocoa)
-import Cocoa
-#endif
 
 extension EZTransition<UIViewController>{
     public func replace(_ controller: UIViewController) -> any EZReplaceTransitionProtocol<EZChildTransitionContext> {
@@ -22,3 +19,4 @@ extension EZTransition<UIViewController>{
 }
 
 public protocol EZReplaceTransitionProtocol<Context>: EZTransitionProtocol{}
+#endif

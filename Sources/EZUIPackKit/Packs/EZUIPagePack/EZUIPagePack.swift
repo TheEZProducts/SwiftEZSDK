@@ -5,11 +5,8 @@
 //  Created by Александр Сенин on 16.02.2025.
 //
 
-#if canImport(UIKit)
+#if canImport(UIKit) && !os(watchOS)
 import UIKit
-#elseif canImport(Cocoa)
-import Cocoa
-#endif
 
 extension EZUIPackBridge{
     public var pagePack: (any EZUIPagePackProtocol)? {
@@ -33,7 +30,7 @@ open class EZUIPagePack<
     public var defaultChildrenTransitionAnimation: (any UIViewControllerAnimatedTransitioning)?
     
     public var storage: EZUIPackStorage<I, M, V>
-    
+#if !os(tvOS)
     open override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
         delegate?.pageViewControllerSupportedInterfaceOrientations?(self) ??
         storage.view.supportedInterfaceOrientations ??
@@ -46,18 +43,21 @@ open class EZUIPagePack<
         super.preferredInterfaceOrientationForPresentation
     }
     
+    @available(visionOS, introduced: 1.0, deprecated: 1.0, message: "Has no effect on visionOS")
     open override var preferredStatusBarStyle: UIStatusBarStyle {
         storage.view.preferredStatusBarStyle ?? super.preferredStatusBarStyle
     }
     
+    @available(visionOS, introduced: 1.0, deprecated: 1.0, message: "Has no effect on visionOS")
     open override var prefersStatusBarHidden: Bool {
         storage.view.prefersStatusBarHidden ?? super.prefersStatusBarHidden
     }
     
+    @available(visionOS, introduced: 1.0, deprecated: 1.0, message: "Has no effect on visionOS")
     open override var preferredStatusBarUpdateAnimation: UIStatusBarAnimation {
         storage.view.preferredStatusBarUpdateAnimation ?? super.preferredStatusBarUpdateAnimation
     }
-    
+#endif
     open override var keyCommands: [UIKeyCommand]? {
         storage.interactor.keyCommands
     }
@@ -125,7 +125,7 @@ open class EZUIPagePack<
         storage.viewWillAppear(animated)
     }
     
-    @available(iOS 13.0, *)
+    @available(iOS 13.0, tvOS 13.0, *)
     open override func viewIsAppearing(_ animated: Bool) {
         super.viewIsAppearing(animated)
         storage.viewIsAppearing(animated)
@@ -155,3 +155,4 @@ open class EZUIPagePack<
         fatalError("init(coder:) has not been implemented")
     }
 }
+#endif

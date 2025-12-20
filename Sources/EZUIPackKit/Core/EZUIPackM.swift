@@ -5,6 +5,7 @@
 //  Created by Александр Сенин on 08.02.2025.
 //
 
+#if canImport(UIKit) && !os(watchOS)
 import Foundation
 
 @MainActor
@@ -70,8 +71,9 @@ open class EZUIPackMediator{
     required public init(){}
 }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, *)
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension EZUIPackMediator: ObservableObject{}
 
 public typealias EZUIPackM = EZUIPackMediatorProtocol & EZUIPackMediatorWithActionProviders & EZUIPackMediator
 
+#endif

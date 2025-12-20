@@ -5,6 +5,7 @@
 //  Created by Александр Сенин on 17.02.2025.
 //
 
+#if canImport(UIKit) && !os(watchOS)
 import UIKit
 
 public typealias EZUINavigationWrapperPack = EZUINavigationPack<
@@ -48,3 +49,4 @@ public class EZUINavigationWrapperPackM: EZUIPackMediator, EZUIPackMediatorProto
     
     public var controllers: [UIViewController]?
 }
+#endif

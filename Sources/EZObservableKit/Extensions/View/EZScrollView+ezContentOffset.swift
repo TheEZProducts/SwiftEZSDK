@@ -1,6 +1,6 @@
 //
 //  File.swift
-//  
+//
 //
 //  Created by Александр Сенин on 04.06.2023.
 //
@@ -18,9 +18,9 @@ import UIKit
 import Cocoa
 #endif
 
-#if canImport(UIKit) || canImport(Cocoa)
+#if (canImport(UIKit) || canImport(Cocoa)) && !os(watchOS)
 @MainActor
-class EZUIScrollViewContentOffSetObserve{
+class EZUIScrollViewContentOffSetObserve {
     private var key: NSKeyValueObservation?
     @EZObservable var ezContentOffSet: CGPoint = .zero
     private weak var view: EZScrollView?
@@ -52,7 +52,31 @@ class EZUIScrollViewContentOffSetObserve{
 extension EZScrollView{
     private var ezContentOffSetKey: String {"EZContentOffSet"}
     
-    public var ezContentOffset: EZObservable<CGPoint>{
+    /// Observable view of the scroll view's current content offset.
+    ///
+    /// This property exposes an `EZObservable<CGPoint>.ProjectedValue` that you can use to:
+    /// - read the current offset (`wrappedValue`),
+    /// - subscribe to offset changes (`add...`).
+    ///
+    /// Under the hood it installs a KVO observer and stores the observation in an associated object
+    /// tied to the scroll view instance.
+    ///
+    /// Platform notes:
+    /// - On UIKit, it observes `contentOffset`.
+    /// - On AppKit, it observes the scroll view's `contentView.bounds.origin`.
+    ///
+    /// ### Example
+    /// ```swift
+    /// let token = scrollView.ezContentOffset.add { change in
+    ///     print("offset:", change.new)
+    /// }
+    /// _ = token
+    ///
+    /// // Read current offset:
+    /// let current = scrollView.ezContentOffset.wrappedValue
+    /// print(current)
+    /// ```
+    public var ezContentOffset: EZObservable<CGPoint>.ProjectedValue {
         if let scrollViewContentOffSetObserve = EZAssociated(self)
             .get(.hashable(ezContentOffSetKey)) as? EZUIScrollViewContentOffSetObserve
         {

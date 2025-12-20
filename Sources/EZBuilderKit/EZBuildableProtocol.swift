@@ -7,11 +7,11 @@
 
 import Foundation
 
-public protocol EZBuildableProtocol{
+public protocol EZBuildableProtocol {
     init()
 }
 
-extension EZBuildableProtocol{
+extension EZBuildableProtocol {
     @discardableResult
     public static func build<B: EZBuilderProtocol<Self>>(_ type: B.Type, _ closure: (B) -> ()) -> Self{
         Self.init().build(type, closure)
@@ -35,7 +35,7 @@ extension EZBuildableProtocol{
     }
 }
 
-extension EZBuildableProtocol{
+extension EZBuildableProtocol {
     public var builder: EZBuilder<Self> { .init(self) }
 
     @discardableResult
@@ -50,6 +50,6 @@ extension EZBuildableProtocol{
     }
 }
 
-@resultBuilder public struct EZAnyBuilder{
+@resultBuilder public struct EZAnyBuilder {
     public static func buildBlock<T>(_ atrs: T...) -> [T] { atrs }
 }

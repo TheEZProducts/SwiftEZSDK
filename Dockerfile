@@ -2,8 +2,10 @@
 # Linux Test Build
 # ================================
 
-FROM swiftarm/swift:latest as build
+FROM swift:latest
 
+WORKDIR /app
 COPY . .
+
 RUN swift package resolve
 RUN swift build -c release

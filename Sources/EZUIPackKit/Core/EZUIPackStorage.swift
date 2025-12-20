@@ -6,11 +6,9 @@
 //
 
 import Foundation
-#if canImport(UIKit)
+#if canImport(UIKit) && !os(watchOS)
 import UIKit
-#elseif canImport(Cocoa)
-import Cocoa
-#endif
+
 
 @MainActor
 open class EZUIPackStorage<
@@ -95,7 +93,7 @@ open class EZUIPackStorage<
         view.animateOpen()
     }
     
-    @available(iOS 13.0, *)
+    @available(iOS 13.0, tvOS 13.0, *)
     open func viewIsAppearing(_ animated: Bool) {
         interactor.viewIsAppearing(animated)
         view.viewIsAppearing(animated)
@@ -165,3 +163,4 @@ extension UIViewController{
         preferredContentSize != .zero ? preferredContentSize : parent?.firstPreferredContentSize
     }
 }
+#endif

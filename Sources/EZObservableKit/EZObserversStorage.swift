@@ -103,7 +103,7 @@ final class EZObserversStorage<Value>: EZObserversStorageProtocol, Sendable {
     func remove(id: UInt) {
         guard
             let tocken = storage.withLock({
-                $0.value.tokens.binaryRemove(keyPath: \.id, value: id)
+                $0.value.tokens.ezBinaryRemove(keyPath: \.id, value: id)
             })
         else { return }
         let value = self.value.get()
@@ -150,5 +150,9 @@ final class EZObserversStorage<Value>: EZObserversStorageProtocol, Sendable {
         self.value = .init(value)
         self.defaultWrapper = defaultWrapper
         storage.withLock { $0.value.parent = parent }
+    }
+    
+    deinit {
+        removeAll()
     }
 }

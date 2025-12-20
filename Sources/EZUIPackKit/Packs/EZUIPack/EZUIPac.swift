@@ -6,11 +6,8 @@
 //
 
 import Foundation
-#if canImport(UIKit)
+#if canImport(UIKit) && !os(watchOS)
 import UIKit
-#elseif canImport(Cocoa)
-import Cocoa
-#endif
 
 @MainActor
 public protocol EZUIPackProtocol: UIViewController, EZTransitionControlledProtocol, EZSharingProtocol{
@@ -170,7 +167,7 @@ open class EZUIPack<
     V: EZUIPackViewProtocol
 >: UIViewController, EZUIPackProtocol where I.Mediator == M, V.Mediator == M{
     public var storage: EZUIPackStorage<I, M, V>
-    
+#if !os(tvOS)
     open override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
         storage.view.supportedInterfaceOrientations ?? .all
     }
@@ -180,18 +177,21 @@ open class EZUIPack<
         super.preferredInterfaceOrientationForPresentation
     }
     
+    @available(visionOS, introduced: 1.0, deprecated: 1.0, message: "Has no effect on visionOS")
     open override var preferredStatusBarStyle: UIStatusBarStyle {
         storage.view.preferredStatusBarStyle ?? super.preferredStatusBarStyle
     }
     
+    @available(visionOS, introduced: 1.0, deprecated: 1.0, message: "Has no effect on visionOS")
     open override var prefersStatusBarHidden: Bool {
         storage.view.prefersStatusBarHidden ?? super.prefersStatusBarHidden
     }
     
+    @available(visionOS, introduced: 1.0, deprecated: 1.0, message: "Has no effect on visionOS")
     open override var preferredStatusBarUpdateAnimation: UIStatusBarAnimation {
         storage.view.preferredStatusBarUpdateAnimation ?? super.preferredStatusBarUpdateAnimation
     }
-    
+#endif
     open override var keyCommands: [UIKeyCommand]? {
         storage.interactor.keyCommands
     }
@@ -230,7 +230,7 @@ open class EZUIPack<
         storage.viewWillAppear(animated)
     }
     
-    @available(iOS 13.0, *)
+    @available(iOS 13.0, tvOS 13.0, *)
     open override func viewIsAppearing(_ animated: Bool) {
         super.viewIsAppearing(animated)
         storage.viewIsAppearing(animated)
@@ -260,7 +260,7 @@ open class EZUIPack<
         fatalError("init(coder:) has not been implemented")
     }
 }
-
+#endif
 
 
 

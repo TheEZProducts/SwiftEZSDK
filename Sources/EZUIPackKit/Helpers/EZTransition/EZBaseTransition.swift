@@ -5,11 +5,8 @@
 //  Created by Александр Сенин on 16.02.2025.
 //
 
-#if canImport(UIKit)
+#if canImport(UIKit) && !os(watchOS)
 import UIKit
-#elseif canImport(Cocoa)
-import Cocoa
-#endif
 
 extension EZTransition<UIViewController>{
     public func present(_ controller: UIViewController) -> EZPresentTransition<Container> {
@@ -86,7 +83,7 @@ extension EZTransitionProtocol where Context == EZBaseTransitionContext{
 
 protocol EZBaseTransitionProtocol: EZTransitionProtocol<EZBaseTransitionContext>{}
 
-@available(iOS 13.0, *)
+@available(iOS 13.0, tvOS 13.0, *)
 extension EZTransitionProtocol<EZBaseTransitionContext>{
     @MainActor
     @discardableResult
@@ -207,3 +204,4 @@ extension UIViewController{
         parent?.rootParent ?? self
     }
 }
+#endif

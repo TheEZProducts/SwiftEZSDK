@@ -6,11 +6,8 @@
 //
 
 import Foundation
-#if canImport(UIKit)
+#if canImport(UIKit) && !os(watchOS)
 import UIKit
-#elseif canImport(Cocoa)
-import Cocoa
-#endif
 
 open class EZUINavigationControllerDelegate: NSObject, UINavigationControllerDelegate{
     public weak var delegate: UINavigationControllerDelegate?
@@ -83,3 +80,5 @@ open class EZUINavigationControllerDelegate: NSObject, UINavigationControllerDel
         }()
     }
 }
+
+#endif

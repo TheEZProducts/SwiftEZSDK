@@ -5,11 +5,8 @@
 //  Created by Александр Сенин on 16.02.2025.
 //
 
-#if canImport(UIKit)
+#if canImport(UIKit) && !os(watchOS)
 import UIKit
-#elseif canImport(Cocoa)
-import Cocoa
-#endif
 
 extension EZTransition<UIViewController>{
     public func navigationPush(_ controller: UIViewController) -> EZNavigationPushTransition {
@@ -93,7 +90,7 @@ extension EZTransitionProtocol where Context == EZChildTransitionContext{
 
 protocol EZNavigationTransitionProtocol: EZTransitionProtocol<EZChildTransitionContext>{}
 
-@available(iOS 13.0, *)
+@available(iOS 13.0, tvOS 13.0, *)
 extension EZTransitionProtocol<EZChildTransitionContext>{
     @MainActor
     @discardableResult
@@ -424,3 +421,4 @@ public struct EZNavigationReplaceTopTransition: EZTransitionProtocol, EZNavigati
         return true
     }
 }
+#endif

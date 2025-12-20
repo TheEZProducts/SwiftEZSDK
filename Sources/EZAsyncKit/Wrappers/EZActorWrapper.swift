@@ -8,6 +8,8 @@
 
 import Foundation
 
+import EZMacrosKit
+
 /// A tiny actor-backed box for a single value.
 ///
 /// `EZActorWrapper` serializes access to a mutable value using actor isolation.
@@ -20,7 +22,7 @@ import Foundation
 /// let v = await box.get() // 1
 /// ```
 @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
-public actor EZActorWrapper<Value>{
+public actor EZActorWrapper<Value> {
     private var value: Value
 
     /// Returns the current value.

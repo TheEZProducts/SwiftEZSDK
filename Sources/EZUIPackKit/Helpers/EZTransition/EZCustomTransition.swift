@@ -5,6 +5,7 @@
 //  Created by Александр Сенин on 19.02.2025.
 //
 
+#if canImport(UIKit) && !os(watchOS)
 import UIKit
 
 extension EZTransition<UIViewController>{
@@ -233,7 +234,7 @@ extension EZTransitionProtocol where Context == EZCustomTransitionContext{
 
 protocol EZCustomTransitionProtocol: EZTransitionProtocol<EZCustomTransitionContext>{}
 
-@available(iOS 13.0, *)
+@available(iOS 13.0, tvOS 13.0, *)
 extension EZTransitionProtocol<EZCustomTransitionContext>{
     @MainActor
     @discardableResult
@@ -301,3 +302,4 @@ public struct EZCustomTransition: EZTransitionProtocol{
         }
     }
 }
+#endif

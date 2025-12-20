@@ -5,11 +5,8 @@
 //  Created by Александр Сенин on 16.02.2025.
 //
 
-#if canImport(UIKit)
+#if canImport(UIKit) && !os(watchOS)
 import UIKit
-#elseif canImport(Cocoa)
-import Cocoa
-#endif
 
 open class EZUITabBarControllerDelegate: NSObject, UITabBarControllerDelegate{
     public weak var delegate: UITabBarControllerDelegate?
@@ -27,7 +24,7 @@ open class EZUITabBarControllerDelegate: NSObject, UITabBarControllerDelegate{
         self.interactive = interactive
     }
     
-    @available(iOS 18.0, *)
+    @available(iOS 18.0, tvOS 18.0, *)
     open func tabBarController(
         _ tabBarController: UITabBarController,
         shouldSelectTab tab: UITab
@@ -39,7 +36,7 @@ open class EZUITabBarControllerDelegate: NSObject, UITabBarControllerDelegate{
     }
     
     
-    @available(iOS 18.0, *)
+    @available(iOS 18.0, tvOS 18.0, *)
     open func tabBarController(
         _ tabBarController: UITabBarController,
         didSelectTab selectedTab: UITab,
@@ -51,20 +48,20 @@ open class EZUITabBarControllerDelegate: NSObject, UITabBarControllerDelegate{
             previousTab: previousTab
         )
     }
-    
-    @available(iOS 18.0, *)
+#if !os(tvOS)
+    @available(iOS 18.0, tvOS 18.0, *)
     open func tabBarControllerWillBeginEditing(_ tabBarController: UITabBarController){
         delegate?.tabBarControllerWillBeginEditing?(tabBarController)
     }
     
     
-    @available(iOS 18.0, *)
+    @available(iOS 18.0, tvOS 18.0, *)
     open func tabBarControllerDidEndEditing(_ tabBarController: UITabBarController){
         delegate?.tabBarControllerDidEndEditing?(tabBarController)
     }
     
     
-    @available(iOS 18.0, *)
+    @available(iOS 18.0, tvOS 18.0, *)
     open func tabBarController(
         _ tabBarController: UITabBarController,
         visibilityDidChangeFor tabs: [UITab]
@@ -75,7 +72,7 @@ open class EZUITabBarControllerDelegate: NSObject, UITabBarControllerDelegate{
         )
     }
     
-    @available(iOS 18.0, *)
+    @available(iOS 18.0, tvOS 18.0, *)
     open func tabBarController(
         _ tabBarController: UITabBarController,
         displayOrderDidChangeFor group: UITabGroup
@@ -86,7 +83,7 @@ open class EZUITabBarControllerDelegate: NSObject, UITabBarControllerDelegate{
         )
     }
     
-    @available(iOS 18.0, *)
+    @available(iOS 18.0, tvOS 18.0, *)
     open func tabBarController(
         _ tabBarController: UITabBarController,
         displayedViewControllersFor tab: UITab,
@@ -98,7 +95,7 @@ open class EZUITabBarControllerDelegate: NSObject, UITabBarControllerDelegate{
             proposedViewControllers: proposedViewControllers
         ) ?? proposedViewControllers
     }
-    
+#endif
     @available(iOS 3.0, macCatalyst 13.1, *)
     open func tabBarController(
         _ tabBarController: UITabBarController,
@@ -120,7 +117,8 @@ open class EZUITabBarControllerDelegate: NSObject, UITabBarControllerDelegate{
             didSelect: viewController
         )
     }
-
+    
+#if !os(tvOS) && !os(visionOS)
     @available(iOS 3.0, macCatalyst 13.1, *)
     open func tabBarController(
         _ tabBarController: UITabBarController,
@@ -131,7 +129,7 @@ open class EZUITabBarControllerDelegate: NSObject, UITabBarControllerDelegate{
             willBeginCustomizing: viewControllers
         )
     }
-
+    
     @available(iOS 3.0, macCatalyst 13.1, *)
     open func tabBarController(
         _ tabBarController: UITabBarController,
@@ -144,7 +142,7 @@ open class EZUITabBarControllerDelegate: NSObject, UITabBarControllerDelegate{
             changed: changed
         )
     }
-
+    
     @available(macCatalyst 13.1, *)
     open func tabBarController(
         _ tabBarController: UITabBarController,
@@ -157,7 +155,9 @@ open class EZUITabBarControllerDelegate: NSObject, UITabBarControllerDelegate{
             changed: changed
         )
     }
-
+#endif
+    
+#if !os(visionOS)
     @available(iOS 7.0, macCatalyst 13.1, *)
     open func tabBarController(
         _ tabBarController: UITabBarController,
@@ -168,7 +168,7 @@ open class EZUITabBarControllerDelegate: NSObject, UITabBarControllerDelegate{
             interactionControllerFor: animationController
         )
     }
-
+    
     @available(iOS 7.0, macCatalyst 13.1, *)
     open func tabBarController(
         _ tabBarController: UITabBarController,
@@ -184,4 +184,7 @@ open class EZUITabBarControllerDelegate: NSObject, UITabBarControllerDelegate{
             return pac.defaultChildrenTransitionAnimation
         }()
     }
+#endif
 }
+
+#endif

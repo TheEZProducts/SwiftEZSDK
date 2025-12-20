@@ -5,6 +5,7 @@
 //  Created by Александр Сенин on 08.02.2025.
 //
 
+#if canImport(UIKit) && !os(watchOS)
 import Foundation
 import UIKit
 
@@ -46,14 +47,14 @@ public protocol EZUIPackInteractorProtocol: EZUIPackWithMediatorProtocol{
     
     func viewDidLoad()
     func viewWillAppear(_ animated: Bool)
-    @available(iOS 13.0, *)
+    @available(iOS 13.0, tvOS 13.0, *)
     func viewIsAppearing(_ animated: Bool)
     func viewDidAppear(_ animated: Bool)
     func viewWillDisappear(_ animated: Bool)
     func viewDidDisappear(_ animated: Bool)
 }
 
-extension EZUIPackInteractorProtocol{
+extension EZUIPackInteractorProtocol {
     public var pack: (any EZUIPackProtocol)? { mediator.packBridge.pack }
     
     public var keyCommands: [UIKeyCommand]? { nil }
@@ -71,7 +72,7 @@ extension EZUIPackInteractorProtocol{
     
     public func viewDidLoad(){}
     public func viewWillAppear(_ animated: Bool){}
-    @available(iOS 13.0, *)
+    @available(iOS 13.0, tvOS 13.0, *)
     public func viewIsAppearing(_ animated: Bool){}
     public func viewDidAppear(_ animated: Bool){}
     public func viewWillDisappear(_ animated: Bool){}
@@ -80,3 +81,4 @@ extension EZUIPackInteractorProtocol{
 
 public typealias EZUIPackI = EZUIPackInteractorProtocol
 
+#endif

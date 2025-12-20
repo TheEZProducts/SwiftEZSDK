@@ -5,11 +5,8 @@
 //  Created by Александр Сенин on 16.02.2025.
 //
 
-#if canImport(UIKit)
+#if canImport(UIKit) && !os(watchOS)
 import UIKit
-#elseif canImport(Cocoa)
-import Cocoa
-#endif
 
 extension EZTransition<UIViewController>{
     public func tabBarSet(_ controllers: [UIViewController]) -> EZTabBarSetTransition {
@@ -346,3 +343,4 @@ public struct EZTabBarReplaceTransition: EZReplaceTransitionProtocol, EZTabBarTr
         }
     }
 }
+#endif

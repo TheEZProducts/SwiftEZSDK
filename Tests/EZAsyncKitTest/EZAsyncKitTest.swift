@@ -9,13 +9,13 @@ import XCTest
 
 import EZAsyncKit
 
+@available(macOS 10.15, iOS 16.0, watchOS 6.0, tvOS 13.0, *)
 final class EZAsyncKitTest: XCTestCase, @unchecked Sendable {
-    @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
     func test_ThreadSafety_Async() async {
-        @EZThreadSafety var testValue: String = "Hello"
+        let testValue = EZThreadSafety<String>(wrappedValue: "Hello")
         
         print("test_ThreadSafety_Async start")
-        let t1 = Task.detached {[testValue = $testValue, weak self] in
+        let t1 = Task.detached {[testValue, weak self] in
             print("t1", "start")
             for i in 0...100000{
                 await self?.addTestValueAsync(value: testValue, i: i)
@@ -23,7 +23,7 @@ final class EZAsyncKitTest: XCTestCase, @unchecked Sendable {
             print("t1", "end")
             return testValue
         }
-        let t2 = Task.detached {[testValue = $testValue, weak self] in
+        let t2 = Task.detached {[testValue, weak self] in
             print("t2", "start")
             for i in 0...100000{
                 await self?.addTestValueAsync(value: testValue, i: i)
@@ -31,7 +31,7 @@ final class EZAsyncKitTest: XCTestCase, @unchecked Sendable {
             print("t2", "end")
             return testValue
         }
-        let t3 = Task.detached {[testValue = $testValue, weak self] in
+        let t3 = Task.detached {[testValue, weak self] in
             print("t3", "start")
             for i in 0...100000{
                 await self?.addTestValueAsync(value: testValue, i: i)
@@ -47,12 +47,11 @@ final class EZAsyncKitTest: XCTestCase, @unchecked Sendable {
         await value.update { $0.value + "\(i)" }
     }
     
-    @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
     func test_ThreadSafety_Sync() async{
-        @EZThreadSafety var testValue: String = "Hello"
+        let testValue = EZThreadSafety<String>(wrappedValue: "Hello")
         
         print("test_ThreadSafety_Sync start")
-        let t1 = Task.detached {[testValue = $testValue, weak self] in
+        let t1 = Task.detached {[testValue, weak self] in
             print("t1", "start")
             for i in 0...100000{
                 self?.addTestValueSync(value: testValue, i: i)
@@ -60,7 +59,7 @@ final class EZAsyncKitTest: XCTestCase, @unchecked Sendable {
             print("t1", "end")
             return testValue
         }
-        let t2 = Task.detached {[testValue = $testValue, weak self] in
+        let t2 = Task.detached {[testValue, weak self] in
             print("t2", "start")
             for i in 0...100000{
                 self?.addTestValueSync(value: testValue, i: i)
@@ -68,7 +67,7 @@ final class EZAsyncKitTest: XCTestCase, @unchecked Sendable {
             print("t2", "end")
             return testValue
         }
-        let t3 = Task.detached {[testValue = $testValue, weak self] in
+        let t3 = Task.detached {[testValue, weak self] in
             print("t3", "start")
             for i in 0...100000{
                 self?.addTestValueSync(value: testValue, i: i)
@@ -85,7 +84,6 @@ final class EZAsyncKitTest: XCTestCase, @unchecked Sendable {
     }
     
     
-    @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
     func test_ezWithCheckedStoppableContinuation_cancelBuforeStart() async {
         let task: Task<Int?, Never> = Task {
             try? await Task.sleep(for: .seconds(1))
@@ -103,7 +101,6 @@ final class EZAsyncKitTest: XCTestCase, @unchecked Sendable {
         XCTAssertEqual(result, nil, "Task.isCancelled != true")
     }
     
-    @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
     func test_ezWithCheckedStoppableContinuation_cancelAfterStart() async {
         let task: Task<Int?, Never> = Task {
             XCTAssertEqual(Task.isCancelled, false, "Task.isCancelled != true")
@@ -305,7 +302,7 @@ final class EZAsyncKitTest: XCTestCase, @unchecked Sendable {
     }
     
         
-//    @available(iOS 18.0, *)
+//    @available(iOS 18.0, tvOS 18.0, *)
 //    func testM7() async {
 //        let a = EZRecursiveMutex([0])
 //        var t = [Task<Void, Never>]()
@@ -328,12 +325,27 @@ final class EZAsyncKitTest: XCTestCase, @unchecked Sendable {
     
 }
 
-enum RequestContext {
-  @TaskLocal static var id: String?
+public protocol TestProtocol {
+    associatedtype T
+    var value: T { get }
 }
 
-func fsdfsd() {
-    RequestContext.$id.withValue("Hello") {
-        
-    }
+actor Fsdfs {
+    var int: Int = 0
 }
+
+final class RequestContext: Sendable {
+    @EZThreadSafety public private(set) var fd: RequestContext1 = .init()
+  
+}
+
+
+
+final class RequestContext1: Sendable {
+    @TaskLocal fileprivate static var id23 = ""
+    
+    
+    //    @EZThreadSafety fileprivate private(set) static var id: String!
+}
+
+class Oh {}

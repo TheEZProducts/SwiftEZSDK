@@ -43,7 +43,7 @@ extension Array where Element == FileModel{
 }
 
 @main
-@available(macOS 13.0, watchOS 6.0, tvOS 13.0, iOS 16.0, *)
+@available(macOS 13.0, watchOS 9.0, tvOS 16.0, iOS 16.0, *)
 struct EZJsonKeysGenerator {
     static func main() async throws {
         let output = URL(fileURLWithPath: CommandLine.arguments[1])

@@ -2,6 +2,7 @@
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
+import CompilerPluginSupport
 
 let package = Package(
     name: "EZSDK",
@@ -60,12 +61,21 @@ let package = Package(
             ]
         ),
         
+        //MARK: - EZMacrosKit
+        .target(
+            name: EZMacrosKit.name,
+            dependencies: [
+                .target(name: EZMacros.name, condition: EZMacros.condition)
+            ]
+        ),
+        
         //MARK: - EZAsyncKit
         .target(
             name: EZAsyncKit.name,
             dependencies: [
                 .target(name: EZAssociatedKit.name, condition: EZAssociatedKit.condition),
-                .target(name: EZHelpersKit.name, condition: EZHelpersKit.condition)
+                .target(name: EZHelpersKit.name, condition: EZHelpersKit.condition),
+                .target(name: EZMacrosKit.name, condition: EZMacrosKit.condition)
             ]
         ),
         .testTarget(
@@ -80,7 +90,8 @@ let package = Package(
             name: EZObservableKit.name,
             dependencies: [
                 .target(name: EZAssociatedKit.name, condition: EZAssociatedKit.condition),
-                .target(name: EZAsyncKit.name, condition: EZAsyncKit.condition)
+                .target(name: EZAsyncKit.name, condition: EZAsyncKit.condition),
+                .target(name: EZMacrosKit.name, condition: EZMacrosKit.condition)
             ]
         ),
         .testTarget(
@@ -109,6 +120,19 @@ let package = Package(
             dependencies: [
                 .target(name: EZSwiftUIBridgeKit.name, condition: EZSwiftUIBridgeKit.condition)
             ]
+        ),
+        
+        //MARK: - Macros
+        .macro(
+            name: EZMacros.name,
+            dependencies: [
+                .target(name: EZSwiftCompilerPluginLight.name)
+            ],
+            path: EZMacros.macrosPath
+        ),
+        .target(
+            name: EZSwiftCompilerPluginLight.name,
+            path: EZSwiftCompilerPluginLight.macrosPath
         ),
         
         //MARK: - Experimental
@@ -144,32 +168,37 @@ let package = Package(
 
 //MARK: - EZTargetrotocol
 protocol EZTargetProtocol{
-    static var name: String {get}
-    static var _name: String {get}
-    static var testName: String {get}
-    static var condition: TargetDependencyCondition? {get}
+    static var name: String { get }
+    static var _name: String { get }
+    static var testName: String { get }
+    static var condition: TargetDependencyCondition? { get }
+    static var macrosPath: String { get }
 }
 extension EZTargetProtocol{
     static var name: String {"\(Self.self)"}
     static var _name: String {"_\(name)"}
     static var testName: String { name + "Test" }
     static var condition: TargetDependencyCondition? { nil }
+    static var macrosPath: String { "Macros/\(name)" }
 }
 
 //MARK: - Stable Targets
 //MARK: EZKit
-struct EZKit: EZTargetProtocol{}
+struct EZKit: EZTargetProtocol {}
 
 //MARK: EZAssociatedKit
-struct EZAssociatedKit: EZTargetProtocol{
-    static var condition: TargetDependencyCondition? {.when(platforms: [.iOS, .macCatalyst, .macOS, .tvOS, .watchOS])}
+struct EZAssociatedKit: EZTargetProtocol {
+    static var condition: TargetDependencyCondition? {.when(platforms: [.iOS, .macCatalyst, .visionOS, .macOS, .tvOS, .watchOS])}
 }
 
+//MARK: EZMacrosKit
+struct EZMacrosKit: EZTargetProtocol {}
+
 //MARK: EZAsyncKit
-struct EZAsyncKit: EZTargetProtocol{}
+struct EZAsyncKit: EZTargetProtocol {}
 
 //MARK: EZObservableKit
-struct EZObservableKit: EZTargetProtocol{}
+struct EZObservableKit: EZTargetProtocol {}
 
 struct EZBuilderKit: EZTargetProtocol {}
 
@@ -177,14 +206,17 @@ struct EZHelpersKit: EZTargetProtocol {}
 
 //MARK: EZUIPackKit
 struct EZUIPackKit: EZTargetProtocol {
-    static var condition: TargetDependencyCondition? {.when(platforms: [.iOS, .macCatalyst])}
+    static var condition: TargetDependencyCondition? {.when(platforms: [.iOS, .macCatalyst, .visionOS, .tvOS])}
 }
 
 struct EZSwiftUIBridgeKit: EZTargetProtocol {
-    static var condition: TargetDependencyCondition? {.when(platforms: [.iOS, .macCatalyst, .macOS, .tvOS])}
+    static var condition: TargetDependencyCondition? {.when(platforms: [.iOS, .macCatalyst, .visionOS, .macOS, .tvOS])}
 }
 
-    
+//MARK: - Macros
+struct EZMacros: EZTargetProtocol {}
+struct EZSwiftCompilerPluginLight: EZTargetProtocol {}
+
 //MARK: - Experimental Targets
 //MARK: EZJsonStriderKit
 struct EZJsonStriderKit: EZTargetProtocol{}

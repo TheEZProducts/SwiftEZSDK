@@ -5,11 +5,8 @@
 //  Created by Александр Сенин on 16.02.2025.
 //
 
-#if canImport(UIKit)
+#if canImport(UIKit) && !os(watchOS)
 import UIKit
-#elseif canImport(Cocoa)
-import Cocoa
-#endif
 
 open class EZDummyTabBarController: UITabBarController {
     var viewDidAppearAction: (() -> ())?
@@ -54,7 +51,7 @@ open class EZContainerView: UIView {
         presentationStatusDidUpdateAction?(self, true)
         let dummy = EZDummyTabBarController()
         dummy.view.alpha = 0
-        if #available(iOS 18.0, *) {
+        if #available(iOS 18.0, tvOS 18.0, visionOS 2.0, *) {
             dummy.mode = .tabBar
             dummy.setTabBarHidden(true, animated: false)
         } else {
@@ -91,3 +88,4 @@ open class EZContainerView: UIView {
         currentViewController = parentViewController
     }
 }
+#endif

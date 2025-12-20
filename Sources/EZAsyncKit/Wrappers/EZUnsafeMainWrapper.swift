@@ -27,7 +27,6 @@ public struct EZUnsafeMainWrapper {
     /// Runs a throwing `@MainActor` closure synchronously by delegating to `MainActor.ezUnsafeRun`.
     ///
     /// Deprecated: call `MainActor.ezUnsafeRun` directly instead.
-    @available(*, deprecated, message: "use MainActor.ezUnsafeRun instead")
     @discardableResult
     public static func run<Result>(
         @_implicitSelfCapture

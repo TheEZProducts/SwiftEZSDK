@@ -5,6 +5,7 @@
 //  Created by Александр Сенин on 23.02.2025.
 //
 
+#if canImport(UIKit) && !os(watchOS)
 import UIKit
 
 public typealias EZUITabBarWrapperPack = EZUITabBarPack<
@@ -48,4 +49,4 @@ public class EZUITabBarWrapperPackM: EZUIPackMediator, EZUIPackMediatorProtocol{
     
     public var controllers: [UIViewController]?
 }
-
+#endif

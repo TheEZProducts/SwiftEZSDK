@@ -4,7 +4,7 @@
 //
 //  Created by Александр Сенин on 17.02.2025.
 //
-
+#if canImport(UIKit) && !os(watchOS)
 import UIKit
 
 extension UIViewControllerAnimatedTransitioning where Self == EZOpenAnimation{
@@ -314,67 +314,4 @@ public class EZShiftAnimation: NSObject, UIViewControllerAnimatedTransitioning{
     }
 }
 
-
-//public static var shiftLeft: RZTransitionAnimation{
-//    RZTransitionAnimation("shiftLeft") { oldView, newView, placeView, end in
-//        let rootSize = placeView.frame.size
-//        if let oldView = oldView, let newView = newView{
-//            newView.transform.tx += rootSize.width
-//            UIView.animate(withDuration: 0.3, animations: {
-//                newView.transform.tx = 0
-//                oldView.transform.tx -= rootSize.width
-//            }){_ in
-//                oldView.transform.tx = 0
-//                end()
-//            }
-//        }
-//    }
-//}
-//
-//public static var shiftRight: RZTransitionAnimation{
-//    RZTransitionAnimation("shiftRight") { oldView, newView, placeView, end in
-//        let rootSize = placeView.frame.size
-//        if let oldView = oldView, let newView = newView{
-//            newView.transform.tx -= rootSize.width
-//            UIView.animate(withDuration: 0.3, animations: {
-//                newView.transform.tx = 0
-//                oldView.transform.tx += rootSize.width
-//            }){_ in
-//                oldView.transform.tx = 0
-//                end()
-//            }
-//        }
-//    }
-//}
-//
-//public static var shiftLeftEz: RZTransitionAnimation{
-//    RZTransitionAnimation("shiftLeftEz") { oldView, newView, placeView, end in
-//        let rootSize = placeView.frame.size
-//        if let oldView = oldView, let newView = newView{
-//            newView.transform.tx += rootSize.width
-//            UIView.animate(withDuration: 0.5, delay: 0, options: [.curveEaseInOut], animations: {
-//                newView.transform.tx = 0
-//                oldView.transform.tx -= rootSize.width
-//            }){_ in
-//                oldView.transform.tx = 0
-//                end()
-//            }
-//        }
-//    }
-//}
-//
-//public static var shiftRightEz: RZTransitionAnimation{
-//    RZTransitionAnimation("shiftRightEz") { oldView, newView, placeView, end in
-//        let rootSize = placeView.frame.size
-//        if let oldView = oldView, let newView = newView{
-//            newView.transform.tx -= rootSize.width
-//            UIView.animate(withDuration: 0.5, delay: 0, options: [.curveEaseInOut], animations: {
-//                newView.transform.tx = 0
-//                oldView.transform.tx += rootSize.width
-//            }){_ in
-//                oldView.transform.tx = 0
-//                end()
-//            }
-//        }
-//    }
-//}
+#endif

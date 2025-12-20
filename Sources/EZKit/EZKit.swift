@@ -19,15 +19,11 @@ import Foundation
 @_exported import EZObservableKit
 #endif
 
-#if canImport(EZChannelKit)
-@_exported import EZChannelKit
-#endif
-
-#if canImport(EZUIPackKit)
+#if canImport(EZUIPackKit) && !os(watchOS) && !os(macOS)
 @_exported import EZUIPackKit
 #endif
 
-#if canImport(EZSwiftUIBridgeKit)
+#if canImport(EZSwiftUIBridgeKit) && !os(watchOS)
 @_exported import EZSwiftUIBridgeKit
 #endif
 

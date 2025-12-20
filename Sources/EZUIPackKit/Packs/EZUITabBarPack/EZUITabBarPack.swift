@@ -6,11 +6,8 @@
 //
 
 import Foundation
-#if canImport(UIKit)
+#if canImport(UIKit) && !os(watchOS)
 import UIKit
-#elseif canImport(Cocoa)
-import Cocoa
-#endif
 
 extension EZUIPackBridge{
     public var tabBarPack: (any EZUITabBarPackProtocol)? {
@@ -52,7 +49,7 @@ open class EZUITabBarPack<
     public var defaultChildrenTransitionAnimation: (any UIViewControllerAnimatedTransitioning)?
     
     public var storage: EZUIPackStorage<I, M, V>
-    
+#if !os(tvOS) && !os(visionOS)
     open override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
         delegate?.tabBarControllerSupportedInterfaceOrientations?(self) ??
         storage.view.supportedInterfaceOrientations ??
@@ -78,7 +75,7 @@ open class EZUITabBarPack<
     open override var preferredStatusBarUpdateAnimation: UIStatusBarAnimation {
         storage.view.preferredStatusBarUpdateAnimation ?? super.preferredStatusBarUpdateAnimation
     }
-    
+#endif
     open override var keyCommands: [UIKeyCommand]? {
         storage.interactor.keyCommands
     }
@@ -147,7 +144,7 @@ open class EZUITabBarPack<
         storage.viewWillAppear(animated)
     }
     
-    @available(iOS 13.0, *)
+    @available(iOS 13.0, tvOS 13.0, *)
     open override func viewIsAppearing(_ animated: Bool) {
         super.viewIsAppearing(animated)
         storage.viewIsAppearing(animated)
@@ -177,3 +174,4 @@ open class EZUITabBarPack<
         fatalError("init(coder:) has not been implemented")
     }
 }
+#endif

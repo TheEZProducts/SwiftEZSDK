@@ -8,7 +8,7 @@
 import Foundation
 
 #if canImport(ObjectiveC)
-public struct EZAssociated{
+public struct EZAssociated {
     public enum SetKey {
         case random
         case hashable(AnyHashable)
@@ -17,7 +17,7 @@ public struct EZAssociated{
     
     private weak var object: AnyObject?
     
-    public init(_ object: AnyObject){ self.object = object }
+    public init(_ object: AnyObject) { self.object = object }
     
     @discardableResult
     public func set(_ value: Any?, _ key: SetKey, _ policy: objc_AssociationPolicy) -> SetKey? {
@@ -27,31 +27,31 @@ public struct EZAssociated{
         return .pointer(key)
     }
     
-    public func get<ReturnObject>(_ key: SetKey) -> ReturnObject?{
+    public func get<ReturnObject>(_ key: SetKey) -> ReturnObject? {
         return get(key) as? ReturnObject
     }
     
-    public func get(_ key: SetKey) -> Any?{
+    public func get(_ key: SetKey) -> Any? {
         guard let object = object else {return nil}
         let key = getKey(key)
         return objc_getAssociatedObject(object, key)
     }
     
     @discardableResult
-    public func setDeinitObserver(_ key: SetKey = .random, _ handler: @escaping () -> ()) -> SetKey?{
+    public func setDeinitObserver(_ key: SetKey = .random, _ handler: @escaping () -> ()) -> SetKey? {
         let provider = DeinitProvider(handler)
         return set(provider, key, .OBJC_ASSOCIATION_RETAIN)
     }
     
-    private func getKey(_ key: SetKey) -> UnsafeRawPointer{
+    private func getKey(_ key: SetKey) -> UnsafeRawPointer {
         var pointerKey: UnsafeRawPointer
         
         switch key {
         case .random:
             var pointer: UnsafeRawPointer?
-            repeat{
+            repeat {
                 pointer = UnsafeRawPointer(bitPattern: Int(arc4random()))
-            }while pointer == nil
+            } while pointer == nil
             pointerKey = pointer!
         case .hashable(let anyHashable):
             pointerKey = UnsafeRawPointer(bitPattern: anyHashable.hashValue)!

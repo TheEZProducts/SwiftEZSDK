@@ -5,14 +5,14 @@
 //  Created by Александр Сенин on 08.02.2025.
 //
 
-#if canImport(UIKit)
+#if canImport(UIKit) && !os(watchOS)
 import UIKit
-#elseif canImport(Cocoa)
-import Cocoa
-#endif
 
 #if canImport(SwiftUI)
 import SwiftUI
+#endif
+
+#if canImport(EZSwiftUIBridgeKit)
 import EZSwiftUIBridgeKit
 #endif
 
@@ -46,7 +46,8 @@ extension EZViewProtocol{
     public func create(){}
 }
 
-public protocol EZUIPackViewProtocol<Mediator>: EZViewProtocol{
+public protocol EZUIPackViewProtocol<Mediator>: EZViewProtocol {
+#if !os(tvOS) && !os(watchOS)
     var supportedInterfaceOrientations: UIInterfaceOrientationMask? { get }
     var preferredInterfaceOrientationForPresentation: UIInterfaceOrientation? { get }
     
@@ -54,8 +55,11 @@ public protocol EZUIPackViewProtocol<Mediator>: EZViewProtocol{
     var preferredStatusBarStyle: UIStatusBarStyle? { get }
     var prefersStatusBarHidden: Bool? { get }
     var preferredStatusBarUpdateAnimation: UIStatusBarAnimation? { get }
+#endif
     
+#if !os(watchOS)
     func getView() -> EZView
+#endif
     
     func didInitialize()
     func willOpen()
@@ -69,20 +73,22 @@ public protocol EZUIPackViewProtocol<Mediator>: EZViewProtocol{
     
     func viewDidLoad()
     func viewWillAppear(_ animated: Bool)
-    @available(iOS 13.0, *)
+    @available(iOS 13.0, tvOS 13.0, *)
     func viewIsAppearing(_ animated: Bool)
     func viewDidAppear(_ animated: Bool)
     func viewWillDisappear(_ animated: Bool)
     func viewDidDisappear(_ animated: Bool)
 }
 
-extension EZUIPackViewProtocol{
+extension EZUIPackViewProtocol {
+#if !os(tvOS) && !os(watchOS)
     public var supportedInterfaceOrientations: UIInterfaceOrientationMask? { nil }
     public var preferredInterfaceOrientationForPresentation: UIInterfaceOrientation? { nil }
     
     public var preferredStatusBarStyle: UIStatusBarStyle? { nil }
     public var prefersStatusBarHidden: Bool? { nil }
     public var preferredStatusBarUpdateAnimation: UIStatusBarAnimation? { nil }
+#endif
     
     public func didInitialize(){}
     public func willOpen(){}
@@ -96,32 +102,37 @@ extension EZUIPackViewProtocol{
     
     public func viewDidLoad(){}
     public func viewWillAppear(_ animated: Bool){}
-    @available(iOS 13.0, *)
+    @available(iOS 13.0, tvOS 13.0, *)
     public func viewIsAppearing(_ animated: Bool){}
     public func viewDidAppear(_ animated: Bool){}
     public func viewWillDisappear(_ animated: Bool){}
     public func viewDidDisappear(_ animated: Bool){}
 }
 
-#if canImport(UIKit)
+#if canImport(UIKit) && !os(watchOS)
 public typealias EZView = UIView
 #elseif canImport(Cocoa)
 public typealias EZView = NSView
 #endif
 
 
-#if canImport(UIKit) || canImport(Cocoa)
-public protocol EZUIPackUIViewProtocol: EZView, EZUIPackViewProtocol{}
+#if (canImport(UIKit) || canImport(Cocoa)) && !os(watchOS)
+public protocol EZUIPackUIViewProtocol: EZView, EZUIPackViewProtocol {}
 extension EZUIPackUIViewProtocol{
     public func getView() -> EZView { self }
 }
 public typealias EZUIPackV = EZView & EZUIPackUIViewProtocol
 #endif
 
+#if os(watchOS)
+public protocol EZUIPackUIViewProtocol: EZUIPackViewProtocol {}
+public typealias EZUIPackV = EZUIPackUIViewProtocol
+#endif
+
 
 #if canImport(SwiftUI)
 @MainActor
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, *)
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 public protocol EZUIPackSViewProtocol: EZUIPackViewProtocol, Equatable{
     associatedtype Body : View
     
@@ -132,12 +143,12 @@ public protocol EZUIPackSViewProtocol: EZUIPackViewProtocol, Equatable{
     init()
 }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, *)
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension EZUIPackSViewProtocol{
     public var additionalObservableObjects: [any ObservableObject] { [] }
 }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, *)
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension EZUIPackSViewProtocol where Self: View {
     nonisolated
     public static func ==(l: Self, r: Self) -> Bool{ false }
@@ -146,6 +157,7 @@ extension EZUIPackSViewProtocol where Self: View {
     public var binding: Binding<Self> { .constant(self) }
 }
  
+#if !os(watchOS)
 @available(macOS 10.15, iOS 13.0, tvOS 13.0, *)
 extension EZUIPackSViewProtocol where Self: View {
     public var uiView: EZView? { packBridge.pack?.view }
@@ -163,13 +175,17 @@ extension EZUIPackSViewProtocol where Self: View {
         }
     }
 }
+#endif
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, *)
+#if !os(watchOS)
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension EZUIPackSViewProtocol where Self: EZView {
     public var bMediator: Binding<Mediator> { .constant(mediator) }
 }
+#endif
  
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, *)
+#if !os(watchOS)
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension EZUIPackSViewProtocol where Self: EZView {
     public func getView() -> EZView {
         let view = wrappedView()
@@ -178,7 +194,7 @@ extension EZUIPackSViewProtocol where Self: EZView {
         return self
     }
     
-    private func wrappedView() -> EZView{
+    private func wrappedView() -> EZView {
         if let observObj = mediator as? (any ObservableObject){
             return .ezWrap(
                 EZObservableObjectGroup(objects: additionalObservableObjects + [observObj])
@@ -195,16 +211,20 @@ extension EZUIPackSViewProtocol where Self: EZView {
         }
     }
 }
+#endif
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, *)
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 public typealias EZUIPackSV = View & EZUIPackSViewProtocol
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, *)
+#if !os(watchOS)
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 public typealias EZUIPackSUIV = UIView & EZUIPackSViewProtocol
 #endif
 
+#endif
 
-open class EZUIPackPlatformsV<M: EZUIPackMediatorProtocol>: EZUIPackViewProtocol{
+
+open class EZUIPackPlatformsV<M: EZUIPackMediatorProtocol>: EZUIPackViewProtocol {
     public var mediator: M!
     private(set) var view: (any EZUIPackViewProtocol<M>)?
     
@@ -214,11 +234,13 @@ open class EZUIPackPlatformsV<M: EZUIPackMediatorProtocol>: EZUIPackViewProtocol
     open var macCatalyst: (any EZUIPackViewProtocol<M>)? { nil }
     open var macOS: (any EZUIPackViewProtocol<M>)? { nil }
     open var tvOS: (any EZUIPackViewProtocol<M>)? { nil }
+    open var visionOS: (any EZUIPackViewProtocol<M>)? { nil }
     
-    
+#if !os(watchOS)
     open func getView() -> EZView {
         view?.getView() ?? EZView()
     }
+#endif
     
     required public init(){}
     required public init(mediator: M) {
@@ -239,10 +261,14 @@ open class EZUIPackPlatformsV<M: EZUIPackMediatorProtocol>: EZUIPackViewProtocol
         view = macOS
 #elseif os(tvOS)
         view = tvOS
+#elseif os(visionOS)
+        view = visionOS
 #endif
     }
     
+#if !os(tvOS) && !os(watchOS)
     open var supportedInterfaceOrientations: UIInterfaceOrientationMask? { view?.supportedInterfaceOrientations }
+#endif
     open func didInitialize(){ view?.didInitialize() }
     open func setupActions(){ view?.setupActions() }
     open func create(){ view?.create() }
@@ -253,4 +279,4 @@ open class EZUIPackPlatformsV<M: EZUIPackMediatorProtocol>: EZUIPackViewProtocol
     open func animateClose(){ view?.animateClose() }
     open func didClose(){ view?.didClose() }
 }
-
+#endif

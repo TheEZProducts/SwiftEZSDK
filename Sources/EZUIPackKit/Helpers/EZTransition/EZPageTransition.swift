@@ -5,11 +5,8 @@
 //  Created by Александр Сенин on 16.02.2025.
 //
 
-#if canImport(UIKit)
+#if canImport(UIKit) && !os(watchOS)
 import UIKit
-#elseif canImport(Cocoa)
-import Cocoa
-#endif
 
 extension EZTransition<UIViewController>{
     public func pageSet(_ controllers: [UIViewController]) -> EZPageSetTransition {
@@ -60,7 +57,7 @@ extension EZTransitionProtocol where Context == EZPageTransitionContext{
 
 protocol EZPageTransitionProtocol: EZTransitionProtocol<EZPageTransitionContext>{}
 
-@available(iOS 13.0, *)
+@available(iOS 13.0, tvOS 13.0, *)
 extension EZTransitionProtocol<EZPageTransitionContext>{
     @MainActor
     @discardableResult
@@ -107,3 +104,4 @@ public struct EZPageSetTransition: EZPageTransitionProtocol{
         return true
     }
 }
+#endif

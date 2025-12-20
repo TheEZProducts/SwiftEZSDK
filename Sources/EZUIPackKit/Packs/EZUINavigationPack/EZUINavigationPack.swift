@@ -6,11 +6,8 @@
 //
 
 import Foundation
-#if canImport(UIKit)
+#if canImport(UIKit) && !os(watchOS)
 import UIKit
-#elseif canImport(Cocoa)
-import Cocoa
-#endif
 
 extension EZUIPackBridge{
     public var navigationPack: (any EZUINavigationPackProtocol)? {
@@ -54,7 +51,7 @@ open class EZUINavigationPack<
     public var defaultChildrenPopTransitionAnimation: (any UIViewControllerAnimatedTransitioning)?
     
     public var storage: EZUIPackStorage<I, M, V>
-    
+#if !os(tvOS)
     open override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
         delegate?.navigationControllerSupportedInterfaceOrientations?(self) ??
         storage.view.supportedInterfaceOrientations ??
@@ -69,18 +66,21 @@ open class EZUINavigationPack<
         super.preferredInterfaceOrientationForPresentation
     }
     
+    @available(visionOS, introduced: 1.0, deprecated: 1.0, message: "Has no effect on visionOS")
     open override var preferredStatusBarStyle: UIStatusBarStyle {
         storage.view.preferredStatusBarStyle ?? super.preferredStatusBarStyle
     }
     
+    @available(visionOS, introduced: 1.0, deprecated: 1.0, message: "Has no effect on visionOS")
     open override var prefersStatusBarHidden: Bool {
         storage.view.prefersStatusBarHidden ?? super.prefersStatusBarHidden
     }
     
+    @available(visionOS, introduced: 1.0, deprecated: 1.0, message: "Has no effect on visionOS")
     open override var preferredStatusBarUpdateAnimation: UIStatusBarAnimation {
         storage.view.preferredStatusBarUpdateAnimation ?? super.preferredStatusBarUpdateAnimation
     }
-    
+#endif
     open override var keyCommands: [UIKeyCommand]? {
         storage.interactor.keyCommands
     }
@@ -120,7 +120,7 @@ open class EZUINavigationPack<
         storage.viewWillAppear(animated)
     }
     
-    @available(iOS 13.0, *)
+    @available(iOS 13.0, tvOS 13.0, *)
     open override func viewIsAppearing(_ animated: Bool) {
         super.viewIsAppearing(animated)
         storage.viewIsAppearing(animated)
@@ -183,3 +183,5 @@ open class EZUINavigationPack<
         fatalError("init(coder:) has not been implemented")
     }
 }
+
+#endif
