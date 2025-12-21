@@ -16,10 +16,12 @@ import Foundation
 
 #if os(Windows)
 @_implementationOnly import ucrt
-#elseif canImport(Glibc)
-import Glibc
+#elseif canImport(Android)
+import Android
 #elseif canImport(Darwin)
 import Darwin
+#elseif canImport(Glibc)
+import Glibc
 #endif
 
 // MARK: - Cross-platform file-descriptor helpers
@@ -38,9 +40,17 @@ private let _STDERR_FD: Int32 = 2
 @inline(__always) private func _closeFD(_ fd: Int32) -> Int32 { close(fd) }
 @inline(__always) private func _dup2FD(_ src: Int32, _ dst: Int32) -> Int32 { dup2(src, dst) }
 
-private let _STDIN_FD: Int32 = STDIN_FILENO
-private let _STDOUT_FD: Int32 = STDOUT_FILENO
-private let _STDERR_FD: Int32 = STDERR_FILENO
+// 0/1/2 are the standard POSIX fds for stdin/stdout/stderr (avoid C macros).
+private let _STDIN_FD: Int32 = 0
+private let _STDOUT_FD: Int32 = 1
+private let _STDERR_FD: Int32 = 2
+
+// `errno` is a C macro on some platforms (e.g. Android NDK), so read it via an accessor.
+#if canImport(Android)
+@inline(__always) private var _currentErrno: Int32 { __errno()!.pointee }
+#else
+@inline(__always) private var _currentErrno: Int32 { errno }
+#endif
 #endif
 
 //
@@ -125,27 +135,27 @@ extension CompilerPlugin {
         // receiving messages from the plugin host.
         let inputFD = _dupFD(_STDIN_FD)
         guard inputFD >= 0 else {
-            internalError("Could not duplicate `stdin`: \(describe(errno: errno)).")
+            internalError("Could not duplicate `stdin`: \(describe(errno: _currentErrno)).")
         }
         
         // Having duplicated the original standard-input descriptor, we close
         // `stdin` so that attempts by the plugin to read console input (which
         // are usually a mistake) return errors instead of blocking.
         guard _closeFD(_STDIN_FD) >= 0 else {
-            internalError("Could not close `stdin`: \(describe(errno: errno)).")
+            internalError("Could not close `stdin`: \(describe(errno: _currentErrno)).")
         }
         
         // Duplicate the `stdout` file descriptor, which we will then use for
         // sending messages to the plugin host.
         let outputFD = _dupFD(_STDOUT_FD)
         guard outputFD >= 0 else {
-            internalError("Could not dup `stdout`: \(describe(errno: errno)).")
+            internalError("Could not dup `stdout`: \(describe(errno: _currentErrno)).")
         }
         
         // Having duplicated the original standard-output descriptor, redirect
         // `stdout` to `stderr` so that all free-form text output goes there.
         guard _dup2FD(_STDERR_FD, _STDOUT_FD) >= 0 else {
-            internalError("Could not dup2 `stdout` to `stderr`: \(describe(errno: errno)).")
+            internalError("Could not dup2 `stdout` to `stderr`: \(describe(errno: _currentErrno)).")
         }
         
         // Open a message channel for communicating with the plugin host.
