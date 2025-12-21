@@ -334,25 +334,47 @@ extension EZObservable {
         isolation: (any Actor),
         action: @escaping (EZObserverValue<Value>) -> ()
     ) -> @Sendable (EZObserverValue<Value>) -> () {
+#if compiler(>=6.2)
         if #available(macOS 26.0, iOS 26.0, watchOS 26.0, visionOS 26.0, tvOS 26.0, *) {
-            let action = EZUnsafeSendableWrapper(action)
-            return { value in
-                isolation.ezTaskImmediate { _ in action.value(value) }
-            }
+            return wrappActionTaskImmediate(isolation: isolation, action: action)
         } else {
-            let isoletedAction = EZActorIsolator(isolation: isolation, value: action)
-            if isolation is MainActor {
-                return { value in
-                    if Thread.isMainThread {
-                        isoletedAction.unsafeUpdate { $0(value) }
-                    }else{
-                        isoletedAction.update { $0(value) }
-                    }
-                }
-            } else {
-                return { value in
+            return wrappActionActorIsolator(isolation: isolation, action: action)
+        }
+#else
+        return wrappActionActorIsolator(isolation: isolation, action: action)
+#endif
+    }
+    
+#if compiler(>=6.2)
+    @available(macOS 26.0, iOS 26.0, watchOS 26.0, visionOS 26.0, tvOS 26.0, *)
+    private func wrappActionTaskImmediate(
+        isolation: (any Actor),
+        action: @escaping (EZObserverValue<Value>) -> ()
+    ) -> @Sendable (EZObserverValue<Value>) -> () {
+        let action = EZUnsafeSendableWrapper(action)
+        return { value in
+            isolation.ezTaskImmediate { _ in action.value(value) }
+        }
+    }
+#endif
+    
+    @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
+    private func wrappActionActorIsolator(
+        isolation: (any Actor),
+        action: @escaping (EZObserverValue<Value>) -> ()
+    ) -> @Sendable (EZObserverValue<Value>) -> () {
+        let isoletedAction = EZActorIsolator(isolation: isolation, value: action)
+        if isolation is MainActor {
+            return { value in
+                if Thread.isMainThread {
+                    isoletedAction.unsafeUpdate { $0(value) }
+                }else{
                     isoletedAction.update { $0(value) }
                 }
+            }
+        } else {
+            return { value in
+                isoletedAction.update { $0(value) }
             }
         }
     }
@@ -399,11 +421,11 @@ extension EZObservable {
 
 @attached(accessor)
 @attached(peer, names: prefixed(`$`), prefixed(`_`))
-public macro EZObservableProjection() = #externalMacro(module: "EZMacros", type: "EZConstantPropertyWrapperMacro")
+public macro EZObservableProjection() = #externalMacro(module: "EZMacros", type: "EZConstantImmutablePropertyWrapperMacro")
 
 @attached(accessor)
 @attached(peer, names: prefixed(`$`), prefixed(`_`))
-public macro EZObservableProjection<T>() = #externalMacro(module: "EZMacros", type: "EZConstantPropertyWrapperMacro")
+public macro EZObservableProjection<T>() = #externalMacro(module: "EZMacros", type: "EZConstantImmutablePropertyWrapperMacro")
 
 public typealias EZObservableProjection<Value> = EZObservable<Value>.Projection
 
@@ -417,7 +439,7 @@ extension EZObservable {
     ///
     /// Note: `update` here receives a plain `Value` (by value). For value types it does not replace
     /// the stored value; for mutations use the backing `_property.update` / `_property.set` APIs.
-    public struct Projection: EZObservableProtocol, EZConstantPropertyWrapperProtocol, Sendable {
+    public struct Projection: EZObservableProtocol, EZConstantImmutablePropertyWrapperProtocol, Sendable {
         let _mainObservable: EZObservable<Value>
         
         /// Read-only access to the current stored value.
@@ -428,7 +450,6 @@ extension EZObservable {
         /// ```
         public var wrappedValue: Value {
             _read { yield _mainObservable.wrappedValue }
-            nonmutating set {}
         }
         
         public var projectedValue: Projection { self }
@@ -610,7 +631,7 @@ extension EZObservable {
         @discardableResult
         public func remove(id: UInt) -> Self { _mainObservable.remove(id: id); return self }
         
-        fileprivate init(observable: EZObservable<Value>) {
+        public init(observable: EZObservable<Value>) {
             self._mainObservable = observable
         }
     }

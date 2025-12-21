@@ -139,11 +139,41 @@ public struct EZThreadSafety<Value: Sendable>: EZConstantPropertyWrapperProtocol
         }
     }
     
-    /// Projected value (`$property`) intended primarily for reading in user code.
+    /// Projected value (`$property`) intended primarily for **reading** and **derived computations**.
     ///
-    /// For mutations use the backing `_property` wrapper (`_name.update` / `_name.set`).
+    /// The key idea is:
+    /// - Use `$name` to read the current value or compute a derived result under the same lock.
+    /// - Use `_name` for mutations (`update` / `set`).
+    ///
+    /// ### Example: read (sync)
+    /// ```swift
+    /// final class Example: Sendable {
+    ///     @EZThreadSafety var count: Int = 0
+    ///
+    ///     func readSync() -> Int {
+    ///         $count.get()
+    ///     }
+    /// }
+    /// ```
+    ///
+    /// ### Example: read (async)
+    /// ```swift
+    /// struct Metrics: Sendable {
+    ///     @EZThreadSafety var count: Int = 0
+    ///
+    ///     func readAsync() async -> Int {
+    ///         await $count.get()
+    ///     }
+    /// }
+    /// ```
+    ///
+    /// ### Example: derived computation under the same lock
+    /// ```swift
+    /// let isPositive = $count.update { $0 > 0 }
+    /// let digits = await $count.update { String($0).count }
+    /// ```
     public var projectedValue: Projection {
-        .init(_main: self)
+        .init(main: self)
     }
     
     /// Atomically updates the stored value and returns a result (async).
@@ -256,14 +286,68 @@ public struct EZThreadSafety<Value: Sendable>: EZConstantPropertyWrapperProtocol
     }
 }
 
+/// Property macro that exposes a read-only *projection-backed* value with constant backing storage.
+///
+/// This is the immutable companion to `@EZThreadSafety`: it uses the same constant-storage macro
+/// pattern, but generates a getter-only property.
+///
+/// The public-facing property is typically declared as the *plain value type* (e.g. `Int`).
+/// The macro then generates a constant backing storage (e.g. `let _counterView: EZThreadSafetyProjection<Int>`)
+/// which you usually initialize in `init`.
+///
+/// This is useful when you want to keep a projection view as a stored member (e.g. in a `Sendable`
+/// class) without introducing a mutable stored wrapper variable.
+///
+/// ### Example
+/// ```swift
+/// final class Source: Sendable {
+///     @EZThreadSafety var counter: Int = 0
+/// }
+///
+/// final class Example: Sendable {
+///     @EZThreadSafetyProjection var counterView: Int
+///
+///     init(counterView: EZThreadSafetyProjection<Int>) {
+///         // Initialize the generated backing storage.
+///         _counterView = counterView
+///     }
+///
+///     func read() -> Int { counterView }
+/// }
+///
+/// let source = Source()
+/// let example = Example(counterView: source.$counter)
+/// _ = example.read()
+/// ```
 @attached(accessor)
 @attached(peer, names: prefixed(`$`), prefixed(`_`))
-public macro EZThreadSafetyProjection() = #externalMacro(module: "EZMacros", type: "EZConstantPropertyWrapperMacro")
+public macro EZThreadSafetyProjection() = #externalMacro(module: "EZMacros", type: "EZConstantImmutablePropertyWrapperMacro")
 
+/// Generic form of `@EZThreadSafetyProjection` that spells the value type explicitly.
+///
+/// ### Example
+/// ```swift
+/// final class Source: Sendable {
+///     @EZThreadSafety var counter: Int = 0
+/// }
+///
+/// final class Example: Sendable {
+///     @EZThreadSafetyProjection<Int> var counterView: Int
+///
+///     init(counterView: EZThreadSafetyProjection<Int>) {
+///         _counterView = counterView
+///     }
+/// }
+///
+/// let source = Source()
+/// let example = Example(counterView: source.$counter)
+/// _ = example
+/// ```
 @attached(accessor)
 @attached(peer, names: prefixed(`$`), prefixed(`_`))
-public macro EZThreadSafetyProjection<T>() = #externalMacro(module: "EZMacros", type: "EZConstantPropertyWrapperMacro")
+public macro EZThreadSafetyProjection<T>() = #externalMacro(module: "EZMacros", type: "EZConstantImmutablePropertyWrapperMacro")
 
+/// Convenience alias for `EZThreadSafety<Value>.Projection`.
 public typealias EZThreadSafetyProjection<Value: Sendable> = EZThreadSafety<Value>.Projection
 
 extension EZThreadSafety {
@@ -271,7 +355,7 @@ extension EZThreadSafety {
     ///
     /// The main intent is reading the current value (or computing a derived result) under the same lock.
     /// Mutating the stored value should be done through the backing `_property` wrapper.
-    public struct Projection: EZConstantPropertyWrapperProtocol, Sendable {
+    public struct Projection: EZConstantImmutablePropertyWrapperProtocol, Sendable {
         let _main: EZThreadSafety<Value>
         
         /// Synchronous read-only access to the current stored value.
@@ -282,7 +366,6 @@ extension EZThreadSafety {
         /// ```
         public var wrappedValue: Value {
             _read { yield _main.wrappedValue }
-            nonmutating set {}
         }
         
         public var projectedValue: Self { self }
@@ -329,15 +412,14 @@ extension EZThreadSafety {
         @available(*, noasync, message: "use await $property.get")
         public func get() -> Value { _main.get() }
         
-        init(_main: EZThreadSafety<Value>) {
-            self._main = _main
+        public init(main: EZThreadSafety<Value>) {
+            self._main = main
         }
     }
 }
 
 @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
-actor ActorIsolatedValue<Value>: EZThreadSafetyIsolatedValueProtocol {
-    private nonisolated(unsafe)
+actor ActorIsolatedValue<Value: Sendable>: EZThreadSafetyIsolatedValueProtocol {
     let _value: EZRecursiveMutex<Value>
     
     @inline(__always)

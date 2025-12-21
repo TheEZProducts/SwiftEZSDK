@@ -10,6 +10,31 @@ import Foundation
 import EZSwiftCompilerPluginLight
 
 @available(macOS 13.0, *)
+public struct EZConstantImmutablePropertyWrapperMacro: AttachedMacro {
+    public static func expandAttachedMacro(
+        data: Data,
+        macro: PluginMessage.MacroReference,
+        macroRole: PluginMessage.MacroRole,
+        discriminator: String,
+        attributeSyntax: PluginMessage.Syntax,
+        declSyntax: PluginMessage.Syntax,
+        lexicalContext: [PluginMessage.Syntax]?,
+        parentDeclSyntax: PluginMessage.Syntax?,
+        extendedTypeSyntax: PluginMessage.Syntax?,
+        conformanceListSyntax: PluginMessage.Syntax?
+    ) throws -> (expandedSource: String?, diagnostics: [PluginMessage.Diagnostic]) {
+        try EZConstantPropertyWrapperMacro.makeResult(
+            isImmutable: true,
+            macro: macro,
+            macroRole: macroRole,
+            attributeSyntax: attributeSyntax,
+            declSyntax: declSyntax,
+            lexicalContext: lexicalContext
+        )
+    }
+}
+
+@available(macOS 13.0, *)
 public struct EZConstantPropertyWrapperMacro: AttachedMacro {
     private typealias DeclParts = (
         modifiers: [String],
@@ -32,10 +57,29 @@ public struct EZConstantPropertyWrapperMacro: AttachedMacro {
         extendedTypeSyntax: PluginMessage.Syntax?,
         conformanceListSyntax: PluginMessage.Syntax?
     ) throws -> (expandedSource: String?, diagnostics: [PluginMessage.Diagnostic]) {
+        try makeResult(
+            isImmutable: false,
+            macro: macro,
+            macroRole: macroRole,
+            attributeSyntax: attributeSyntax,
+            declSyntax: declSyntax,
+            lexicalContext: lexicalContext
+        )
+    }
+    
+    public static func makeResult(
+        isImmutable: Bool,
+        macro: PluginMessage.MacroReference,
+        macroRole: PluginMessage.MacroRole,
+        attributeSyntax: PluginMessage.Syntax,
+        declSyntax: PluginMessage.Syntax,
+        lexicalContext: [PluginMessage.Syntax]?
+    ) throws -> (expandedSource: String?, diagnostics: [PluginMessage.Diagnostic]) {
         guard let parts = RegexLib.extractSwiftDeclPartsSeparated(from: declSyntax.source) else { return ("error", []) }
         
         if macroRole == .accessor {
             return expandAccessor(
+                isImmutable: isImmutable,
                 lexicalContext: lexicalContext,
                 parts: parts
             )
@@ -53,6 +97,7 @@ public struct EZConstantPropertyWrapperMacro: AttachedMacro {
 @available(macOS 13.0, *)
 extension EZConstantPropertyWrapperMacro {
     private static func expandAccessor(
+        isImmutable: Bool,
         lexicalContext: [PluginMessage.Syntax]?,
         parts: DeclParts
     ) -> (expandedSource: String?, diagnostics: [PluginMessage.Diagnostic]) {
@@ -61,16 +106,35 @@ extension EZConstantPropertyWrapperMacro {
         let isStatic = parts.modifiers.contains("static")
         let needsNonmutatingModify = isStruct && !isStatic
         
-        return (makeGetSet(oh: needsNonmutatingModify, name: parts.name), [])
+        return (makeGetSet(
+            isImmutable: isImmutable,
+            needsNonmutatingModify: needsNonmutatingModify,
+            name: parts.name
+        ), [])
     }
     
-    private static func makeGetSet(oh: Bool, name: String) -> String {
+    private static func makeGetSet(
+        isImmutable: Bool,
+        needsNonmutatingModify: Bool,
+        name: String
+    ) -> String {
         """
         {
             _read { yield _\(name).wrappedValue }
-            \(oh ? "nonmutating " : "")_modify { yield &_\(name).wrappedValue }
+            \(makeSet(isImmutable: isImmutable, needsNonmutatingModify: needsNonmutatingModify, name: name))
         }
         """
+    }
+    private static func makeSet(
+        isImmutable: Bool,
+        needsNonmutatingModify: Bool,
+        name: String
+    ) -> String {
+        if !isImmutable {
+            return "\(needsNonmutatingModify ? "nonmutating " : "")_modify { yield &_\(name).wrappedValue }"
+        } else {
+            return ""
+        }
     }
 }
 

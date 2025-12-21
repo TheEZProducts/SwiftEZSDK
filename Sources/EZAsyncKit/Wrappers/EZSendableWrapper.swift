@@ -118,11 +118,29 @@ public final class EZSendableWrapper<Value>: EZConstantPropertyWrapperProtocol, 
     nonisolated(unsafe)
     private let _value: EZRecursiveMutex<Value>
     
-    /// Projected value (`$property`) intended primarily for reading in user code.
+    /// Projected value (`$property`) intended primarily for **reading** and **derived computations**.
     ///
-    /// In typical usage you read through `$property` and perform mutations via the backing
-    /// `_property` wrapper on the owning type.
-    public var projectedValue: Projection { .init(_main: self) }
+    /// The key idea is:
+    /// - Use `$name` to read the current value or compute a derived result under the same lock.
+    /// - Use `_name` for mutations (`update` / `set`).
+    ///
+    /// ### Example: read
+    /// ```swift
+    /// final class Example: Sendable {
+    ///     @EZSendableWrapper var count: Int = 0
+    ///
+    ///     func read() -> Int {
+    ///         $count.get()
+    ///     }
+    /// }
+    /// ```
+    ///
+    /// ### Example: derived computation under the same lock
+    /// ```swift
+    /// let isPositive = $count.update { $0 > 0 }
+    /// let digits = $count.update { String($0).count }
+    /// ```
+    public var projectedValue: Projection { .init(main: self) }
     
     /// Convenient access to the value.
     ///
@@ -204,14 +222,67 @@ public final class EZSendableWrapper<Value>: EZConstantPropertyWrapperProtocol, 
     }
 }
 
+/// Property macro that exposes a read-only *projection-backed* value with constant backing storage.
+///
+/// This is the immutable companion to `@EZSendableWrapper`: it uses the constant-storage macro pattern,
+/// but generates a getter-only property whose value is read from an `EZSendableWrapper<Value>.Projection`.
+///
+/// The public-facing property is typically declared as the *plain value type* (e.g. `Int`).
+/// The macro then generates constant backing storage (e.g. `let _counterView: EZSendableWrapperProjection<Int>`)
+/// which you initialize by passing a projection into `init`.
+///
+/// This is useful when you want to store a projection view as a member (e.g. in a `Sendable` class)
+/// without introducing a mutable stored wrapper variable.
+///
+/// ### Example
+/// ```swift
+/// final class Source: Sendable {
+///     @EZSendableWrapper var counter: Int = 0
+/// }
+///
+/// final class Example: Sendable {
+///     @EZSendableWrapperProjection var counterView: Int
+///
+///     init(counterView: EZSendableWrapperProjection<Int>) {
+///         _counterView = counterView
+///     }
+///
+///     func read() -> Int { counterView }
+/// }
+///
+/// let source = Source()
+/// let example = Example(counterView: source.$counter)
+/// _ = example.read()
+/// ```
 @attached(accessor)
 @attached(peer, names: prefixed(`$`), prefixed(`_`))
-public macro EZSendableWrapperProjection() = #externalMacro(module: "EZMacros", type: "EZConstantPropertyWrapperMacro")
+public macro EZSendableWrapperProjection() = #externalMacro(module: "EZMacros", type: "EZConstantImmutablePropertyWrapperMacro")
 
+/// Generic form of `@EZSendableWrapperProjection` that spells the value type explicitly.
+///
+/// ### Example
+/// ```swift
+/// final class Source: Sendable {
+///     @EZSendableWrapper var counter: Int = 0
+/// }
+///
+/// final class Example: Sendable {
+///     @EZSendableWrapperProjection<Int> var counterView: Int
+///
+///     init(counterView: EZSendableWrapperProjection<Int>) {
+///         _counterView = counterView
+///     }
+/// }
+///
+/// let source = Source()
+/// let example = Example(counterView: source.$counter)
+/// _ = example
+/// ```
 @attached(accessor)
 @attached(peer, names: prefixed(`$`), prefixed(`_`))
-public macro EZSendableWrapperProjection<T>() = #externalMacro(module: "EZMacros", type: "EZConstantPropertyWrapperMacro")
+public macro EZSendableWrapperProjection<T>() = #externalMacro(module: "EZMacros", type: "EZConstantImmutablePropertyWrapperMacro")
 
+/// Convenience alias for `EZSendableWrapper<Value>.Projection`.
 public typealias EZSendableWrapperProjection<Value> = EZSendableWrapper<Value>.Projection
 
 extension EZSendableWrapper {
@@ -224,7 +295,7 @@ extension EZSendableWrapper {
     /// Calling `update` here passes the current `Value` into the closure; for value types this
     /// does not replace the stored value, while for reference types you may mutate the referenced
     /// object.
-    public struct Projection: EZConstantPropertyWrapperProtocol, Sendable {
+    public struct Projection: EZConstantImmutablePropertyWrapperProtocol, Sendable {
         let _main: EZSendableWrapper<Value>
         
         /// Synchronous access to the wrapped value.
@@ -237,9 +308,19 @@ extension EZSendableWrapper {
         /// ```
         public var wrappedValue: Value {
             _read { yield _main.wrappedValue }
-            nonmutating set {}
         }
         
+        /// Returns the projection itself.
+        ///
+        /// This exists to support constant-storage macros that expect a `projectedValue`.
+        /// In day-to-day code you typically already work with a `Projection` when using `$name`.
+        ///
+        /// ### Example
+        /// ```swift
+        /// let p: EZSendableWrapperProjection<Int> = source.$counter
+        /// let current = p.wrappedValue
+        /// _ = current
+        /// ```
         public var projectedValue: Self { self }
         
         /// Computes a result under the same lock by passing the current `Value` into `closure`.
@@ -259,11 +340,16 @@ extension EZSendableWrapper {
         }
         
         /// Returns the current value.
+        ///
+        /// ### Example
+        /// ```swift
+        /// let current = $value.get()
+        /// ```
         @discardableResult
         public func get() -> Value { _main.get() }
         
-        init(_main: EZSendableWrapper<Value>) {
-            self._main = _main
+        public init(main: EZSendableWrapper<Value>) {
+            self._main = main
         }
     }
 }

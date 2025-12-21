@@ -9,6 +9,7 @@ import Foundation
 
 @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
 extension Actor {
+#if compiler(>=6.2)
     /// Returns `true` when accessed while already running on this actor's executor.
     ///
     /// Treat this as a best-effort diagnostic / convenience API.
@@ -41,6 +42,7 @@ extension Actor {
         ezTaskImmediate { _ in isIsolated.wrappedValue = true }
         return isIsolated.wrappedValue
     }
+#endif
     
     /// Executes `body` on this actor, preserving isolation.
     ///
@@ -92,6 +94,7 @@ extension Actor {
         return ezUnsafeRun { $0.makeTask(name: name, priority: priority, operation: body.value) }
     }
     
+#if compiler(>=6.2)
     /// Like `ezTask`, but uses `Task.immediate` where available (Apple OS 26+).
     ///
     /// When you call this while already executing on the actor, the operation starts immediately,
@@ -144,6 +147,7 @@ extension Actor {
         let body = EZUnsafeSendableWrapper(operation)
         return ezUnsafeRun { $0.makeTaskImmediate(name: name, priority: priority, operation: body.value) }
     }
+#endif
     
     /// Creates a detached `Task` and then hops onto this actor for the operation.
     ///
@@ -232,9 +236,14 @@ extension Actor {
         priority: TaskPriority? = nil,
         operation: @escaping (isolated Self) async throws -> R
     ) -> Task<R, Error> {
+#if compiler(>=6.2)
         .init(name: name, priority: priority) { try await operation(self) }
+#else
+        .init(priority: priority) { try await operation(self) }
+#endif
     }
     
+#if compiler(>=6.2)
     @available(macOS 26.0, iOS 26.0, watchOS 26.0, tvOS 26.0, *)
     private func makeTaskImmediate<R>(
         name: String? = nil,
@@ -243,14 +252,21 @@ extension Actor {
     ) -> Task<R, Error> {
         .immediate(name: name, priority: priority) { try await operation(self) }
     }
+#endif
     
     private func makeTaskDetached<R>(
         name: String? = nil,
         priority: TaskPriority? = nil,
         operation: @Sendable @escaping (isolated Self) async throws -> R
     ) -> Task<R, Error> {
+#if compiler(>=6.2)
         .detached(name: name, priority: priority) { try await self.ezWithIsolation {
             try await operation($0)
         }}
+#else
+        .detached(priority: priority) { try await self.ezWithIsolation {
+            try await operation($0)
+        }}
+#endif
     }
 }

@@ -28,7 +28,7 @@ public struct EZOptionalError: LocalizedError, Sendable, Equatable {
     public static func isNil(
         file: StaticString = #file,
         functionName: StaticString = #function,
-        line: UInt = #line,
+        line: UInt = #line
     ) -> EZOptionalError {
         EZOptionalError(text: "Value is nil, file: \(file), function: \(functionName), line: \(line)")
     }

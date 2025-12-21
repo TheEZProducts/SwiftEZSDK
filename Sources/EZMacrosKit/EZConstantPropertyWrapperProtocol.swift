@@ -112,3 +112,85 @@ public protocol EZConstantPropertyWrapperProtocol {
     var wrappedValue: WrappedValue { get nonmutating set }
     var projectedValue: ProjectedValue { get }
 }
+
+
+ 
+/// Contract for constant-storage property macros that expose a *read-only* `wrappedValue`.
+///
+/// This protocol supports the same constant-backing-storage macro pattern as
+/// `EZConstantPropertyWrapperProtocol`, but for cases where the public-facing property should be
+/// immutable (getter-only).
+///
+/// Because the computed property is read-only, the generated accessor only needs `_read` and the
+/// storage type only needs `wrappedValue` as a getter.
+///
+/// ## Example: defining an immutable storage type and its macro
+/// A constant-storage macro is typically declared in two forms (non-generic and generic), and uses
+/// the universal implementation:
+/// - `module: "EZMacros"`
+/// - `type: "EZConstantImmutablePropertyWrapperMacro"`
+///
+/// In this example the macro name matches the storage type name (`ReadOnlyBox`), so `@ReadOnlyBox`
+/// produces backing storage of type `ReadOnlyBox<WrappedValue>`.
+///
+/// ```swift
+/// @attached(accessor)
+/// @attached(peer, names: prefixed(`$`), prefixed(`_`))
+/// public macro ReadOnlyBox() =
+///     #externalMacro(module: "EZMacros", type: "EZConstantImmutablePropertyWrapperMacro")
+///
+/// @attached(accessor)
+/// @attached(peer, names: prefixed(`$`), prefixed(`_`))
+/// public macro ReadOnlyBox<T>() =
+///     #externalMacro(module: "EZMacros", type: "EZConstantImmutablePropertyWrapperMacro")
+///
+/// public struct ReadOnlyBox<Value>: EZConstantImmutablePropertyWrapperProtocol {
+///     public typealias WrappedValue = Value
+///     public typealias ProjectedValue = Self
+///
+///     public let wrappedValue: Value
+///     public var projectedValue: Self { self }
+///
+///     public init(wrappedValue: Value) {
+///         self.wrappedValue = wrappedValue
+///     }
+/// }
+/// ```
+///
+/// ## Using the macro
+/// ```swift
+/// @ReadOnlyBox var value: Int = 123
+/// // or
+/// @ReadOnlyBox<Int> var value = 123
+/// ```
+///
+/// ## Conceptual expansion
+/// Conceptually, the macro expands the declaration into something equivalent to:
+/// ```swift
+/// var value: Int {
+///     _read { yield _value.wrappedValue }
+/// }
+///
+/// var $value: ReadOnlyBox<Int>.ProjectedValue {
+///     _read { yield _value.projectedValue }
+/// }
+///
+/// let _value: ReadOnlyBox<Int> = ReadOnlyBox(wrappedValue: 123)
+/// ```
+///
+/// ## What a conforming storage type must provide
+/// A type conforming to `EZConstantImmutablePropertyWrapperProtocol` is intended to be used as the
+/// backing storage (`_value`). For the macro to work, the conformer must expose:
+///
+/// - `wrappedValue` as a getter-only property.
+/// - `projectedValue` for the `$property` projection.
+///
+/// Note: access-control mapping and any extra forwarding rules are defined by the macro,
+/// not by this protocol.
+public protocol EZConstantImmutablePropertyWrapperProtocol {
+    associatedtype WrappedValue
+    associatedtype ProjectedValue
+    
+    var wrappedValue: WrappedValue { get }
+    var projectedValue: ProjectedValue { get }
+}

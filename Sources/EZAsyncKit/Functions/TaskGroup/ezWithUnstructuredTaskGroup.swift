@@ -9,6 +9,7 @@ import Foundation
 
 import EZHelpersKit
 
+#if compiler(>=6.2)
 /// Awaits several unstructured `Task` values in parallel and returns their results as a tuple.
 ///
 /// All tasks are awaited concurrently, and this helper also wires in cancellation: if the
@@ -32,12 +33,44 @@ import EZHelpersKit
 public func ezWithUnstructuredTaskGroup<each T>(
     result: EZTaskGroupResultValuesType = .values,
     _ values: repeat Task<each T, Never>
-) async -> (repeat each T) {
+) async -> (repeat each T) where repeat each T: Sendable {
     await withTaskCancellationHandler(
         operation: { (repeat await (each values).value) },
         onCancel: { repeat (each values).cancel() }
     )
 }
+#else
+/// Awaits several unstructured `Task` values in parallel and returns their results as a tuple.
+///
+/// All tasks are awaited concurrently, and this helper also wires in cancellation: if the
+/// surrounding task is cancelled, all child tasks are cancelled as well via `withTaskCancellationHandler`.
+///
+/// - Parameters:
+///   - result: Use `.values` to make the intent explicit (kept for symmetry with other helpers).
+///   - values: A variadic tuple of non-throwing tasks.
+/// - Returns: A tuple containing the `.value` of each task, in the same order.
+///
+/// ### Example
+/// ```swift
+/// let t1 = Task { 1 }
+/// let t2 = Task { 2 }
+///
+/// let (a, b) = await ezWithUnstructuredTaskGroup(t1, t2)
+/// // a == 1, b == 2
+/// ```
+@available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
+@discardableResult
+public func ezWithUnstructuredTaskGroup<each T>(
+    result: EZTaskGroupResultValuesType = .values,
+    _ values: repeat Task<each T, Never>
+) async -> (repeat each T) where repeat each T: Sendable {
+    let values = EZUnsafeSendableWrapper((repeat each values))
+    return await withTaskCancellationHandler(
+        operation: { (repeat await (each values.value).value) },
+        onCancel: { repeat (each values.value).cancel() }
+    )
+}
+#endif
 
 /// Builder-based variant that awaits several non-throwing tasks and returns their values.
 ///
@@ -53,7 +86,7 @@ public func ezWithUnstructuredTaskGroup<each T>(
 /// ```
 @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
 @discardableResult
-public func ezWithUnstructuredTaskGroup<each T>(
+public func ezWithUnstructuredTaskGroup<each T: Sendable>(
     result: EZTaskGroupResultValuesType = .values,
     @EZTaskGroupBuilder _ values: () -> (repeat Task<each T, Never>)
 ) async -> (repeat each T) {
@@ -84,7 +117,7 @@ public func ezWithUnstructuredTaskGroup<each T>(
 @_documentation(visibility: private)
 @_disfavoredOverload
 @discardableResult
-public func ezWithUnstructuredTaskGroup<each T, each Err>(
+public func ezWithUnstructuredTaskGroup<each T: Sendable, each Err>(
     result: EZTaskGroupResultValuesType = .values,
     _ values: repeat Task<each T, each Err>
 ) async throws(EZGroupError<(repeat Result<each T, each Err>)>) -> (repeat each T) {
@@ -120,13 +153,14 @@ public func ezWithUnstructuredTaskGroup<each T, each Err>(
 @_documentation(visibility: private)
 @_disfavoredOverload
 @discardableResult
-public func ezWithUnstructuredTaskGroup<each T, each Err>(
+public func ezWithUnstructuredTaskGroup<each T: Sendable, each Err>(
     result: EZTaskGroupResultValuesType = .values,
     @EZTaskGroupBuilder _ values: () -> (repeat Task<each T, each Err>)
 ) async throws(EZGroupError<(repeat Result<each T, each Err>)>) -> (repeat each T) {
     return try await ezWithUnstructuredTaskGroup(result: result, repeat each values())
 }
 
+#if compiler(>=6.2)
 // MARK: - Unstructured Results
 /// Awaits several possibly-throwing tasks and returns one `Result` per task.
 ///
@@ -153,12 +187,48 @@ public func ezWithUnstructuredTaskGroup<each T, each Err>(
 public func ezWithUnstructuredTaskGroup<each T, each Err>(
     result: EZTaskGroupResultResultsType,
     _ values: repeat Task<each T, each Err>
-) async -> (repeat Result<each T, each Err>) {
+) async -> (repeat Result<each T, each Err>) where repeat each T: Sendable {
     return await withTaskCancellationHandler(
         operation: { (repeat await (each values).result) },
         onCancel: { repeat (each values).cancel() }
     )
 }
+#else
+// MARK: - Unstructured Results
+/// Awaits several possibly-throwing tasks and returns one `Result` per task.
+///
+/// Each child task is awaited in parallel. The function itself does not throw; instead, the
+/// outcome of each task is captured as `Result<Success, Failure>` in the returned tuple.
+///
+/// - Parameters:
+///   - result: Use `.results` to make the intent explicit.
+///   - values: A variadic tuple of tasks to await.
+/// - Returns: A tuple of `Result` values, preserving the order of `values`.
+///
+/// ### Example
+/// ```swift
+/// let t1 = Task { try await loadUser() }
+/// let t2 = Task { try await loadPosts() }
+///
+/// let (userResult, postsResult): (Result<User, Error>, Result<[Post], Error>) =
+///     await ezWithUnstructuredTaskGroup(result: .results, t1, t2)
+/// ```
+@available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
+@_documentation(visibility: private)
+@_disfavoredOverload
+@discardableResult
+public func ezWithUnstructuredTaskGroup<each T, each Err>(
+    result: EZTaskGroupResultResultsType,
+    _ values: repeat Task<each T, each Err>
+) async -> (repeat Result<each T, each Err>) where repeat each T: Sendable {
+    let values = EZUnsafeSendableWrapper((repeat each values))
+    return await withTaskCancellationHandler(
+        operation: { (repeat await (each values.value).result) },
+        onCancel: { repeat (each values.value).cancel() }
+    )
+}
+
+#endif
 
 /// Builder-based variant that returns `Result` values for each task.
 ///
@@ -176,13 +246,14 @@ public func ezWithUnstructuredTaskGroup<each T, each Err>(
 @_documentation(visibility: private)
 @_disfavoredOverload
 @discardableResult
-public func ezWithUnstructuredTaskGroup<each T, each Err>(
+public func ezWithUnstructuredTaskGroup<each T: Sendable, each Err>(
     result: EZTaskGroupResultResultsType,
     @EZTaskGroupBuilder _ values: () -> (repeat Task<each T, each Err>)
 ) async -> (repeat Result<each T, each Err>) {
     await ezWithUnstructuredTaskGroup(result: result, repeat each values())
 }
 
+#if compiler(>=6.2)
 // MARK: - Unstructured Optionals
 /// Awaits several possibly-throwing tasks and returns optional values for each one.
 ///
@@ -210,12 +281,48 @@ public func ezWithUnstructuredTaskGroup<each T, each Err>(
 public func ezWithUnstructuredTaskGroup<each T, each Err>(
     result: EZTaskGroupResultOptionalsType,
     _ values: repeat Task<each T, each Err>
-) async -> (repeat Optional<each T>) {
+) async -> (repeat Optional<each T>) where repeat each T: Sendable {
     return await withTaskCancellationHandler(
         operation: { (repeat try? await (each values).value) },
         onCancel: { repeat (each values).cancel() }
     )
 }
+#else
+// MARK: - Unstructured Optionals
+/// Awaits several possibly-throwing tasks and returns optional values for each one.
+///
+/// This is a convenience wrapper over the `.results` overload:
+/// - `.success(value)` becomes `value`
+/// - `.failure(error)` becomes `nil`
+///
+/// - Parameters:
+///   - result: Use `.optionals` to make the intent explicit.
+///   - values: A variadic tuple of tasks.
+/// - Returns: A tuple of optional values in the same order.
+///
+/// ### Example
+/// ```swift
+/// let t1 = Task { try await loadUser() }
+/// let t2 = Task { try await loadPosts() }
+///
+/// let (user, posts): (User?, [Post]?) =
+///     await ezWithUnstructuredTaskGroup(result: .optionals, t1, t2)
+/// ```
+@available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
+@_documentation(visibility: private)
+@_disfavoredOverload
+@discardableResult
+public func ezWithUnstructuredTaskGroup<each T, each Err>(
+    result: EZTaskGroupResultOptionalsType,
+    _ values: repeat Task<each T, each Err>
+) async -> (repeat Optional<each T>) where repeat each T: Sendable {
+    let values = EZUnsafeSendableWrapper((repeat each values))
+    return await withTaskCancellationHandler(
+        operation: { (repeat try? await (each values.value).value) },
+        onCancel: { repeat (each values.value).cancel() }
+    )
+}
+#endif
 
 /// Builder-based variant that returns optional values for each task.
 ///
@@ -233,7 +340,7 @@ public func ezWithUnstructuredTaskGroup<each T, each Err>(
 @_documentation(visibility: private)
 @_disfavoredOverload
 @discardableResult
-public func ezWithUnstructuredTaskGroup<each T, each Err>(
+public func ezWithUnstructuredTaskGroup<each T: Sendable, each Err>(
     result: EZTaskGroupResultOptionalsType,
     @EZTaskGroupBuilder _ values: () -> (repeat Task<each T, each Err>)
 ) async -> (repeat Optional<each T>) {

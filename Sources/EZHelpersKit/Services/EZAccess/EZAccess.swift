@@ -7,7 +7,7 @@
 
 import Foundation
 
-#if hasFeature(Lifetimes)
+#if compiler(>=6.2) && hasFeature(Lifetimes)
 public struct EZAccess<Value>: ~Copyable, ~Escapable where Value: ~Copyable {
     private let ptr: UnsafeMutablePointer<Value>
 
