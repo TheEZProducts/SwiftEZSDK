@@ -6,13 +6,13 @@
 //
 
 #if !os(iOS) && !os(tvOS) && !os(watchOS) && !os(visionOS)
-import EZSwiftCompilerPluginLight
 
 @main
 @available(macOS 13.0, *)
 struct EZMacros: CompilerPlugin {
     let providingMacros: [Macro.Type] = [
-        EZConstantPropertyWrapperMacro.self
+        EZConstantPropertyWrapperMacro.self,
+        EZConstantImmutablePropertyWrapperMacro.self
     ]
 }
 #endif

@@ -7,7 +7,6 @@
 
 #if !os(iOS) && !os(tvOS) && !os(watchOS) && !os(visionOS)
 import Foundation
-import EZSwiftCompilerPluginLight
 
 @available(macOS 13.0, *)
 public struct EZConstantImmutablePropertyWrapperMacro: AttachedMacro {

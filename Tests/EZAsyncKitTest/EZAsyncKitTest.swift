@@ -334,9 +334,12 @@ actor Fsdfs {
     var int: Int = 0
 }
 
-final class RequestContext: Sendable {
+struct RequestContext: Sendable {
     @EZThreadSafety public private(set) var fd: RequestContext1 = .init()
   
+    @EZThreadSafetyProjection public var id: String
+    
+    
 }
 
 

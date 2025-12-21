@@ -125,14 +125,8 @@ let package = Package(
         //MARK: - Macros
         .macro(
             name: EZMacros.name,
-            dependencies: [
-                .target(name: EZSwiftCompilerPluginLight.name)
-            ],
+            dependencies: [],
             path: EZMacros.macrosPath
-        ),
-        .target(
-            name: EZSwiftCompilerPluginLight.name,
-            path: EZSwiftCompilerPluginLight.macrosPath
         ),
         
         //MARK: - Experimental
@@ -215,7 +209,6 @@ struct EZSwiftUIBridgeKit: EZTargetProtocol {
 
 //MARK: - Macros
 struct EZMacros: EZTargetProtocol {}
-struct EZSwiftCompilerPluginLight: EZTargetProtocol {}
 
 //MARK: - Experimental Targets
 //MARK: EZJsonStriderKit
