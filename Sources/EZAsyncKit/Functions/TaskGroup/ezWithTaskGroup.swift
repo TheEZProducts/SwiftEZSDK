@@ -290,3 +290,86 @@ private func _ezWithTaskGroup_makeResults<each T, each R: Error>(
 ) -> (repeat Result<each T, each R>) {
     return (repeat Result(cortege: (each cortege))!)
 }
+
+
+@available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
+@discardableResult
+public func ezWithTaskGroup<T: Sendable>(
+    isolation: isolated (any Actor)? = #isolation,
+    result: EZTaskGroupResultResultsType,
+    _ ops: [EZTaskItem<T, Error>]
+) async -> [Result<T, Error>] {
+    guard !ops.isEmpty else { return [] }
+    return await withTaskGroup(
+        of: Result<T, Error>.self,
+        returning: [Result<T, Error>].self,
+        isolation: isolation
+    ) { group in
+        for op in ops {
+            group.addTask {
+                do {
+                    return .success(try await op.task())
+                } catch {
+                    return .failure(error)
+                }
+            }
+        }
+        
+        var results: [Result<T, Error>] = []
+        for await result in group { results.append(result) }
+        return results
+    }
+}
+
+@available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
+@discardableResult
+public func ezWithTaskGroup<T: Sendable>(
+    isolation: isolated (any Actor)? = #isolation,
+    result: EZTaskGroupResultValuesType = .values,
+    _ ops: [EZTaskItem<T, Error>]
+) async throws -> [T] {
+    let results = await ezWithTaskGroup(
+        isolation: isolation,
+        result: .results,
+        ops
+    )
+    return try results.map { try $0.get() }
+}
+
+@available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
+@discardableResult
+public func ezWithTaskGroup<T: Sendable>(
+    isolation: isolated (any Actor)? = #isolation,
+    result: EZTaskGroupResultValuesType = .values,
+    _ ops: [EZTaskItem<T, Never>]
+) async -> [T] {
+    guard !ops.isEmpty else { return [] }
+    return await withTaskGroup(
+        of: T.self,
+        returning: [T].self,
+        isolation: isolation
+    ) { group in
+        for op in ops {
+            group.addTask { await op.task() }
+        }
+        
+        var results: [T] = []
+        for await result in group { results.append(result) }
+        return results
+    }
+}
+
+@available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
+@discardableResult
+public func ezWithTaskGroup<T: Sendable>(
+    isolation: isolated (any Actor)? = #isolation,
+    result: EZTaskGroupResultOptionalsType,
+    _ ops: [EZTaskItem<T, Error>]
+) async -> [T?] {
+    let results = await ezWithTaskGroup(
+        isolation: isolation,
+        result: .results,
+        ops
+    )
+    return results.map { $0.ezCortege.0 }
+}

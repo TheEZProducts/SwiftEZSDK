@@ -48,7 +48,7 @@ class FirstPacV: EZUIPackPlatformsV<FirstPacM>{
 
 
 class FirstPacI: EZUIPackI{
-    var mediator: FirstPacM!
+    var access: FirstPacM.AccessI!
     
     func didInitialize() {
         
@@ -61,21 +61,21 @@ class FirstPacI: EZUIPackI{
     func didCreate() {
 //        packBridge.tabBarPack?.toolbarItems = []
 //        packBridge.tabBarPack?.tabBar.isHidden = true
-        transit
-            .tabBarSet(
-                [
-                    UIViewController().apply(template: .custom{ $0.view.backgroundColor = .init(red: .random(in: 0...1), green: .random(in: 0...1), blue: .random(in: 0...1), alpha: 1) }),
-                    UIViewController().apply(template: .custom{ $0.view.backgroundColor = .init(red: .random(in: 0...1), green: .random(in: 0...1), blue: .random(in: 0...1), alpha: 1) })
-                ])
-            .transit()
+//        transit
+//            .tabBarSet(
+//                [
+//                    UIViewController().apply(template: .custom{ $0.view.backgroundColor = .init(red: .random(in: 0...1), green: .random(in: 0...1), blue: .random(in: 0...1), alpha: 1) }),
+//                    UIViewController().apply(template: .custom{ $0.view.backgroundColor = .init(red: .random(in: 0...1), green: .random(in: 0...1), blue: .random(in: 0...1), alpha: 1) })
+//                ])
+//            .transit()
         
-//        DispatchQueue.main.asyncAfter(deadline: .now() + 2){
-//            self.transit
-//                .tabBarSet([.tabBarWrapper([SecondPac(), SecondPac(), SecondPac()])])
-//                .unsafeTransition()
-//                .animation(.ezOpen)
-//                .transit()
-//        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2){
+            self.transit
+                .tabBarSet([.tabBarWrapper([SecondPac(), SecondPac(), SecondPac()])])
+                .unsafeTransition()
+                .animation(.ezOpen)
+                .transit()
+        }
         
     }
     
@@ -112,7 +112,7 @@ class FirstPacI: EZUIPackI{
             print()
             print()
             print()
-            let tansition = self.mediator.testView.transit
+        let tansition = self.viewModel.testView.transit
 //            .present(SecondPac())
                     .present(
                         .tabBarWrapper([SecondPac(), SecondPac(), SecondPac()])
@@ -229,18 +229,24 @@ extension FirstPacI: EZTransitionControllerProtocol{
     }
 }
 
-class FirstPacM: EZUIPackM{
+class FirstPacM: EZUIPackM {
     var packBridge = EZUIPackBridge()
     
-    var testView: EZContainerView = .init()
+    var storage: Void = ()
+    
+    var viewModel = ViewModel()
+    @MainActor struct ViewModel {
+        var testView: EZContainerView = .init()
+    }
+    
     
     var iActions = iAction()
-    struct iAction: EZUIPackActionProviderProtocol{
+    struct iAction {
         
     }
     
     var vActions = VAction()
-    struct VAction: EZUIPackActionProviderProtocol{
+    struct VAction {
         
     }
 }
@@ -252,7 +258,7 @@ extension UIView{
 class FirstPacIOSV: EZUIPackV{
     var supportedInterfaceOrientations: UIInterfaceOrientationMask? { .all }
     
-    var mediator: FirstPacM!
+    var access: FirstPacM.AccessV!
     
     func create() {
         createSelf()
@@ -276,17 +282,17 @@ class FirstPacIOSV: EZUIPackV{
     }
     
     private func createTestView(){
-        addSubview(mediator.testView)
-        mediator.testView.translatesAutoresizingMaskIntoConstraints = false
-        mediator.testView.layer.masksToBounds = true
-        mediator.testView.isUserInteractionEnabled = false
+        addSubview(viewModel.testView)
+        viewModel.testView.translatesAutoresizingMaskIntoConstraints = false
+        viewModel.testView.layer.masksToBounds = true
+        viewModel.testView.isUserInteractionEnabled = false
         NSLayoutConstraint.activate([
-            mediator.testView.centerXAnchor.constraint(equalTo: centerXAnchor),
-            mediator.testView.centerYAnchor.constraint(equalTo: centerYAnchor),
-            mediator.testView.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 0.5),
-            mediator.testView.heightAnchor.constraint(equalTo: heightAnchor, multiplier: 0.5)
+            viewModel.testView.centerXAnchor.constraint(equalTo: centerXAnchor),
+            viewModel.testView.centerYAnchor.constraint(equalTo: centerYAnchor),
+            viewModel.testView.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 0.5),
+            viewModel.testView.heightAnchor.constraint(equalTo: heightAnchor, multiplier: 0.5)
         ])
-        mediator.testView.presentationStatusDidUpdateAction = {view, status in
+        viewModel.testView.presentationStatusDidUpdateAction = { view, status in
             view.isUserInteractionEnabled = status
         }
     }

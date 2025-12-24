@@ -14,7 +14,10 @@ public protocol FreestandingMacro: Macro {
         macro: PluginMessage.MacroReference,
         macroRole: PluginMessage.MacroRole?,
         discriminator: String,
-        expandingSyntax: PluginMessage.Syntax
-    ) throws -> (expandedSource: String?,
-                 diagnostics: [PluginMessage.Diagnostic])
+        expandingSyntax: PluginMessage.Syntax,
+        parameters: String
+    ) throws -> (
+        expandedSource: String?,
+        diagnostics: [PluginMessage.Diagnostic]
+    )
 }

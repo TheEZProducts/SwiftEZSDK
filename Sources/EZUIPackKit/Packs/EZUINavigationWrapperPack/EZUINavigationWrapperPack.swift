@@ -24,20 +24,20 @@ extension UIViewController{
     }
 }
 
-extension EZUINavigationWrapperPack{
+extension EZUINavigationWrapperPack {
     public convenience init(_ controllers: [UIViewController]){
         let mediator = Mediator()
-        mediator.controllers = controllers
+        mediator.storage.controllers = controllers
         self.init(mediator: mediator)
     }
 }
 
-public class EZUINavigationWrapperPackI: EZUIPackI{
-    public var mediator: EZUINavigationWrapperPackM!
+public class EZUINavigationWrapperPackI: EZUIPackI {
+    public var access: EZUINavigationWrapperPackM.AccessI!
     
     public func didInitialize() {
-        guard let controllers = mediator.controllers else { return }
-        mediator.controllers = nil
+        guard let controllers = storage.controllers else { return }
+        storage.controllers = nil
         transit.navigationSet(controllers).unsafeTransition().transit()
     }
     
@@ -47,6 +47,14 @@ public class EZUINavigationWrapperPackI: EZUIPackI{
 public class EZUINavigationWrapperPackM: EZUIPackMediator, EZUIPackMediatorProtocol{
     public var packBridge = EZUIPackBridge()
     
-    public var controllers: [UIViewController]?
+    public var storage = Storage()
+    public struct Storage {
+        public var controllers: [UIViewController]?
+    }
+    
+    
+    public var viewModel: Void = ()
+    public var iActions: Void = ()
+    public var vActions: Void = ()
 }
 #endif

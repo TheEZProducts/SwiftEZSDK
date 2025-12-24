@@ -138,10 +138,10 @@ extension UIViewController{
         animation: UIViewControllerAnimatedTransitioning? = nil,
         interactive: Bool = false,
         action: (UIPercentDrivenInteractiveTransition?) -> (Result)
-    ) -> Result{
+    ) -> Result {
         if let transitioningDelegate = transitioningDelegate as? UIViewControllerTransitioning {
             return action(transitioningDelegate.interactive)
-        }else{
+        } else {
             let wrapper = UIViewControllerTransitioning(
                 delegate: transitioningDelegate,
                 animation: animation,
@@ -165,7 +165,7 @@ open class EZUIPack<
     I: EZUIPackInteractorProtocol,
     M: EZUIPackMediatorProtocol,
     V: EZUIPackViewProtocol
->: UIViewController, EZUIPackProtocol where I.Mediator == M, V.Mediator == M{
+>: UIViewController, EZUIPackProtocol where I.Mediator == M, V.Mediator == M {
     public var storage: EZUIPackStorage<I, M, V>
 #if !os(tvOS)
     open override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
@@ -260,6 +260,63 @@ open class EZUIPack<
         fatalError("init(coder:) has not been implemented")
     }
 }
+
+@MainActor
+public struct EZUIPac1<
+    I: EZUIPackInteractorProtocol,
+    M: EZUIPackMediatorProtocol,
+    V: EZUIPackViewProtocol
+> where I: UIViewController, I.Mediator == M, V.Mediator == M {
+    public private(set) weak var interactor: I?
+    public let mediator: M
+    public let view: V
+    
+    private init(interactor: I, mediator: M, view: V) {
+        self.interactor = interactor
+        self.mediator = mediator
+        self.view = view
+    }
+}
+
+extension EZUIPac1 {
+    public static func make(interactor: I, mediator: M, view: V) -> I {
+        setupPack(interactor: interactor, mediator: mediator, view: view)
+        return interactor
+    }
+    
+    private static func setupPack(interactor: I, mediator: M, view: V) {
+        mediator.didInitialize()
+        interactor.didInitialize()
+        view.didInitialize()
+        if let actions = interactor.setupActions() { mediator.iActions = actions }
+        if let actions = view.setupActions() { mediator.vActions = actions }
+    }
+}
+
+extension EZUIPac1 where I: EZUIPackWithMediatorIProtocol, V: EZUIPackWithMediatorVProtocol {
+    public static func make() -> I {
+        make(.init())
+    }
+    
+    public static func make(_ mediator: M) -> I {
+        let interactor = makeInteractor(mediator: mediator)
+        let view = makeView(mediator: mediator)
+        return make(interactor: interactor, mediator: mediator, view: view)
+    }
+}
+
+extension EZUIPac1 where I: EZUIPackWithMediatorIProtocol {
+    public static func makeInteractor(mediator: M) -> I {
+        .init(mediator: mediator)
+    }
+}
+
+extension EZUIPac1 where V: EZUIPackWithMediatorVProtocol {
+    public static func makeView(mediator: M) -> V {
+        .init(mediator: mediator)
+    }
+}
+
 #endif
 
 

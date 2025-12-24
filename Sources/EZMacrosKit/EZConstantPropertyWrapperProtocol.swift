@@ -12,7 +12,7 @@
 ///
 /// The implementation is universal and should be referenced as:
 /// - `module: "EZMacros"`
-/// - `type: "EZConstantPropertyWrapperMacro"`
+/// - `type: "EZPropertyWrapperMacro"`
 ///
 /// In this example the macro name matches the storage type name (`LockedBox`), so `@LockedBox`
 /// produces backing storage of type `LockedBox<WrappedValue>`.
@@ -21,12 +21,12 @@
 /// @attached(accessor)
 /// @attached(peer, names: prefixed(`$`), prefixed(`_`))
 /// public macro LockedBox(option: Int = 0) =
-///     #externalMacro(module: "EZMacros", type: "EZConstantPropertyWrapperMacro")
+///     #externalMacro(module: "EZMacros", type: "EZPropertyWrapperMacro_CMP")
 ///
 /// @attached(accessor)
 /// @attached(peer, names: prefixed(`$`), prefixed(`_`))
 /// public macro LockedBox<T>(option: Int = 0) =
-///     #externalMacro(module: "EZMacros", type: "EZConstantPropertyWrapperMacro")
+///     #externalMacro(module: "EZMacros", type: "EZPropertyWrapperMacro_CMP")
 ///
 /// public final class LockedBox<Value>: EZConstantPropertyWrapperProtocol {
 ///     public typealias WrappedValue = Value
@@ -105,7 +105,7 @@
 ///
 /// Note: the exact forwarding rules and access-control mapping are defined by the macro,
 /// not by this protocol.
-public protocol EZConstantPropertyWrapperProtocol {
+public protocol EZConstantPropertyWrapperProtocol: EZConstantImmutablePropertyWrapperProtocol {
     associatedtype WrappedValue
     associatedtype ProjectedValue
     
@@ -128,7 +128,7 @@ public protocol EZConstantPropertyWrapperProtocol {
 /// A constant-storage macro is typically declared in two forms (non-generic and generic), and uses
 /// the universal implementation:
 /// - `module: "EZMacros"`
-/// - `type: "EZConstantImmutablePropertyWrapperMacro"`
+/// - `type: "EZPropertyWrapperMacro_I"`
 ///
 /// In this example the macro name matches the storage type name (`ReadOnlyBox`), so `@ReadOnlyBox`
 /// produces backing storage of type `ReadOnlyBox<WrappedValue>`.
@@ -137,12 +137,12 @@ public protocol EZConstantPropertyWrapperProtocol {
 /// @attached(accessor)
 /// @attached(peer, names: prefixed(`$`), prefixed(`_`))
 /// public macro ReadOnlyBox() =
-///     #externalMacro(module: "EZMacros", type: "EZConstantImmutablePropertyWrapperMacro")
+///     #externalMacro(module: "EZMacros", type: "EZPropertyWrapperMacro_CIP")
 ///
 /// @attached(accessor)
 /// @attached(peer, names: prefixed(`$`), prefixed(`_`))
 /// public macro ReadOnlyBox<T>() =
-///     #externalMacro(module: "EZMacros", type: "EZConstantImmutablePropertyWrapperMacro")
+///     #externalMacro(module: "EZMacros", type: "EZPropertyWrapperMacro_CIP")
 ///
 /// public struct ReadOnlyBox<Value>: EZConstantImmutablePropertyWrapperProtocol {
 ///     public typealias WrappedValue = Value
@@ -194,3 +194,5 @@ public protocol EZConstantImmutablePropertyWrapperProtocol {
     var wrappedValue: WrappedValue { get }
     var projectedValue: ProjectedValue { get }
 }
+
+

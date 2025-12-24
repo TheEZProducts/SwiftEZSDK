@@ -50,14 +50,15 @@ let package = Package(
         .target(
             name: EZHelpersKit.name,
             dependencies: [
-                .target(name: EZAssociatedKit.name)
+                .target(name: EZAssociatedKit.name),
+                .target(name: EZMacrosKit.name)
             ],
             swiftSettings: [.enableExperimentalFeature("Lifetimes")]
         ),
         .testTarget(
             name: EZHelpersKit.testName,
             dependencies: [
-                .target(name: EZHelpersKit.name)
+                .target(name: EZHelpersKit.name, condition: EZHelpersKit.condition)
             ]
         ),
         
@@ -118,7 +119,8 @@ let package = Package(
         .target(
             name: EZUIPackKit.name,
             dependencies: [
-                .target(name: EZSwiftUIBridgeKit.name, condition: EZSwiftUIBridgeKit.condition)
+                .target(name: EZSwiftUIBridgeKit.name, condition: EZSwiftUIBridgeKit.condition),
+                .target(name: EZHelpersKit.name, condition: EZHelpersKit.condition)
             ]
         ),
         

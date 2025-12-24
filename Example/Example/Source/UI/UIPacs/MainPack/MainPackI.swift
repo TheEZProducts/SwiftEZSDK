@@ -9,11 +9,11 @@ import EZUIPackKit
 import UIKit
 import Foundation
 
-class MainPackI: EZUIPackI{
-    var mediator: MainPackM!
+class MainPackI: EZUIPackI {
+    var access: MainPackM.AccessI!
     
     func setupActions() {
-        iActions = self
+//        iActions = self
     }
     
     var firstPac = FirstPac()
@@ -146,24 +146,28 @@ struct DGsg{
     var test: Int = 10
 }
 
-class MainPackM: EZUIPackM{
+class MainPackM: EZUIPackM {
     var packBridge = EZUIPackBridge()
-    
-    var test: Int = 10
-    
-    var sdf: DGsg
     
     
     init(test: DGsg){
-        self.sdf = test
+        viewModel = .init(sdf: test)
         super.init()
     }
     
     required init() {
-        sdf = .init()
+        viewModel = .init(sdf: .init())
         super.init()
     }
     
+    var storage: Void = ()
+    
+    var viewModel: ViewModel
+    @MainActor struct ViewModel {
+        var test: Int = 10
+        var sdf: DGsg
+    }
+        
     weak var iActions: IActionProvider?
     @MainActor protocol IActionProvider: AnyObject{
         func test()
@@ -176,19 +180,16 @@ class MainPackM: EZUIPackM{
     
     var shared: EZSharedStorage? {
         .init([
-            .init(key: .mainPackMChain.test, value: test)
+            .init(key: .mainPackMChain.test, value: viewModel.test)
         ])
     }
 }
 
-extension Optional: @retroactive EZUIPackActionProviderProtocol{}
 
-class MainPackV: EZUIPackV{
-    var mediator: MainPackM!
+class MainPackV: EZUIPackV {
+    var access: MainPackM.AccessV!
     
-    func setupActions() {
-        vActions = self
-    }
+    func setupActions() -> MainPackM.VActionProvider? { self }
     
     func create() {
         createSelf()

@@ -9,6 +9,6 @@
 import Foundation
 
 final public class EZDummyUIPackV<Mediator: EZUIPackMediatorProtocol>: EZUIPackV {
-    public var mediator: Mediator!
+    public var access: Mediator.AccessV!
 }
 #endif

@@ -22,7 +22,8 @@ public protocol AttachedMacro: Macro {
         lexicalContext: [PluginMessage.Syntax]?,
         parentDeclSyntax: PluginMessage.Syntax?,
         extendedTypeSyntax: PluginMessage.Syntax?,
-        conformanceListSyntax: PluginMessage.Syntax?
+        conformanceListSyntax: PluginMessage.Syntax?,
+        parameters: String
     ) throws -> (
         expandedSource: String?,
         diagnostics: [PluginMessage.Diagnostic]

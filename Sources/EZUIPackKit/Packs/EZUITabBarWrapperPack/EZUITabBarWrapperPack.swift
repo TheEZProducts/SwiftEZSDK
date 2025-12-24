@@ -24,29 +24,36 @@ extension UIViewController{
     }
 }
 
-extension EZUITabBarWrapperPack{
+extension EZUITabBarWrapperPack {
     public convenience init(_ controllers: [UIViewController]){
         let mediator = Mediator()
-        mediator.controllers = controllers
+        mediator.storage.controllers = controllers
         self.init(mediator: mediator)
     }
 }
 
-public class EZUITabBarWrapperPackI: EZUIPackI{
-    public var mediator: EZUITabBarWrapperPackM!
+public class EZUITabBarWrapperPackI: EZUIPackI {
+    public var access: EZUITabBarWrapperPackM.AccessI!
     
     public func didInitialize() {
-        guard let controllers = mediator.controllers else { return }
-        mediator.controllers = nil
+        guard let controllers = storage.controllers else { return }
+        storage.controllers = nil
         transit.tabBarSet(controllers).unsafeTransition().transit()
     }
     
     required public init(){}
 }
 
-public class EZUITabBarWrapperPackM: EZUIPackMediator, EZUIPackMediatorProtocol{
+public class EZUITabBarWrapperPackM: EZUIPackMediator, EZUIPackMediatorProtocol {
     public var packBridge = EZUIPackBridge()
     
-    public var controllers: [UIViewController]?
+    public var storage = Storage()
+    public struct Storage {
+        public var controllers: [UIViewController]?
+    }
+    
+    public var viewModel: Void = ()
+    public var iActions: Void = ()
+    public var vActions: Void = ()
 }
 #endif

@@ -9,33 +9,47 @@
 import Foundation
 import UIKit
 
-extension EZUIPackWithMediatorProtocol where Self: EZUIPackInteractorProtocol{
+extension EZUIPackWithMediatorIProtocol where Self: EZUIPackInteractorProtocol {
     public init(mediator: Mediator){
         self.init()
-        self.mediator = mediator
+        self.access = mediator.accessI
     }
     
-    public var transit: EZTransition<UIViewController> { packBridge.transit }
+    public var transit: EZTransition<UIViewController> { access.packBridge.transit }
 }
 
-extension EZUIPackInteractorProtocol where Mediator: EZUIPackMediatorWithActionProviders{
-    public var iActions: Mediator.InteractorActionProvider.Provider {
-        _read{ yield mediator.iActions.provider }
-        nonmutating _modify { yield &mediator.iActions.provider }
+extension EZUIPackInteractorProtocol {
+    public var packBridge: EZUIPackBridge {
+        _read { yield access.packBridge }
     }
-    public var vActions: Mediator.ViewActionProvider.Provider  {
-        _read{ yield mediator.vActions.provider }
+    
+    public var storage: Mediator.Storage {
+        _read { yield access.storage }
+        nonmutating _modify { yield &access.storage }
+    }
+    
+    public var parentShered: EZSharedStorage {
+        _read { yield access.parentShered }
+    }
+    
+    public var viewModel: Mediator.ViewModel {
+        _read { yield access.viewModel }
+        nonmutating _modify { yield &access.viewModel }
+    }
+    
+    public var vActions: Mediator.ViewActionProvider {
+        _read { yield access.vActions }
     }
 }
 
 @MainActor
-public protocol EZUIPackInteractorProtocol: EZUIPackWithMediatorProtocol{
+public protocol EZUIPackInteractorProtocol: EZUIPackWithMediatorIProtocol {
     init()
     
     var keyCommands: [UIKeyCommand]? { get }
     
     func didInitialize()
-    func setupActions()
+    func setupActions() -> Mediator.InteractorActionProvider?
     func start()
     func didCreate()
     func willOpen()
@@ -55,12 +69,12 @@ public protocol EZUIPackInteractorProtocol: EZUIPackWithMediatorProtocol{
 }
 
 extension EZUIPackInteractorProtocol {
-    public var pack: (any EZUIPackProtocol)? { mediator.packBridge.pack }
+    public var pack: (any EZUIPackProtocol)? { access.packBridge.pack }
     
     public var keyCommands: [UIKeyCommand]? { nil }
     
     public func didInitialize(){}
-    public func setupActions(){}
+    public func setupActions() -> Mediator.InteractorActionProvider? { nil }
     public func start(){}
     public func didCreate(){}
     public func willOpen(){}

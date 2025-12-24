@@ -342,13 +342,118 @@ struct RequestContext: Sendable {
     
 }
 
-
+public protocol FDGdg {}
 
 final class RequestContext1: Sendable {
     @TaskLocal fileprivate static var id23 = ""
     
     
+    
     //    @EZThreadSafety fileprivate private(set) static var id: String!
 }
 
-class Oh {}
+import EZMacrosKit
+//import EZObservableKit
+
+struct Afdf {
+    var test = ""
+    
+    @EZThreadSafety var test2: String = ""
+    
+    func fsdfs() {
+        
+    }
+
+}
+
+struct Oh {
+    @Test var a: Afdf = .init()
+    
+    func fsdfs() {
+//        a.test = "Hello"
+//        _a.test = "Hello"
+//        $a.test = "Hello"
+        
+        a.test2 = "Hello"
+        _a._test2.wrappedValue = "Hello"
+        $a._test2.wrappedValue = "hello"
+//        vf.wrappedValue = "hello"
+    }
+}
+
+
+@attached(accessor)
+@attached(peer, names: prefixed(`$`), prefixed(`_`))
+public macro Test() = #externalMacro(module: "EZMacros", type: "EZPropertyWrapperMacro_CMP")
+
+@attached(accessor)
+@attached(peer, names: prefixed(`$`), prefixed(`_`))
+public macro Test<T>() = #externalMacro(module: "EZMacros", type: "EZPropertyWrapperMacro_CMP")
+
+
+@dynamicMemberLookup
+public class Test<V>: EZConstantPropertyWrapperProtocol {
+    public var wrappedValue: V
+    public var projectedValue: Projection { .init(test: self) }
+    
+    public subscript<Key>(dynamicMember key: WritableKeyPath<V, Key>) -> Key {
+        set { wrappedValue[keyPath: key] = newValue }
+        get { wrappedValue[keyPath: key] }
+    }
+    
+    @_disfavoredOverload
+    public subscript<Key>(dynamicMember key: KeyPath<V, Key>) -> Key {
+        get { wrappedValue[keyPath: key] }
+    }
+    
+    public init(wrappedValue: V) {
+        self.wrappedValue = wrappedValue
+    }
+}
+
+@attached(accessor)
+@attached(peer, names: prefixed(`$`), prefixed(`_`))
+public macro TestProjection() = #externalMacro(module: "EZMacros", type: "EZPropertyWrapperMacro_CIP")
+
+@attached(accessor)
+@attached(peer, names: prefixed(`$`), prefixed(`_`))
+public macro TestProjection<T>() = #externalMacro(module: "EZMacros", type: "EZPropertyWrapperMacro_CIP")
+
+public typealias TestProjection<Value> = Test<Value>.Projection
+
+extension Test {
+    @dynamicMemberLookup
+    public struct Projection: EZConstantImmutablePropertyWrapperProtocol {
+        private let test: Test<V>
+        
+        public var wrappedValue: V {
+            _read { yield test.wrappedValue }
+        }
+        
+        public var projectedValue: Self { self }
+        
+        public subscript<Key>(
+            dynamicMember key: KeyPath<V, Key>
+        ) -> Key where Key: EZConstantPropertyWrapperProtocol {
+            get { wrappedValue[keyPath: key] }
+        }
+        
+        @_disfavoredOverload
+        public subscript<Key>(dynamicMember key: KeyPath<V, Key>) -> Key {
+            get { wrappedValue[keyPath: key] }
+        }
+        
+        public init(test: Test<V>) {
+            self.test = test
+        }
+    }
+}
+
+
+protocol Tesf {
+    @Test var text1: String { get }
+}
+
+class Test2: Tesf {
+    @Test private(set) var text1: String = "Hello"
+}

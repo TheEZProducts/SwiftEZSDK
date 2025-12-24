@@ -63,7 +63,17 @@ protocol EZThreadSafetyIsolatedValueProtocol<Value>: Sendable {
 /// ```
 @attached(accessor)
 @attached(peer, names: prefixed(`$`), prefixed(`_`))
-public macro EZThreadSafety() = #externalMacro(module: "EZMacros", type: "EZConstantPropertyWrapperMacro")
+public macro EZThreadSafety() = #externalMacro(module: "EZMacros", type: "EZPropertyWrapperMacro_CMP")
+
+///let
+///-immutable - EZPropertyWrapper_LI_Macro
+///-mutating - EZPropertyWrapper_LM_Macro
+///
+///var
+///-immutable - EZPropertyWrapper_VI_Macro
+///-mutating - EZPropertyWrapper_VM_Macro
+
+
 
 /// Generic form of `@EZThreadSafety` that spells the value type explicitly.
 ///
@@ -73,7 +83,7 @@ public macro EZThreadSafety() = #externalMacro(module: "EZMacros", type: "EZCons
 /// ```
 @attached(accessor)
 @attached(peer, names: prefixed(`$`), prefixed(`_`))
-public macro EZThreadSafety<T>() = #externalMacro(module: "EZMacros", type: "EZConstantPropertyWrapperMacro")
+public macro EZThreadSafety<T>() = #externalMacro(module: "EZMacros", type: "EZPropertyWrapperMacro_CMP")
 
 /// Thread-safe access to a mutable value via `get / set / update`.
 ///
@@ -321,7 +331,7 @@ public struct EZThreadSafety<Value: Sendable>: EZConstantPropertyWrapperProtocol
 /// ```
 @attached(accessor)
 @attached(peer, names: prefixed(`$`), prefixed(`_`))
-public macro EZThreadSafetyProjection() = #externalMacro(module: "EZMacros", type: "EZConstantImmutablePropertyWrapperMacro")
+public macro EZThreadSafetyProjection() = #externalMacro(module: "EZMacros", type: "EZPropertyWrapperMacro_CIP")
 
 /// Generic form of `@EZThreadSafetyProjection` that spells the value type explicitly.
 ///
@@ -345,7 +355,7 @@ public macro EZThreadSafetyProjection() = #externalMacro(module: "EZMacros", typ
 /// ```
 @attached(accessor)
 @attached(peer, names: prefixed(`$`), prefixed(`_`))
-public macro EZThreadSafetyProjection<T>() = #externalMacro(module: "EZMacros", type: "EZConstantImmutablePropertyWrapperMacro")
+public macro EZThreadSafetyProjection<T>() = #externalMacro(module: "EZMacros", type: "EZPropertyWrapperMacro_CIP")
 
 /// Convenience alias for `EZThreadSafety<Value>.Projection`.
 public typealias EZThreadSafetyProjection<Value: Sendable> = EZThreadSafety<Value>.Projection

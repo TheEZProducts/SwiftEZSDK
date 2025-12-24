@@ -93,25 +93,13 @@ public protocol CompilerPlugin {
     init()
     
     var providingMacros: [Macro.Type] { get }
+    
+    func resolveMacro(moduleName: String, typeName: String) -> (any Macro.Type, String)?
 }
 
 extension CompilerPlugin {
-    func resolveMacro(moduleName: String, typeName: String) -> Macro.Type? {
-        let qualifedName = "\(moduleName).\(typeName)"
-        
-        for type in providingMacros {
-            // FIXME: Is `String(reflecting:)` stable?
-            // Getting the module name and type name should be more robust.
-            let name = String(reflecting: type)
-            if name == qualifedName {
-                return type
-            }
-        }
-        return nil
-    }
-    
     // @testable
-    public func _resolveMacro(moduleName: String, typeName: String) -> Macro.Type? {
+    public func _resolveMacro(moduleName: String, typeName: String) -> (any Macro.Type, String)? {
         resolveMacro(moduleName: moduleName, typeName: typeName)
     }
 }
@@ -121,7 +109,7 @@ struct MacroProviderAdapter<Plugin: CompilerPlugin>: PluginProvider {
     init(plugin: Plugin) {
         self.plugin = plugin
     }
-    func resolveMacro(moduleName: String, typeName: String) -> Macro.Type? {
+    func resolveMacro(moduleName: String, typeName: String) -> (any Macro.Type, String)? {
         plugin.resolveMacro(moduleName: moduleName, typeName: typeName)
     }
 }

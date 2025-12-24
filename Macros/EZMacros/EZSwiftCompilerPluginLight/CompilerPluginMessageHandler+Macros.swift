@@ -18,9 +18,15 @@ extension CompilerPluginMessageHandler {
         let response: PluginToHostMessage
         var diagnostics: [PluginMessage.Diagnostic]
         var expandedSource: String? = nil
-        let macroType = provider.resolveMacro(moduleName: macro.moduleName, typeName: macro.typeName)
-        if let macroType = macroType as? FreestandingMacro.Type {
-            let result = try macroType.expandFreestandingMacro(macro: macro, macroRole: macroRole, discriminator: discriminator, expandingSyntax: expandingSyntax)
+        let result = provider.resolveMacro(moduleName: macro.moduleName, typeName: macro.typeName)
+        if let result, let macroType = result.0 as? FreestandingMacro.Type {
+            let result = try macroType.expandFreestandingMacro(
+                macro: macro,
+                macroRole: macroRole,
+                discriminator: discriminator,
+                expandingSyntax: expandingSyntax,
+                parameters: result.1
+            )
             expandedSource = result.expandedSource
             diagnostics = result.diagnostics
         } else {
@@ -55,9 +61,21 @@ extension CompilerPluginMessageHandler {
         let response: PluginToHostMessage
         var diagnostics: [PluginMessage.Diagnostic]
         var expandedSource: String? = nil
-        let macroType = provider.resolveMacro(moduleName: macro.moduleName, typeName: macro.typeName)
-        if let macroType = macroType as? AttachedMacro.Type {
-            let result = try macroType.expandAttachedMacro(data: data, macro: macro, macroRole: macroRole, discriminator: discriminator, attributeSyntax: attributeSyntax, declSyntax: declSyntax, lexicalContext: lexicalContext, parentDeclSyntax: parentDeclSyntax, extendedTypeSyntax: extendedTypeSyntax, conformanceListSyntax: conformanceListSyntax)
+        let result = provider.resolveMacro(moduleName: macro.moduleName, typeName: macro.typeName)
+        if let result, let macroType = result.0 as? AttachedMacro.Type {
+            let result = try macroType.expandAttachedMacro(
+                data: data,
+                macro: macro,
+                macroRole: macroRole,
+                discriminator: discriminator,
+                attributeSyntax: attributeSyntax,
+                declSyntax: declSyntax,
+                lexicalContext: lexicalContext,
+                parentDeclSyntax: parentDeclSyntax,
+                extendedTypeSyntax: extendedTypeSyntax,
+                conformanceListSyntax: conformanceListSyntax,
+                parameters: result.1
+            )
             expandedSource = result.expandedSource
             diagnostics = result.diagnostics
         } else {

@@ -16,34 +16,39 @@ import SwiftUI
 import EZSwiftUIBridgeKit
 #endif
 
-extension EZUIPackWithMediatorProtocol where Self: EZViewProtocol{
+extension EZUIPackWithMediatorVProtocol where Self: EZViewProtocol {
     public init(mediator: Mediator){
         self.init()
-        self.mediator = mediator
+        self.access = mediator.accessV
     }
 }
 
 @MainActor
-public protocol EZViewProtocol<Mediator>: EZUIPackWithMediatorProtocol{
+public protocol EZViewProtocol<Mediator>: EZUIPackWithMediatorVProtocol {
     init()
     
-    func setupActions()
+    func setupActions() -> Mediator.ViewActionProvider?
     func create()
 }
 
-extension EZViewProtocol where Mediator: EZUIPackMediatorWithActionProviders{
-    public var iActions: Mediator.InteractorActionProvider.Provider {
-        _read{ yield mediator.iActions.provider }
+extension EZViewProtocol {
+    public var packBridge: EZUIPackBridge {
+        _read { yield access.packBridge }
     }
-    public var vActions: Mediator.ViewActionProvider.Provider  {
-        _read{ yield mediator.vActions.provider }
-        nonmutating _modify{ yield &mediator.vActions.provider }
+    
+    public var viewModel: Mediator.ViewModel {
+        _read { yield access.viewModel }
+        nonmutating _modify { yield &access.viewModel }
+    }
+    
+    public var iActions: Mediator.InteractorActionProvider {
+        _read { yield access.iActions }
     }
 }
 
 extension EZViewProtocol{
-    public func setupActions(){}
     public func create(){}
+    public func setupActions() -> Mediator.ViewActionProvider? { nil }
 }
 
 public protocol EZUIPackViewProtocol<Mediator>: EZViewProtocol {
@@ -151,9 +156,9 @@ extension EZUIPackSViewProtocol{
 @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension EZUIPackSViewProtocol where Self: View {
     nonisolated
-    public static func ==(l: Self, r: Self) -> Bool{ false }
+    public static func ==(l: Self, r: Self) -> Bool { false }
     
-    public var bMediator: Binding<Mediator> { .constant(mediator) }
+    public var bMediator: Binding<Mediator.AccessV> { .constant(access) }
     public var binding: Binding<Self> { .constant(self) }
 }
  
@@ -163,7 +168,7 @@ extension EZUIPackSViewProtocol where Self: View {
     public var uiView: EZView? { packBridge.pack?.view }
     
     public func getView() -> EZView {
-        if let observObj = mediator as? (any ObservableObject){
+        if let observObj = access.viewModel as? (any ObservableObject) {
             return .ezWrap(
                 EZObservableObjectGroup(objects: additionalObservableObjects + [observObj])
             ){ self }
@@ -180,7 +185,7 @@ extension EZUIPackSViewProtocol where Self: View {
 #if !os(watchOS)
 @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension EZUIPackSViewProtocol where Self: EZView {
-    public var bMediator: Binding<Mediator> { .constant(mediator) }
+    public var bMediator: Binding<Mediator.AccessV> { .constant(access) }
 }
 #endif
  
@@ -195,10 +200,10 @@ extension EZUIPackSViewProtocol where Self: EZView {
     }
     
     private func wrappedView() -> EZView {
-        if let observObj = mediator as? (any ObservableObject){
+        if let observObj = access.viewModel as? (any ObservableObject) {
             return .ezWrap(
                 EZObservableObjectGroup(objects: additionalObservableObjects + [observObj])
-            ){[weak self] in
+            ) {[weak self] in
                 if let self = self {
                     body
                 }
@@ -226,6 +231,10 @@ public typealias EZUIPackSUIV = UIView & EZUIPackSViewProtocol
 
 open class EZUIPackPlatformsV<M: EZUIPackMediatorProtocol>: EZUIPackViewProtocol {
     public var mediator: M!
+    public var access: M.AccessV! {
+        set {}
+        get { mediator.accessV }
+    }
     private(set) var view: (any EZUIPackViewProtocol<M>)?
     
     
@@ -269,14 +278,14 @@ open class EZUIPackPlatformsV<M: EZUIPackMediatorProtocol>: EZUIPackViewProtocol
 #if !os(tvOS) && !os(watchOS)
     open var supportedInterfaceOrientations: UIInterfaceOrientationMask? { view?.supportedInterfaceOrientations }
 #endif
-    open func didInitialize(){ view?.didInitialize() }
-    open func setupActions(){ view?.setupActions() }
-    open func create(){ view?.create() }
-    open func willOpen(){ view?.willOpen() }
-    open func animateOpen(){ view?.animateOpen() }
-    open func didOpen(){ view?.didOpen() }
-    open func willClose(){ view?.willClose() }
-    open func animateClose(){ view?.animateClose() }
-    open func didClose(){ view?.didClose() }
+    open func didInitialize() { view?.didInitialize() }
+    open func setupActions() -> Mediator.ViewActionProvider? { view?.setupActions() }
+    open func create() { view?.create() }
+    open func willOpen() { view?.willOpen() }
+    open func animateOpen() { view?.animateOpen() }
+    open func didOpen() { view?.didOpen() }
+    open func willClose() { view?.willClose() }
+    open func animateClose() { view?.animateClose() }
+    open func didClose() { view?.didClose() }
 }
 #endif

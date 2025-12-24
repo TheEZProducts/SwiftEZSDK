@@ -9,32 +9,34 @@
 import Foundation
 
 @available(macOS 13.0, *)
-public struct EZConstantImmutablePropertyWrapperMacro: AttachedMacro {
-    public static func expandAttachedMacro(
-        data: Data,
-        macro: PluginMessage.MacroReference,
-        macroRole: PluginMessage.MacroRole,
-        discriminator: String,
-        attributeSyntax: PluginMessage.Syntax,
-        declSyntax: PluginMessage.Syntax,
-        lexicalContext: [PluginMessage.Syntax]?,
-        parentDeclSyntax: PluginMessage.Syntax?,
-        extendedTypeSyntax: PluginMessage.Syntax?,
-        conformanceListSyntax: PluginMessage.Syntax?
-    ) throws -> (expandedSource: String?, diagnostics: [PluginMessage.Diagnostic]) {
-        try EZConstantPropertyWrapperMacro.makeResult(
-            isImmutable: true,
-            macro: macro,
-            macroRole: macroRole,
-            attributeSyntax: attributeSyntax,
-            declSyntax: declSyntax,
-            lexicalContext: lexicalContext
-        )
+extension EZPropertyWrapperMacro {
+    public struct Parameters: Sendable {
+        let isConstant: Bool
+        let isImmutable: Bool
+        let isProjected: Bool
+        
+        init(isConstant: Bool = true, isImmutable: Bool = true, isProjected: Bool = true) {
+            self.isConstant = isConstant
+            self.isImmutable = isImmutable
+            self.isProjected = isProjected
+        }
+        
+        public static func make(parameters: String) -> Parameters {
+            guard parameters.count >= 3 else { return .init() }
+            let isConstant = parameters[parameters.index(parameters.startIndex, offsetBy: 0)] == "C"
+            let isImmutable = parameters[parameters.index(parameters.startIndex, offsetBy: 1)] == "I"
+            let isProjected = parameters[parameters.index(parameters.startIndex, offsetBy: 2)] == "P"
+            return .init(
+                isConstant: isConstant,
+                isImmutable: isImmutable,
+                isProjected: isProjected
+            )
+        }
     }
 }
 
 @available(macOS 13.0, *)
-public struct EZConstantPropertyWrapperMacro: AttachedMacro {
+public struct EZPropertyWrapperMacro: AttachedMacro {
     private typealias DeclParts = (
         modifiers: [String],
         accessModifiers: [String],
@@ -54,10 +56,11 @@ public struct EZConstantPropertyWrapperMacro: AttachedMacro {
         lexicalContext: [PluginMessage.Syntax]?,
         parentDeclSyntax: PluginMessage.Syntax?,
         extendedTypeSyntax: PluginMessage.Syntax?,
-        conformanceListSyntax: PluginMessage.Syntax?
+        conformanceListSyntax: PluginMessage.Syntax?,
+        parameters: String
     ) throws -> (expandedSource: String?, diagnostics: [PluginMessage.Diagnostic]) {
         try makeResult(
-            isImmutable: false,
+            parameters: Parameters.make(parameters: parameters),
             macro: macro,
             macroRole: macroRole,
             attributeSyntax: attributeSyntax,
@@ -67,23 +70,24 @@ public struct EZConstantPropertyWrapperMacro: AttachedMacro {
     }
     
     public static func makeResult(
-        isImmutable: Bool,
+        parameters: Parameters,
         macro: PluginMessage.MacroReference,
         macroRole: PluginMessage.MacroRole,
         attributeSyntax: PluginMessage.Syntax,
         declSyntax: PluginMessage.Syntax,
-        lexicalContext: [PluginMessage.Syntax]?
+        lexicalContext: [PluginMessage.Syntax]?,
     ) throws -> (expandedSource: String?, diagnostics: [PluginMessage.Diagnostic]) {
         guard let parts = RegexLib.extractSwiftDeclPartsSeparated(from: declSyntax.source) else { return ("error", []) }
         
         if macroRole == .accessor {
             return expandAccessor(
-                isImmutable: isImmutable,
+                parameters: parameters,
                 lexicalContext: lexicalContext,
                 parts: parts
             )
         } else {
             return try expandPeer(
+                parameters: parameters,
                 attributeSource: attributeSyntax.source,
                 wrapperTypeName: macro.name,
                 parts: parts
@@ -94,22 +98,31 @@ public struct EZConstantPropertyWrapperMacro: AttachedMacro {
 
 //MARK: - expandAccessor
 @available(macOS 13.0, *)
-extension EZConstantPropertyWrapperMacro {
+extension EZPropertyWrapperMacro {
     private static func expandAccessor(
-        isImmutable: Bool,
+        parameters: Parameters,
         lexicalContext: [PluginMessage.Syntax]?,
         parts: DeclParts
     ) -> (expandedSource: String?, diagnostics: [PluginMessage.Diagnostic]) {
-        let containerSource = lexicalContext?.first?.source ?? ""
-        let isStruct = containerSource.contains("struct")
-        let isStatic = parts.modifiers.contains("static")
-        let needsNonmutatingModify = isStruct && !isStatic
-        
-        return (makeGetSet(
-            isImmutable: isImmutable,
-            needsNonmutatingModify: needsNonmutatingModify,
-            name: parts.name
-        ), [])
+        if parts.value?.hasPrefix("{") == true {
+            return (
+                parameters.isImmutable || parts.value?.contains("set") == false ?
+                    "{ get }" :
+                    "{ get \(parameters.isConstant ? "nonmutating" : "") set }",
+                []
+            )
+        } else {
+            let containerSource = lexicalContext?.first?.source ?? ""
+            let isStruct = containerSource.contains("struct")
+            let isStatic = parts.modifiers.contains("static")
+            let needsNonmutatingModify = parameters.isConstant && isStruct && !isStatic
+            
+            return (makeGetSet(
+                isImmutable: parameters.isImmutable,
+                needsNonmutatingModify: needsNonmutatingModify,
+                name: parts.name
+            ), [])
+        }
     }
     
     private static func makeGetSet(
@@ -139,8 +152,9 @@ extension EZConstantPropertyWrapperMacro {
 
 //MARK: - expandPeer
 @available(macOS 13.0, *)
-extension EZConstantPropertyWrapperMacro {
+extension EZPropertyWrapperMacro {
     private static func expandPeer(
+        parameters: Parameters,
         attributeSource: String,
         wrapperTypeName: String,
         parts: DeclParts
@@ -162,6 +176,7 @@ extension EZConstantPropertyWrapperMacro {
         let wrappedTypeFromWrapper = wrapperTypeName.findAndRemove(of: .typeContent)?.content
         if let wrappedType = wrappedTypeFromWrapper ?? parts.type {
             return (makeType(
+                parameters: parameters,
                 setMods: joinTokens(setModifiers),
                 getMods: joinTokens(getModifiers),
                 name: parts.name,
@@ -205,6 +220,7 @@ extension EZConstantPropertyWrapperMacro {
     
     
     private static func makeType(
+        parameters: Parameters,
         setMods: String,
         getMods: String,
         name: String,
@@ -217,21 +233,42 @@ extension EZConstantPropertyWrapperMacro {
             type: type,
             wrappedType: wrappedType.replacingOccurrences(of: "!", with: "?")
         )
-        
-        let initializer = makeTypeValue(type: type, wrappedType: wrappedType, wrappedValue: wrappedValue, atr: atr)
         let setModsPrefix = setMods.isEmpty ? "" : "\(setMods) "
         let getModsPrefix = getMods.isEmpty ? "" : "\(getMods) "
-
-        return makeTypes(
-            setModsPrefix: setModsPrefix,
-            getModsPrefix: getModsPrefix,
-            name: name,
-            wrapperType: wrapperType,
-            initializer: initializer
-        )
+        
+        if let wrappedValue, wrappedValue.hasPrefix("{") {
+            return (
+                """
+                \(parameters.isProjected ? "\(getModsPrefix) var $\(name): \(wrapperType).ProjectedValue { get }" : "")
+                \(
+                    wrappedValue.contains("set") || parameters.isImmutable ?
+                        "\(getModsPrefix) var _\(name): \(wrapperType) { get \(!parameters.isConstant ? "set" : "") }" :
+                        ""
+                )
+                """
+            )
+        } else {
+            let initializer = makeTypeValue(
+                parameters: parameters,
+                type: wrapperType,
+                wrappedType: wrappedType,
+                wrappedValue: wrappedValue,
+                atr: atr
+            )
+    
+            return makeTypes(
+                parameters: parameters,
+                setModsPrefix: setModsPrefix,
+                getModsPrefix: getModsPrefix,
+                name: name,
+                wrapperType: wrapperType,
+                initializer: initializer
+            )
+        }
     }
     
     private static func makeTypes(
+        parameters: Parameters,
         setModsPrefix: String,
         getModsPrefix: String,
         name: String,
@@ -239,10 +276,16 @@ extension EZConstantPropertyWrapperMacro {
         initializer: String
     ) -> String {
         """
-        \(getModsPrefix)var $\(name): \(wrapperType).ProjectedValue {
-            _read { yield _\(name).projectedValue }
-        }
-        \(setModsPrefix)let _\(name): \(wrapperType)\(initializer)
+        \(
+            parameters.isProjected ?
+                """
+                \(getModsPrefix)var $\(name): \(wrapperType).ProjectedValue {
+                    _read { yield _\(name).projectedValue }
+                }
+                """ :
+                ""
+        )
+        \(setModsPrefix)\(parameters.isConstant ? "let" : "var") _\(name): \(wrapperType)\(initializer)
         """
     }
     
@@ -254,6 +297,7 @@ extension EZConstantPropertyWrapperMacro {
     }
     
     private static func makeTypeValue(
+        parameters: Parameters,
         type: String,
         wrappedType: String?,
         wrappedValue: String?,
@@ -262,6 +306,7 @@ extension EZConstantPropertyWrapperMacro {
         if let wrappedValue {
             return " = \(type)(wrappedValue: \(wrappedValue)\(makeTypeValueAtr(atr: atr)))"
         } else if
+            !parameters.isImmutable || !parameters.isConstant,
             let wrappedType,
             wrappedType.hasSuffix("?") ||
             wrappedType.hasPrefix("Optional<")
@@ -281,3 +326,4 @@ extension EZConstantPropertyWrapperMacro {
     }
 }
 #endif
+

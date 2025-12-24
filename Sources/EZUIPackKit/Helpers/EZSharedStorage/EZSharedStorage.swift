@@ -8,7 +8,7 @@
 import Foundation
 
 @MainActor
-public protocol EZSharingProtocol{
+public protocol EZSharingProtocol {
     var shared: EZSharedStorage? { get }
 }
 

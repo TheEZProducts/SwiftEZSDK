@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 60;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -21,6 +21,7 @@
 		516035E52A2C82C600349188 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 516035E42A2C82C600349188 /* SceneDelegate.swift */; };
 		516035EC2A2C82C700349188 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 516035EB2A2C82C700349188 /* Assets.xcassets */; };
 		516035EF2A2C82C700349188 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 516035ED2A2C82C700349188 /* LaunchScreen.storyboard */; };
+		51A18C202EFBE87B003CF083 /* All in Frameworks */ = {isa = PBXBuildFile; productRef = 51A18C1F2EFBE87B003CF083 /* All */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -48,6 +49,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				51A18C202EFBE87B003CF083 /* All in Frameworks */,
 				515023D52A2C87E3008255CA /* All in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -208,6 +210,7 @@
 			name = Example;
 			packageProductDependencies = (
 				515023D42A2C87E3008255CA /* All */,
+				51A18C1F2EFBE87B003CF083 /* All */,
 			);
 			productName = Example;
 			productReference = 516035DF2A2C82C600349188 /* Example.app */;
@@ -237,6 +240,9 @@
 				Base,
 			);
 			mainGroup = 516035D62A2C82C600349188;
+			packageReferences = (
+				51A18C1E2EFBE87B003CF083 /* XCLocalSwiftPackageReference "../../SwiftEZSDK" */,
+			);
 			productRefGroup = 516035E02A2C82C600349188 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -496,8 +502,19 @@
 		};
 /* End XCConfigurationList section */
 
+/* Begin XCLocalSwiftPackageReference section */
+		51A18C1E2EFBE87B003CF083 /* XCLocalSwiftPackageReference "../../SwiftEZSDK" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../../SwiftEZSDK;
+		};
+/* End XCLocalSwiftPackageReference section */
+
 /* Begin XCSwiftPackageProductDependency section */
 		515023D42A2C87E3008255CA /* All */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = All;
+		};
+		51A18C1F2EFBE87B003CF083 /* All */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = All;
 		};

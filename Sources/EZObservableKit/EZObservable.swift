@@ -47,7 +47,7 @@ import EZMacrosKit
 @attached(peer, names: prefixed(`$`), prefixed(`_`))
 public macro EZObservable(
     defaultWrapper: EZObserverWrapperProtocol? = nil
-) = #externalMacro(module: "EZMacros", type: "EZConstantPropertyWrapperMacro")
+) = #externalMacro(module: "EZMacros", type: "EZPropertyWrapperMacro_CMP")
 
 /// Generic form of `@EZObservable` that spells the value type explicitly.
 ///
@@ -59,7 +59,7 @@ public macro EZObservable(
 @attached(peer, names: prefixed(`$`), prefixed(`_`))
 public macro EZObservable<T>(
     defaultWrapper: EZObserverWrapperProtocol? = nil
-) = #externalMacro(module: "EZMacros", type: "EZConstantPropertyWrapperMacro")
+) = #externalMacro(module: "EZMacros", type: "EZPropertyWrapperMacro_CMP")
 
 /// Observable value container used as backing storage for the `@EZObservable` macro.
 ///
@@ -421,11 +421,11 @@ extension EZObservable {
 
 @attached(accessor)
 @attached(peer, names: prefixed(`$`), prefixed(`_`))
-public macro EZObservableProjection() = #externalMacro(module: "EZMacros", type: "EZConstantImmutablePropertyWrapperMacro")
+public macro EZObservableProjection() = #externalMacro(module: "EZMacros", type: "EZPropertyWrapperMacro_CIP")
 
 @attached(accessor)
 @attached(peer, names: prefixed(`$`), prefixed(`_`))
-public macro EZObservableProjection<T>() = #externalMacro(module: "EZMacros", type: "EZConstantImmutablePropertyWrapperMacro")
+public macro EZObservableProjection<T>() = #externalMacro(module: "EZMacros", type: "EZPropertyWrapperMacro_CIP")
 
 public typealias EZObservableProjection<Value> = EZObservable<Value>.Projection
 

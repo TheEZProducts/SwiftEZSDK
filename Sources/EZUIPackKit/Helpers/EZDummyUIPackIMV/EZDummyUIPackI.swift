@@ -8,7 +8,10 @@
 import Foundation
 
 final public class EZDummyUIPackI<Mediator: EZUIPackMediatorProtocol>: EZUIPackI {
-    public var mediator: Mediator!
+    public var mediator: Mediator.AccessI!
+    
+    public var access: Mediator.AccessI!
+    
     public required init(){}
 }
 #endif

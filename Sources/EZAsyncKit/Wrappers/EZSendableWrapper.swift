@@ -60,7 +60,7 @@ import EZMacrosKit
 /// In most cases you should use the macro, not `EZSendableWrapper<Value>` directly.
 @attached(accessor)
 @attached(peer, names: prefixed(`$`), prefixed(`_`))
-public macro EZSendableWrapper() = #externalMacro(module: "EZMacros", type: "EZConstantPropertyWrapperMacro")
+public macro EZSendableWrapper() = #externalMacro(module: "EZMacros", type: "EZPropertyWrapperMacro_CMP")
 
 /// Generic form of `@EZSendableWrapper` that spells the value type explicitly.
 ///
@@ -72,7 +72,7 @@ public macro EZSendableWrapper() = #externalMacro(module: "EZMacros", type: "EZC
 /// ```
 @attached(accessor)
 @attached(peer, names: prefixed(`$`), prefixed(`_`))
-public macro EZSendableWrapper<T>() = #externalMacro(module: "EZMacros", type: "EZConstantPropertyWrapperMacro")
+public macro EZSendableWrapper<T>() = #externalMacro(module: "EZMacros", type: "EZPropertyWrapperMacro_CMP")
 
 /// A minimal **@unchecked Sendable** box.
 ///
@@ -256,7 +256,7 @@ public final class EZSendableWrapper<Value>: EZConstantPropertyWrapperProtocol, 
 /// ```
 @attached(accessor)
 @attached(peer, names: prefixed(`$`), prefixed(`_`))
-public macro EZSendableWrapperProjection() = #externalMacro(module: "EZMacros", type: "EZConstantImmutablePropertyWrapperMacro")
+public macro EZSendableWrapperProjection() = #externalMacro(module: "EZMacros", type: "EZPropertyWrapperMacro_CIP")
 
 /// Generic form of `@EZSendableWrapperProjection` that spells the value type explicitly.
 ///
@@ -280,7 +280,7 @@ public macro EZSendableWrapperProjection() = #externalMacro(module: "EZMacros", 
 /// ```
 @attached(accessor)
 @attached(peer, names: prefixed(`$`), prefixed(`_`))
-public macro EZSendableWrapperProjection<T>() = #externalMacro(module: "EZMacros", type: "EZConstantImmutablePropertyWrapperMacro")
+public macro EZSendableWrapperProjection<T>() = #externalMacro(module: "EZMacros", type: "EZPropertyWrapperMacro_CIP")
 
 /// Convenience alias for `EZSendableWrapper<Value>.Projection`.
 public typealias EZSendableWrapperProjection<Value> = EZSendableWrapper<Value>.Projection

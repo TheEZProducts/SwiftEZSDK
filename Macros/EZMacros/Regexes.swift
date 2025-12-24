@@ -331,9 +331,11 @@ private enum SwiftDecl {
         }
     }
 
-    // Body for explicit type: read until (optional whitespace) '=' or end.
+    // Body for explicit type: read until (optional whitespace) '=' or '{' (computed property) or end.
     static let typeBody = OneOrMore {
-        NegativeLookahead { ws; "=" }
+        // stop before "=" or "{" with/without whitespace
+        NegativeLookahead { ws; ChoiceOf { "="; "{" } }
+        NegativeLookahead { ChoiceOf { "="; "{" } }
         NegativeLookahead { Anchor.endOfSubject }
         CharacterClass.any
     }
@@ -385,13 +387,29 @@ private enum SwiftDecl {
             ws
         }
 
-        // optional "= expr"
+        // optional "= expr" OR computed-property body "{ ... }"
         Optionally {
-            "="
-            ws
             Capture(as: valueRef) {
-                ZeroOrMore { CharacterClass.any }
-            } transform: { String($0).trimmingCharacters(in: .whitespacesAndNewlines) }
+                ChoiceOf {
+                    Regex {
+                        "="
+                        ws
+                        ZeroOrMore { CharacterClass.any }
+                    }
+                    Regex {
+                        "{" 
+                        ZeroOrMore { CharacterClass.any }
+                    }
+                }
+            } transform: { raw in
+                var s = String(raw).trimmingCharacters(in: .whitespacesAndNewlines)
+                // drop leading '=' for initializers, keep '{' for computed properties
+                if s.first == "=" {
+                    s.removeFirst()
+                    s = s.trimmingCharacters(in: .whitespacesAndNewlines)
+                }
+                return s
+            }
         }
 
         ws

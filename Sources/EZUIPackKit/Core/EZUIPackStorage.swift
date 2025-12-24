@@ -45,8 +45,8 @@ open class EZUIPackStorage<
         interactor.didInitialize()
         view.didInitialize()
         packBridge.pack?.didInitialize()
-        interactor.setupActions()
-        view.setupActions()
+        if let actions = interactor.setupActions() { mediator.iActions = actions }
+        if let actions = view.setupActions() { mediator.vActions = actions }
     }
     
     open func loadView() -> UIView{

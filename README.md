@@ -202,7 +202,7 @@ traditional stored `@propertyWrapper` variables in `class` types and global `sta
 A constant-storage macro is typically declared in two forms (non-generic + generic) and uses the
 universal implementation:
 - `module: "EZMacros"`
-- `type: "EZConstantPropertyWrapperMacro"`
+- `type: "EZPropertyWrapperMacro"`
 
 ```swift
 import EZMacrosKit
@@ -210,12 +210,12 @@ import EZMacrosKit
 @attached(accessor)
 @attached(peer, names: prefixed(`$`), prefixed(`_`))
 public macro LockedBox(option: Int = 0) =
-    #externalMacro(module: "EZMacros", type: "EZConstantPropertyWrapperMacro")
+    #externalMacro(module: "EZMacros", type: "EZPropertyWrapperMacro_CMP")
 
 @attached(accessor)
 @attached(peer, names: prefixed(`$`), prefixed(`_`))
 public macro LockedBox<T>(option: Int = 0) =
-    #externalMacro(module: "EZMacros", type: "EZConstantPropertyWrapperMacro")
+    #externalMacro(module: "EZMacros", type: "EZPropertyWrapperMacro_CMP")
 
 public final class LockedBox<Value>: EZConstantPropertyWrapperProtocol {
     public typealias WrappedValue = Value
@@ -262,7 +262,7 @@ If you want a getter-only property, make the storage conform to `EZConstantImmut
 @attached(accessor)
 @attached(peer, names: prefixed(`$`), prefixed(`_`))
 public macro ReadOnlyBox() =
-    #externalMacro(module: "EZMacros", type: "EZConstantPropertyWrapperMacro")
+    #externalMacro(module: "EZMacros", type: "EZPropertyWrapperMacro_CIP")
 
 public struct ReadOnlyBox<Value>: EZConstantImmutablePropertyWrapperProtocol {
     public typealias WrappedValue = Value
