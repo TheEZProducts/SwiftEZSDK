@@ -9,7 +9,7 @@ import Foundation
 #if canImport(UIKit) && !os(watchOS)
 import UIKit
 
-open class EZUINavigationControllerDelegate: NSObject, UINavigationControllerDelegate{
+open class EZUINavigationControllerDelegate: NSObject, UINavigationControllerDelegate {
     public weak var delegate: UINavigationControllerDelegate?
     
     public var animation: (any UIViewControllerAnimatedTransitioning)?
@@ -71,7 +71,7 @@ open class EZUINavigationControllerDelegate: NSObject, UINavigationControllerDel
             from: fromVC,
             to: toVC
         ) ?? {
-            guard let pac = navigationController as? (any EZUINavigationPackProtocol) else { return nil }
+            guard let pac = navigationController as? (any EZUINavigationInteractorProtocol) else { return nil }
             return if operation == .pop {
                 pac.defaultChildrenPopTransitionAnimation
             }else{

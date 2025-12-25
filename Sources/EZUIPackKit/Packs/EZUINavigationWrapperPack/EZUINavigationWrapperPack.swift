@@ -8,31 +8,31 @@
 #if canImport(UIKit) && !os(watchOS)
 import UIKit
 
-public typealias EZUINavigationWrapperPack = EZUINavigationPack<
+public typealias EZUINavigationWrapperPack = EZUIPack<
     EZUINavigationWrapperPackI,
     EZUINavigationWrapperPackM,
     EZDummyUIPackV<EZUINavigationWrapperPackM>
 >
 
-extension UIViewController{
-    public static func navigationWrapper(_ controller: UIViewController) -> EZUINavigationWrapperPack{
-        .init([controller])
+extension UIViewController {
+    public static func navigationWrapper(_ controller: UIViewController) -> EZUINavigationWrapperPackI {
+        navigationWrapper([controller])
     }
     
-    public static func navigationWrapper(_ controllers: [UIViewController]) -> EZUINavigationWrapperPack{
-        .init(controllers)
+    public static func navigationWrapper(_ controllers: [UIViewController]) -> EZUINavigationWrapperPackI {
+        EZUINavigationWrapperPack.make(controllers)
     }
 }
 
 extension EZUINavigationWrapperPack {
-    public convenience init(_ controllers: [UIViewController]){
+    public static func make(_ controllers: [UIViewController]) -> Interactor {
         let mediator = Mediator()
         mediator.storage.controllers = controllers
-        self.init(mediator: mediator)
+        return make(mediator)
     }
 }
 
-public class EZUINavigationWrapperPackI: EZUIPackI {
+public class EZUINavigationWrapperPackI: EZUINavigationPackI {
     public var access: EZUINavigationWrapperPackM.AccessI!
     
     public func didInitialize() {
@@ -40,21 +40,12 @@ public class EZUINavigationWrapperPackI: EZUIPackI {
         storage.controllers = nil
         transit.navigationSet(controllers).unsafeTransition().transit()
     }
-    
-    required public init(){}
 }
 
 public class EZUINavigationWrapperPackM: EZUIPackMediator, EZUIPackMediatorProtocol{
-    public var packBridge = EZUIPackBridge()
-    
     public var storage = Storage()
     public struct Storage {
         public var controllers: [UIViewController]?
     }
-    
-    
-    public var viewModel: Void = ()
-    public var iActions: Void = ()
-    public var vActions: Void = ()
 }
 #endif

@@ -141,9 +141,9 @@ public enum EZTransitionControllerDelegateSearchType{
         case .selfDelegate:
             return (controller as? EZTransitionControlledProtocol)?.transitionController
         case .parent:
-            return (controller.sourceViewController as? any EZTransitionControlledProtocol)?.transitionController
+            return (controller.ezSourceViewController as? any EZTransitionControlledProtocol)?.transitionController
         case .hierarchy:
-            return controller.firstTransitionController
+            return controller.ezFirstTransitionController
         }
     }
 }

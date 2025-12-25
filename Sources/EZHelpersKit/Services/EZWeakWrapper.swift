@@ -67,6 +67,10 @@ public struct EZWeakWrapper<Value: AnyObject> {
     public init(value: Value?) {
         self.value = value
     }
+    
+    public init(_ value: Value?) {
+        self.value = value
+    }
 }
 
 /// Conforms to `Sendable` when `Value` is `Sendable`.

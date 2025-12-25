@@ -39,7 +39,7 @@ class ColorSeter<Subject>{
     }
 }
 
-typealias FirstPac = EZUITabBarPack<FirstPacI, FirstPacM, FirstPacV>
+typealias FirstPac = EZUIPack<FirstPacI, FirstPacM, FirstPacV>
 
 class FirstPacV: EZUIPackPlatformsV<FirstPacM>{
     override var iOS: (any EZUIPackViewProtocol<FirstPacM>)? { FirstPacIOSV(mediator: mediator) }
@@ -47,8 +47,13 @@ class FirstPacV: EZUIPackPlatformsV<FirstPacM>{
 }
 
 
-class FirstPacI: EZUIPackI{
+class FirstPacI: EZUITabBarPackI {
     var access: FirstPacM.AccessI!
+    
+    func setupActions() -> FirstPacM.iAction {
+        .init()
+    }
+    
     
     func didInitialize() {
         
@@ -59,6 +64,15 @@ class FirstPacI: EZUIPackI{
     }
     
     func didCreate() {
+        self.transit
+            .tabBarSet([.tabBarWrapper([SecondPac.make(), SecondPac.make(), SecondPac.make()])])
+            .unsafeTransition()
+            .animation(.ezOpen)
+            .transit()
+    
+    
+        self.transit()
+        
 //        packBridge.tabBarPack?.toolbarItems = []
 //        packBridge.tabBarPack?.tabBar.isHidden = true
 //        transit
@@ -69,21 +83,24 @@ class FirstPacI: EZUIPackI{
 //                ])
 //            .transit()
         
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2){
-            self.transit
-                .tabBarSet([.tabBarWrapper([SecondPac(), SecondPac(), SecondPac()])])
-                .unsafeTransition()
-                .animation(.ezOpen)
-                .transit()
-        }
-        
+//        DispatchQueue.main.asyncAfter(deadline: .now() + 2){
+//            self.transit
+//                .tabBarSet([.tabBarWrapper([SecondPac.make(), SecondPac.make(), SecondPac.make()])])
+//                .unsafeTransition()
+//                .animation(.ezOpen)
+//                .transit()
+//        
+//        
+//            self.transit()
+//        }
     }
     
     func didInstall() {
-//        transit()
+        
     }
     
     func willOpen() {
+        print("aaa")
     }
     
     func didOpen() {
@@ -115,12 +132,12 @@ class FirstPacI: EZUIPackI{
         let tansition = self.viewModel.testView.transit
 //            .present(SecondPac())
                     .present(
-                        .tabBarWrapper([SecondPac(), SecondPac(), SecondPac()])
+                        .tabBarWrapper([SecondPac.make(), SecondPac.make(), SecondPac.make()])
 //                        SecondPac()
                         //                .apply(template: .childAnimation(animation: .ezOpen))
                         //                .apply(template: .hiddenNavigationBar)
                         //                .apply(template: .childAnimations(push: .ezAppearance, pop: .ezDisappearance))
-                            .apply(template: .custom{
+                            .apply(template: .custom {
                                 $0.transitionController = .custom{[weak self] context in
                                     self?.transit(context: context) ?? false
                                 }
@@ -158,8 +175,6 @@ class FirstPacI: EZUIPackI{
 //        }
         
     }
-    
-    required init(){}
 }
 
 extension FirstPacI: EZTransitionControllerProtocol{
@@ -170,7 +185,7 @@ extension FirstPacI: EZTransitionControllerProtocol{
     private func transitNavigation(context: EZCustomTransitionContext) -> Bool{
         if context.transitionType == .ezNext{
             return context.fromController?.transit
-                .navigationPush(SecondPac())
+                .navigationPush(SecondPac.make())
                 .animate()
                 .completion {
                     context.completion?()
@@ -230,10 +245,6 @@ extension FirstPacI: EZTransitionControllerProtocol{
 }
 
 class FirstPacM: EZUIPackM {
-    var packBridge = EZUIPackBridge()
-    
-    var storage: Void = ()
-    
     var viewModel = ViewModel()
     @MainActor struct ViewModel {
         var testView: EZContainerView = .init()

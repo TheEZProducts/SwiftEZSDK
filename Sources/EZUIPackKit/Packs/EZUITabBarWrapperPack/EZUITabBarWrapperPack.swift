@@ -8,31 +8,31 @@
 #if canImport(UIKit) && !os(watchOS)
 import UIKit
 
-public typealias EZUITabBarWrapperPack = EZUITabBarPack<
+public typealias EZUITabBarWrapperPack = EZUIPack<
     EZUITabBarWrapperPackI,
     EZUITabBarWrapperPackM,
     EZDummyUIPackV<EZUITabBarWrapperPackM>
 >
 
-extension UIViewController{
-    public static func tabBarWrapper(_ controller: UIViewController) -> EZUITabBarWrapperPack{
-        .init([controller])
+extension UIViewController {
+    public static func tabBarWrapper(_ controller: UIViewController) -> EZUITabBarWrapperPackI {
+        tabBarWrapper([controller])
     }
     
-    public static func tabBarWrapper(_ controllers: [UIViewController]) -> EZUITabBarWrapperPack{
-        .init(controllers)
+    public static func tabBarWrapper(_ controllers: [UIViewController]) -> EZUITabBarWrapperPackI {
+        EZUITabBarWrapperPack.make(controllers)
     }
 }
 
 extension EZUITabBarWrapperPack {
-    public convenience init(_ controllers: [UIViewController]){
+    public static func make(_ controllers: [UIViewController]) -> Interactor {
         let mediator = Mediator()
         mediator.storage.controllers = controllers
-        self.init(mediator: mediator)
+        return make(mediator)
     }
 }
 
-public class EZUITabBarWrapperPackI: EZUIPackI {
+public class EZUITabBarWrapperPackI: EZUITabBarPackI {
     public var access: EZUITabBarWrapperPackM.AccessI!
     
     public func didInitialize() {
@@ -40,20 +40,12 @@ public class EZUITabBarWrapperPackI: EZUIPackI {
         storage.controllers = nil
         transit.tabBarSet(controllers).unsafeTransition().transit()
     }
-    
-    required public init(){}
 }
 
 public class EZUITabBarWrapperPackM: EZUIPackMediator, EZUIPackMediatorProtocol {
-    public var packBridge = EZUIPackBridge()
-    
     public var storage = Storage()
     public struct Storage {
         public var controllers: [UIViewController]?
     }
-    
-    public var viewModel: Void = ()
-    public var iActions: Void = ()
-    public var vActions: Void = ()
 }
 #endif

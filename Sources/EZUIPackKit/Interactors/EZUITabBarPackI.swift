@@ -9,76 +9,44 @@ import Foundation
 #if canImport(UIKit) && !os(watchOS)
 import UIKit
 
-extension EZUIPackBridge{
-    public var tabBarPack: (any EZUITabBarPackProtocol)? {
-        pack as? any EZUITabBarPackProtocol
-    }
-}
-
-public protocol EZUITabBarPackProtocol: UITabBarController, EZUIPackProtocol{
+public protocol EZUITabBarInteractorProtocol: UITabBarController, EZUIPackInteractorProtocol {
     var defaultChildrenTransitionAnimation: UIViewControllerAnimatedTransitioning? { get set }
 }
 
-extension UITabBarController{
-    @discardableResult
-    public func wrappDelegateForChildTransition<Result>(
-        animation: UIViewControllerAnimatedTransitioning? = nil,
-        interactive: Bool = false,
-        action: (UIPercentDrivenInteractiveTransition?) -> (Result)
-    ) -> Result{
-        if let delegate = delegate as? EZUITabBarControllerDelegate {
-            return action(delegate.interactive)
-        }else{
-            let wrapper = EZUITabBarControllerDelegate(
-                delegate: delegate,
-                animation: animation,
-                interactive: interactive ? UIPercentDrivenInteractiveTransition() : nil
-            )
-            delegate = wrapper
-            defer { delegate = wrapper.delegate }
-            return action(wrapper.interactive)
-        }
-    }
-}
+public typealias EZUITabBarPackI = EZUITabBarPackInteractor & EZUITabBarInteractorProtocol
 
-open class EZUITabBarPack<
-    I: EZUIPackInteractorProtocol,
-    M: EZUIPackMediatorProtocol,
-    V: EZUIPackViewProtocol
->: UITabBarController, EZUITabBarPackProtocol where I.Mediator == M, V.Mediator == M{
+open class EZUITabBarPackInteractor: UITabBarController, EZUIPackBaseInteractorProtocol {
+    public var pack: (any EZUIPackProtocol)
+    
     public var defaultChildrenTransitionAnimation: (any UIViewControllerAnimatedTransitioning)?
     
-    public var storage: EZUIPackStorage<I, M, V>
 #if !os(tvOS) && !os(visionOS)
     open override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
         delegate?.tabBarControllerSupportedInterfaceOrientations?(self) ??
-        storage.view.supportedInterfaceOrientations ??
+        pack.view.supportedInterfaceOrientations ??
         selectedViewController?.supportedInterfaceOrientations ??
         super.supportedInterfaceOrientations
     }
     
     open override var preferredInterfaceOrientationForPresentation: UIInterfaceOrientation {
         delegate?.tabBarControllerPreferredInterfaceOrientationForPresentation?(self) ??
-        storage.view.preferredInterfaceOrientationForPresentation ??
+        pack.view.preferredInterfaceOrientationForPresentation ??
         selectedViewController?.preferredInterfaceOrientationForPresentation ??
         super.preferredInterfaceOrientationForPresentation
     }
     
     open override var preferredStatusBarStyle: UIStatusBarStyle {
-        storage.view.preferredStatusBarStyle ?? super.preferredStatusBarStyle
+        pack.view.preferredStatusBarStyle ?? super.preferredStatusBarStyle
     }
     
     open override var prefersStatusBarHidden: Bool {
-        storage.view.prefersStatusBarHidden ?? super.prefersStatusBarHidden
+        pack.view.prefersStatusBarHidden ?? super.prefersStatusBarHidden
     }
     
     open override var preferredStatusBarUpdateAnimation: UIStatusBarAnimation {
-        storage.view.preferredStatusBarUpdateAnimation ?? super.preferredStatusBarUpdateAnimation
+        pack.view.preferredStatusBarUpdateAnimation ?? super.preferredStatusBarUpdateAnimation
     }
 #endif
-    open override var keyCommands: [UIKeyCommand]? {
-        storage.interactor.keyCommands
-    }
     
     private var delegateWrapper: EZUITabBarControllerDelegate?
     open override var selectedViewController: UIViewController? {
@@ -109,68 +77,60 @@ open class EZUITabBarPack<
         }
     }
     
-    required public init(mediator: M) {
-        storage = .init(mediator: mediator)
-        super.init(nibName: nil, bundle: nil)
-        storage.setupPack(pack: self)
-    }
-    
-    public convenience init() {
-        self.init(mediator: .init())
-    }
-    
-    open func didInitialize(){}
-    
     open override func loadView() {
         super.loadView()
         let oldView: UIView = view
-        view = storage.loadView()
-        view.frame = oldView.frame
+        view = pack.loadView(frame: view.frame)
         view.addSubview(oldView)
     }
     
     open override func viewDidLoad() {
         super.viewDidLoad()
-        storage.viewDidLoad()
+        pack.viewDidLoad()
     }
     
     open override func didMove(toParent parent: UIViewController?) {
         super.didMove(toParent: parent)
-        storage.didMove(toParent: parent)
+        pack.didMove(toParent: parent)
     }
     
     open override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        storage.viewWillAppear(animated)
+        pack.viewWillAppear(animated)
     }
     
     @available(iOS 13.0, tvOS 13.0, *)
     open override func viewIsAppearing(_ animated: Bool) {
         super.viewIsAppearing(animated)
-        storage.viewIsAppearing(animated)
+        pack.viewIsAppearing(animated)
     }
     
     open override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        storage.viewDidLayoutSubviews()
+        pack.viewDidLayoutSubviews()
     }
     
     open override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        storage.viewDidAppear(animated)
+        pack.viewDidAppear(animated)
     }
 
     open override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        storage.viewWillDisappear(animated)
+        pack.viewWillDisappear(animated)
     }
 
     open override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
-        storage.viewDidDisappear(animated)
+        pack.viewDidDisappear(animated)
     }
     
-    public required init?(coder: NSCoder) {
+    public required init(pack: some EZUIPackProtocol, customData: ()) {
+        self.pack = pack
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    public required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 }

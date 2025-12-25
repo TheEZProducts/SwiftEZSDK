@@ -127,7 +127,7 @@ public struct EZTabBarSelectIndexTransition: EZTabBarTransitionProtocol{
 }
 
 //MARK: - EZTabBarNextTransition
-public struct EZTabBarNextTransition: EZTabBarTransitionProtocol{
+public struct EZTabBarNextTransition: EZTabBarTransitionProtocol {
     private var container: UIViewController
     
     public var context = EZChildTransitionContext()
@@ -153,7 +153,7 @@ public struct EZTabBarNextTransition: EZTabBarTransitionProtocol{
             animation: context._animation,
             interactive: context._interactive != nil
         ) { animator in
-            animator.map{ context._interactive?($0) }
+            animator.map { context._interactive?($0) }
             tabBarController.selectedIndex += 1
             if let transitionCoordinator = tabBarController.transitionCoordinator{
                 transitionCoordinator.animate(

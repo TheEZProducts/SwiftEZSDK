@@ -34,7 +34,7 @@ extension UIViewController: EZTemplatebleViewControllerProtocol{}
 
 
 //MARK: - Templates
-extension EZUIViewControllerSettingsTemplate{
+extension EZUIViewControllerSettingsTemplate {
     public static func group(
         _ templates: [Self]
     ) -> Self {
@@ -44,31 +44,31 @@ extension EZUIViewControllerSettingsTemplate{
     }
 }
 
-extension EZUIViewControllerSettingsTemplate where Controller: UINavigationController{
+extension EZUIViewControllerSettingsTemplate where Controller: UINavigationController {
     public static var hiddenNavigationBar: Self {
-        .custom{
+        .custom {
             $0.navigationBar.isHidden = true
         }
     }
 }
 
-extension EZUIViewControllerSettingsTemplate where Controller: EZUINavigationPackProtocol{
+extension EZUIViewControllerSettingsTemplate where Controller: EZUINavigationInteractorProtocol {
     public static func childAnimations(
         push: UIViewControllerAnimatedTransitioning? = nil,
         pop: UIViewControllerAnimatedTransitioning? = nil
     ) -> Self {
-        .custom{
+        .custom {
             $0.defaultChildrenPushTransitionAnimation = push
             $0.defaultChildrenPopTransitionAnimation = pop
         }
     }
 }
 
-extension EZUIViewControllerSettingsTemplate where Controller: EZUITabBarPackProtocol{
+extension EZUIViewControllerSettingsTemplate where Controller: EZUITabBarInteractorProtocol {
     public static func childAnimation(
         animation: UIViewControllerAnimatedTransitioning? = nil
     ) -> Self {
-        .custom{
+        .custom {
             $0.defaultChildrenTransitionAnimation = animation
         }
     }

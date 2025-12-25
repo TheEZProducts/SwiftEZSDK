@@ -13,10 +13,10 @@ import SwiftUI
 
 typealias SecondPac = EZUIPack<SecondPacI, SecondPacM, SecondPacSV>
 
-class SecondPacI: EZUIPackI{
+class SecondPacI: EZUIPackI {
     var access: SecondPacM.AccessI!
     
-    func setupActions() -> SecondPacM.IAction? {
+    func setupActions() -> SecondPacM.IAction {
         var iActions = SecondPacM.IAction()
         iActions.next = {[weak self] in self?.next() }
         iActions.back = {[weak self] in self?.back() }
@@ -32,6 +32,10 @@ class SecondPacI: EZUIPackI{
                 self?.viewModel.count += 1
             }
         })
+    }
+    
+    func willOpen() {
+        print(view.window)
     }
     
     private func next(){
@@ -75,15 +79,11 @@ class SecondPacI: EZUIPackI{
             .animate()
             .transit()
     }
-    
-    required init(){}
 }
 
 
 
 class SecondPacM: EZUIPackM {
-    var packBridge = EZUIPackBridge()
-    
     var storage: Void = ()
     
     var viewModel = ViewModel()

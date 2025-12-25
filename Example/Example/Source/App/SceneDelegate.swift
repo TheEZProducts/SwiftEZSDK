@@ -387,7 +387,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 //        v.backgroundColor = .white
 //       
 //        
-        window.rootViewController = MainPack()//split
+        window.rootViewController = MainPack.make()//split
         self.window = window
         
         Task {

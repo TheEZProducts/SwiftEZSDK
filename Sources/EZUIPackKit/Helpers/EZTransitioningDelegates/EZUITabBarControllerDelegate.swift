@@ -8,7 +8,7 @@
 #if canImport(UIKit) && !os(watchOS)
 import UIKit
 
-open class EZUITabBarControllerDelegate: NSObject, UITabBarControllerDelegate{
+open class EZUITabBarControllerDelegate: NSObject, UITabBarControllerDelegate {
     public weak var delegate: UITabBarControllerDelegate?
     
     public var animation: (any UIViewControllerAnimatedTransitioning)?
@@ -180,7 +180,7 @@ open class EZUITabBarControllerDelegate: NSObject, UITabBarControllerDelegate{
             animationControllerForTransitionFrom: fromVC,
             to: toVC
         ) ?? {
-            guard let pac = tabBarController as? (any EZUITabBarPackProtocol) else { return nil }
+            guard let pac = tabBarController as? (any EZUITabBarInteractorProtocol) else { return nil }
             return pac.defaultChildrenTransitionAnimation
         }()
     }

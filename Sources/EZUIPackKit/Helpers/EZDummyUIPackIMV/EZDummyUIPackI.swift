@@ -7,11 +7,9 @@
 #if canImport(UIKit) && !os(watchOS)
 import Foundation
 
-final public class EZDummyUIPackI<Mediator: EZUIPackMediatorProtocol>: EZUIPackI {
-    public var mediator: Mediator.AccessI!
-    
+final public class EZDummyUIPackI<
+    Mediator: EZUIPackMediatorProtocol
+>: EZUIPackI where Mediator.IActionProvider == Void {
     public var access: Mediator.AccessI!
-    
-    public required init(){}
 }
 #endif

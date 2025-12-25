@@ -22,6 +22,8 @@
 		516035EC2A2C82C700349188 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 516035EB2A2C82C700349188 /* Assets.xcassets */; };
 		516035EF2A2C82C700349188 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 516035ED2A2C82C700349188 /* LaunchScreen.storyboard */; };
 		51A18C202EFBE87B003CF083 /* All in Frameworks */ = {isa = PBXBuildFile; productRef = 51A18C1F2EFBE87B003CF083 /* All */; };
+		51A18C242EFD70F0003CF083 /* IMV.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51A18C232EFD70E8003CF083 /* IMV.swift */; };
+		51A18C262EFD9BC9003CF083 /* MyPack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51A18C252EFD9BC1003CF083 /* MyPack.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -42,6 +44,8 @@
 		516035F02A2C82C700349188 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		516035FB2A2C878700349188 /* SwiftEZSDK */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = SwiftEZSDK; path = ..; sourceTree = "<group>"; };
 		51753CB02A374B4A0033DDA9 /* Example.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Example.entitlements; sourceTree = "<group>"; };
+		51A18C232EFD70E8003CF083 /* IMV.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IMV.swift; sourceTree = "<group>"; };
+		51A18C252EFD9BC1003CF083 /* MyPack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyPack.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -95,6 +99,7 @@
 		515023D72A2C8845008255CA /* UIPacs */ = {
 			isa = PBXGroup;
 			children = (
+				51A18C212EFD70D0003CF083 /* IMV Light */,
 				514585CC2D625C0000C1241B /* MainPack */,
 				515023DB2A2C8F98008255CA /* SecondPac */,
 				515023D82A2C884E008255CA /* FirstPac */,
@@ -192,6 +197,23 @@
 			name = Packages;
 			sourceTree = "<group>";
 		};
+		51A18C212EFD70D0003CF083 /* IMV Light */ = {
+			isa = PBXGroup;
+			children = (
+				51A18C222EFD70E0003CF083 /* Core */,
+			);
+			path = "IMV Light";
+			sourceTree = "<group>";
+		};
+		51A18C222EFD70E0003CF083 /* Core */ = {
+			isa = PBXGroup;
+			children = (
+				51A18C232EFD70E8003CF083 /* IMV.swift */,
+				51A18C252EFD9BC1003CF083 /* MyPack.swift */,
+			);
+			path = Core;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -272,7 +294,9 @@
 				516035E32A2C82C600349188 /* AppDelegate.swift in Sources */,
 				516035E52A2C82C600349188 /* SceneDelegate.swift in Sources */,
 				515023DD2A2C8FB2008255CA /* SecondPac.swift in Sources */,
+				51A18C262EFD9BC9003CF083 /* MyPack.swift in Sources */,
 				514741132E81EC3D00270B84 /* Logger.swift in Sources */,
+				51A18C242EFD70F0003CF083 /* IMV.swift in Sources */,
 				514741142E81EC3D00270B84 /* TypeMapping.swift in Sources */,
 				514741152E81EC3D00270B84 /* Invocation.swift in Sources */,
 				514741162E81EC3D00270B84 /* Dynamic.swift in Sources */,

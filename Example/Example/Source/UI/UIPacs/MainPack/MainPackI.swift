@@ -9,21 +9,25 @@ import EZUIPackKit
 import UIKit
 import Foundation
 
-class MainPackI: EZUIPackI {
+class MainPackI: EZUINavigationPackI {
     var access: MainPackM.AccessI!
     
-    func setupActions() {
-//        iActions = self
-    }
+    func setupActions() -> (any MainPackM.IActionProvider)? { self }
     
-    var firstPac = FirstPac()
+    var firstPac = FirstPac.make()
+    
+    
+    func didInstall() {
+        let r = self.transit
+            .present(FirstPac.make())
+//            .navigationSet([FirstPac.make()])
+            .animation(.ezAppearance)
+            .transit()
+    }
     
     func start() {
         
-        let r = self.transit
-            .navigationSet([FirstPac()])
-            .animation(.ezOpen)
-            .transit()
+        
         
 //        let r = self.transit
 //            .tabBarSet([self.firstPac])
@@ -121,9 +125,6 @@ class MainPackI: EZUIPackI {
 //            }
 //        }
     }
-    
-    
-    required init(){}
 }
 
 //MARK: - Actions
@@ -147,8 +148,6 @@ struct DGsg{
 }
 
 class MainPackM: EZUIPackM {
-    var packBridge = EZUIPackBridge()
-    
     
     init(test: DGsg){
         viewModel = .init(sdf: test)

@@ -9,33 +9,35 @@
 import Foundation
 
 @MainActor
-public protocol EZUIPackMediatorProtocol: AnyObject, EZSharingProtocol {
-    associatedtype InteractorActionProvider
-    associatedtype ViewActionProvider
+public protocol EZUIPackBaseMediatorProtocol: AnyObject {
+    var packBridge: EZUIPackBridge { get set }
+}
+
+@MainActor
+public protocol EZUIPackMediatorProtocol: EZUIPackBaseMediatorProtocol {
+    associatedtype IActionProvider
+    associatedtype VActionProvider
     
     associatedtype Storage
     associatedtype ViewModel
     
-    typealias AccessI = EZMediatorWrapperI<Self>
-    typealias AccessV = EZMediatorWrapperV<Self>
-    
-    var packBridge: EZUIPackBridge { get set }
+    typealias AccessI = EZMediatorAccessI<Self>
+    typealias AccessV = EZMediatorAccessV<Self>
     
     func didInitialize()
         
     var storage: Storage { get set }
     var viewModel: ViewModel { get set }
     
-    var iActions: InteractorActionProvider { get set }
-    var vActions: ViewActionProvider { get set }
+    var iActions: IActionProvider { get set }
+    var vActions: VActionProvider { get set }
     
     init()
 }
 
 extension EZUIPackMediatorProtocol {
-    public var shared: EZSharedStorage? { nil }
     public var parentShered: EZSharedStorage {
-        packBridge.pack?.parentShered ?? .init()
+        packBridge.pack?.interactor?.parentShered ?? .init()
     }
     
     public func didInitialize() {}
@@ -60,15 +62,15 @@ extension EZUIPackMediatorProtocol where ViewModel == Void {
     }
 }
 
-extension EZUIPackMediatorProtocol where InteractorActionProvider == Void {
-    public var iActions: InteractorActionProvider {
+extension EZUIPackMediatorProtocol where IActionProvider == Void {
+    public var iActions: IActionProvider {
         set {}
         get { () }
     }
 }
 
-extension EZUIPackMediatorProtocol where ViewActionProvider == Void {
-    public var vActions: ViewActionProvider {
+extension EZUIPackMediatorProtocol where VActionProvider == Void {
+    public var vActions: VActionProvider {
         set {}
         get { () }
     }
@@ -76,33 +78,16 @@ extension EZUIPackMediatorProtocol where ViewActionProvider == Void {
 
 
 @MainActor
-public protocol EZUIPackWithMediatorIProtocol {
-    associatedtype Mediator: EZUIPackMediatorProtocol
-    var access: Mediator.AccessI! { get set }
-    init(mediator: Mediator)
-}
-
-@MainActor
-public protocol EZUIPackWithMediatorVProtocol {
-    associatedtype Mediator: EZUIPackMediatorProtocol
-    var access: Mediator.AccessV! { get set }
-    init(mediator: Mediator)
-}
-
-@MainActor
-open class EZUIPackMediator {
-    @MainActor
+open class EZUIPackMediator: EZUIPackBaseMediatorProtocol {
+    public var packBridge = EZUIPackBridge()
+    
     required public init(){}
 }
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
-extension EZUIPackMediator: ObservableObject{}
-
 public typealias EZUIPackM = EZUIPackMediatorProtocol & EZUIPackMediator
 
-
 @MainActor
-public struct EZMediatorWrapperI<Mediator: EZUIPackMediatorProtocol> {
+public struct EZMediatorAccessI<Mediator: EZUIPackMediatorProtocol> {
     private let _mediator: Mediator
     
     public var packBridge: EZUIPackBridge {
@@ -123,7 +108,7 @@ public struct EZMediatorWrapperI<Mediator: EZUIPackMediatorProtocol> {
         nonmutating _modify { yield &_mediator.viewModel }
     }
     
-    public var vActions: Mediator.ViewActionProvider {
+    public var vActions: Mediator.VActionProvider {
         _read { yield _mediator.vActions }
     }
     
@@ -133,7 +118,7 @@ public struct EZMediatorWrapperI<Mediator: EZUIPackMediatorProtocol> {
 }
 
 @MainActor
-public struct EZMediatorWrapperV<Mediator: EZUIPackMediatorProtocol> {
+public struct EZMediatorAccessV<Mediator: EZUIPackMediatorProtocol> {
     private let _mediator: Mediator
     
     public var packBridge: EZUIPackBridge {
@@ -145,7 +130,7 @@ public struct EZMediatorWrapperV<Mediator: EZUIPackMediatorProtocol> {
         nonmutating _modify { yield &_mediator.viewModel }
     }
     
-    public var iActions: Mediator.InteractorActionProvider {
+    public var iActions: Mediator.IActionProvider {
         _read { yield _mediator.iActions }
     }
     

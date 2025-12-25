@@ -10,5 +10,7 @@ import Foundation
 
 final public class EZDummyUIPackV<Mediator: EZUIPackMediatorProtocol>: EZUIPackV {
     public var access: Mediator.AccessV!
+    
+    public func setupActions() -> Mediator.VActionProvider? { nil }
 }
 #endif
