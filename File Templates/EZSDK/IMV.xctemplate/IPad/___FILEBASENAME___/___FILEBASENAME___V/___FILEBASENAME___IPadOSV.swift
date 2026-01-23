@@ -5,7 +5,7 @@ import UIKit
 import EZUIPackKit
 
 class ___VARIABLE_productName:identifier___IPadOSV: EZUIPackV {
-    var mediator: ___VARIABLE_productName:identifier___M!
+    let access = ___VARIABLE_productName:identifier___M.accessV
     
     func willOpen() {}
     func animateOpen() {}
@@ -18,7 +18,13 @@ class ___VARIABLE_productName:identifier___IPadOSV: EZUIPackV {
     func didClose() {}
     
     func didInitialize() {}
-    func makeContext() {}
+    
+    func makeContext() -> Mediator.ContextV {
+        .init(actions: self)
+    }
     
     func create() {}
+}
+
+extension ___VARIABLE_productName:identifier___IPadOSV: ___VARIABLE_productName:identifier___M.VAction {
 }

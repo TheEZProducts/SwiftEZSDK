@@ -130,6 +130,8 @@ class MainPackI: EZUINavigationPackI {
     }
 }
 
+
+
 //MARK: - Actions
 extension MainPackI: MainPackM.IAction {
     func test() {
@@ -159,12 +161,12 @@ class MainPackM: EZUIPackM {
         var sdf: DGsg = .init()
     }
         
-    weak var inputI: IAction?
+    weak let inputI: IAction?
     @MainActor protocol IAction: AnyObject{
         func test()
     }
     
-    weak var inputV: VAction?
+    weak let inputV: VAction?
     @MainActor protocol VAction: AnyObject{
         func test()
     }
@@ -175,6 +177,7 @@ class MainPackM: EZUIPackM {
         inputV = contextV.actions
     }
 }
+
 
 
 class MainPackV: EZUIPackV {

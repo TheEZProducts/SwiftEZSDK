@@ -11,3 +11,5 @@ import EZUIPackKit
 
 //typealias MainPack = EZUITabBarPack<MainPackI, MainPackM, MainPackV>
 typealias MainPack = EZUIPack<MainPackI, MainPackM, MainPackV>
+
+

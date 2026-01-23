@@ -3,17 +3,24 @@
 import EZUIPackKit
 
 class ___VARIABLE_productName:identifier___M: EZUIPackM {
-    var packBridge = EZUIPackBridge()
-    
-    var inputI = inputI()
-    struct inputI: EZUIPackActionProviderProtocol {
+    var viewModel: ViewModel
+    @MainActor struct ViewModel {
         
     }
-    
-    var vActions = VActions()
-    struct VActions: EZUIPackActionProviderProtocol {
         
+    weak let inputI: IAction?
+    @MainActor protocol IAction: AnyObject {
+      
     }
     
-    func didInitialize() {}
+    weak let inputV: VAction?
+    @MainActor protocol VAction: AnyObject {
+      
+    }
+    
+    required init(contextI: BaseContextI, contextV: BaseContextV) {
+        viewModel = contextI.viewModel
+        inputI = contextI.actions
+        inputV = contextV.actions
+    }
 }

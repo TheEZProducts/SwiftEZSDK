@@ -3,10 +3,13 @@
 import EZUIPackKit
 
 class ___VARIABLE_productName:identifier___I: EZUIPackI {
-    var mediator: ___VARIABLE_productName:identifier___M!
+    let access = ___VARIABLE_productName:identifier___M.accessI
     
     func didInitialize() {}
-    func makeContext() {}
+    
+    func makeContext() -> Mediator.ContextI {
+        .init(actions: self, viewModel: .init())
+    }
     
     func willOpen() {}
     func didOpen() {}
@@ -18,6 +21,7 @@ class ___VARIABLE_productName:identifier___I: EZUIPackI {
     
     func start() {}
     func didCreate() {}
-    
-    required init() {}
+}
+
+extension ___VARIABLE_productName:identifier___I: ___VARIABLE_productName:identifier___M.IAction {
 }
