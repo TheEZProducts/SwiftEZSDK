@@ -18,7 +18,7 @@ class ___VARIABLE_productName:identifier___IOSV: EZUIPackV {
     func didClose() {}
     
     func didInitialize() {}
-    func setupActions() {}
+    func makeContext() {}
     
     func create() {}
 }

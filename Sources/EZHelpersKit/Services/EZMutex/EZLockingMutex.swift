@@ -10,7 +10,7 @@ import Foundation
 /// A tiny mutex-protected box for `Value`, parameterized by a concrete lock type.
 ///
 /// `EZLockingMutex` wraps a `Value` behind a lock that conforms to `EZLockProtocol`. It stores the
-/// value in heap memory and exposes it through `EZAccess<Value>` so that it works well with
+/// value in heap memory and exposes it through `EZBorrowedAccess<Value>` so that it works well with
 /// noncopyable (`~Copyable`) types.
 ///
 /// Typical usage is via higher-level helpers like `EZSendableWrapper` or `EZThreadSafety`, but this
@@ -44,7 +44,7 @@ public final class EZLockingMutex<Lock: EZLockProtocol, Value> where Value: ~Cop
     private let _lock: Lock
     private let _ptr: UnsafeMutablePointer<Value>
 
-    /// Runs `body` while holding the lock, exposing the stored value via `EZAccess<Value>`.
+    /// Runs `body` while holding the lock, exposing the stored value via `EZBorrowedAccess<Value>`.
     ///
     /// The lock is acquired before `body` is called and released afterwards, even if `body` throws.
     ///
@@ -55,9 +55,9 @@ public final class EZLockingMutex<Lock: EZLockProtocol, Value> where Value: ~Cop
     /// }
     /// ```
     @inline(__always)
-    public func withLock<R>(_ body: (borrowing EZAccess<Value>) throws -> R) rethrows -> R where R: ~Copyable {
+    public func withLock<R>(_ body: (borrowing EZBorrowedAccess<Value>) throws -> R) rethrows -> R where R: ~Copyable {
         _lock.lock(); defer { _lock.unlock() }
-        return try body(EZAccess(_ptr))
+        return try body(EZBorrowedAccess(_ptr))
     }
     
     /// Returns a copy of the stored value.

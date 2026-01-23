@@ -100,7 +100,7 @@ public struct EZUnsafeSendableWrapper<Value>: @unchecked Sendable {
 /// `wrappedValue` provides convenient access, but for read–modify–write operations prefer `update(_:)`
 /// to keep the whole mutation atomic. There are two overloads:
 /// - a deprecated `(inout Value) -> R` variant, and
-/// - the recommended overload that takes `EZAccess<Value>` and works well with noncopyable types.
+/// - the recommended overload that takes `EZBorrowedAccess<Value>` and works well with noncopyable types.
 ///
 /// ### Example (via the macro)
 /// ```swift
@@ -166,7 +166,7 @@ public final class EZSendableWrapper<Value>: EZConstantPropertyWrapperProtocol, 
     
     /// Runs `closure` while holding the lock, allowing atomic read/modify/write.
     ///
-    /// Deprecated: prefer the overload that takes `EZAccess<T>` instead, especially for noncopyable values.
+    /// Deprecated: prefer the overload that takes `EZBorrowedAccess<T>` instead, especially for noncopyable values.
     ///
     /// ### Example
     /// ```swift
@@ -175,14 +175,14 @@ public final class EZSendableWrapper<Value>: EZConstantPropertyWrapperProtocol, 
     ///     return current
     /// }
     /// ```
-    @available(*, deprecated, message: "Use update(_ closure: (borrowing EZAccess<T>) throws -> R) instead")
+    @available(*, deprecated, message: "Use update(_ closure: (borrowing EZBorrowedAccess<T>) throws -> R) instead")
     @inline(__always)
     @discardableResult
     public func update<R>(_ closure: (inout Value) throws -> (R)) rethrows -> R where R: ~Copyable  {
         try update { try closure(&$0.value) }
     }
     
-    /// Preferred `update` overload that exposes the underlying value via `EZAccess<T>`.
+    /// Preferred `update` overload that exposes the underlying value via `EZBorrowedAccess<T>`.
     ///
     /// This works well with noncopyable values and keeps the whole mutation atomic.
     ///
@@ -195,7 +195,7 @@ public final class EZSendableWrapper<Value>: EZConstantPropertyWrapperProtocol, 
     /// ```
     @inline(__always)
     @discardableResult
-    public func update<R>(_ closure: (borrowing EZAccess<Value>) throws -> (R)) rethrows -> R where R: ~Copyable {
+    public func update<R>(_ closure: (borrowing EZBorrowedAccess<Value>) throws -> (R)) rethrows -> R where R: ~Copyable {
         try _value.withLock(closure)
     }
     

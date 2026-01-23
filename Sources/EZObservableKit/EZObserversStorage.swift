@@ -19,7 +19,7 @@ public enum EZSetType: Sendable {
 protocol EZObserversStorageProtocol<Value>: AnyObject, Sendable {
     associatedtype Value
     
-    func update<R>(type: EZSetType, _ closure: (borrowing EZAccess<Value>) throws -> (R)) rethrows -> R
+    func update<R>(type: EZSetType, _ closure: (borrowing EZBorrowedAccess<Value>) throws -> (R)) rethrows -> R
     func get() -> Value
     func set(value: Value, _ type: EZSetType)
     func signal(_ type: EZSetType)
@@ -61,7 +61,7 @@ final class EZObserversStorage<Value>: EZObserversStorageProtocol, Sendable {
         update(type: type, { $0.value = value })
     }
     
-    func update<R>(type: EZSetType, _ closure: (borrowing EZAccess<Value>) throws -> (R)) rethrows -> R {
+    func update<R>(type: EZSetType, _ closure: (borrowing EZBorrowedAccess<Value>) throws -> (R)) rethrows -> R {
         let (old, result) = try value.withLock {
             let old = $0.value
             return (old, try closure($0))

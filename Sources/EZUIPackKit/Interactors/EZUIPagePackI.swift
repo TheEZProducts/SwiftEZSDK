@@ -10,41 +10,10 @@ import UIKit
 
 public protocol EZUIPagePackProtocol: UIPageViewController, EZUIPackProtocol {}
 
-extension EZUIPack where I: EZUIPagePackI {
-    public static func make() -> I {
-        make(.init())
-    }
-    
-    public static func make(_ mediator: M) -> I {
-        make(
-            transitionStyle: .scroll,
-            navigationOrientation: .vertical,
-            mediator: mediator
-        )
-    }
-    
-    public static func make(
-        transitionStyle style: UIPageViewController.TransitionStyle,
-        navigationOrientation: UIPageViewController.NavigationOrientation,
-        options: [UIPageViewController.OptionsKey : Any]? = nil,
-        mediator: M
-    ) -> I {
-        make(
-            mediator,
-            customData: (
-                transitionStyle: style,
-                navigationOrientation: navigationOrientation,
-                options: options
-            )
-        )
-    }
-}
-
-
 public typealias EZUIPagePackI = EZUIPagePackInteractor & EZUIPagePackProtocol
 
 open class EZUIPagePackInteractor: UIPageViewController, EZUIPackBaseInteractorProtocol {
-    public var pack: any EZUIPackProtocol
+    public var pack: (any EZUIPackProtocol) = EZPackMaker.getPack()
     
 #if !os(tvOS)
     open override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
@@ -121,26 +90,6 @@ open class EZUIPagePackInteractor: UIPageViewController, EZUIPackBaseInteractorP
     open override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         pack.viewDidDisappear(animated)
-    }
-    
-    public required init(
-        pack: some EZUIPackProtocol,
-        customData: (
-            transitionStyle: UIPageViewController.TransitionStyle,
-            navigationOrientation: UIPageViewController.NavigationOrientation,
-            options: [UIPageViewController.OptionsKey : Any]?
-        )
-    ) {
-        self.pack = pack
-        super.init(
-            transitionStyle: customData.transitionStyle,
-            navigationOrientation: customData.navigationOrientation,
-            options: customData.options
-        )
-    }
-    
-    public required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
     }
 }
 #endif

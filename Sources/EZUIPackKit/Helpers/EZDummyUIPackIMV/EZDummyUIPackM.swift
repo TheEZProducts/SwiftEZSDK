@@ -8,6 +8,8 @@
 #if canImport(UIKit) && !os(watchOS)
 import Foundation
 
-final public class EZDummyUIPackM: EZUIPackMediator, EZUIPackMediatorProtocol {}
+final public class EZDummyUIPackM: EZUIPackMediator, EZUIPackMediatorProtocol {
+    public init(contextI: EZUIPackMediatorContextI<EZDummyUIPackM>, contextV: EZUIPackMediatorContextV<EZDummyUIPackM>) {}    
+}
 #endif
 

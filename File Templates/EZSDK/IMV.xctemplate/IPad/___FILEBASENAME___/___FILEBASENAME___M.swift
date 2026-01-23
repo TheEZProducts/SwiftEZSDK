@@ -5,8 +5,8 @@ import EZUIPackKit
 class ___VARIABLE_productName:identifier___M: EZUIPackM {
     var packBridge = EZUIPackBridge()
     
-    var iActions = IActions()
-    struct IActions: EZUIPackActionProviderProtocol {
+    var inputI = inputI()
+    struct inputI: EZUIPackActionProviderProtocol {
         
     }
     

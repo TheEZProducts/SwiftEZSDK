@@ -8,9 +8,14 @@
 #if canImport(UIKit) && !os(watchOS)
 import Foundation
 
-final public class EZDummyUIPackV<Mediator: EZUIPackMediatorProtocol>: EZUIPackV {
-    public var access: Mediator.AccessV!
+final public class EZDummyUIPackV<
+    Mediator: EZUIPackMediatorProtocol
+>: EZUIPackV where
+    Mediator.ContextV == EZUIPackMediatorContextV<Mediator>,
+    Mediator.InputV == Void
+{
+    public let access = Mediator.accessV
     
-    public func setupActions() -> Mediator.VActionProvider? { nil }
+    public func makeContext() -> Mediator.ContextV { .init(actions: ()) }
 }
 #endif

@@ -15,10 +15,10 @@ protocol EZThreadSafetyIsolatedValueProtocol<Value>: Sendable {
     
     @discardableResult
     @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
-    func update<R: Sendable>(_ closure: @Sendable (borrowing EZAccess<Value>) throws -> (R)) async rethrows -> R where R: ~Copyable
+    func update<R: Sendable>(_ closure: @Sendable (borrowing EZBorrowedAccess<Value>) throws -> (R)) async rethrows -> R where R: ~Copyable
     
     @discardableResult
-    func update<R>(_ closure: @Sendable (borrowing EZAccess<Value>) throws -> (R)) rethrows -> R where R: ~Copyable
+    func update<R>(_ closure: @Sendable (borrowing EZBorrowedAccess<Value>) throws -> (R)) rethrows -> R where R: ~Copyable
 }
 
 /// Property macro that turns a stored property into a thread-safe, `Sendable`‑friendly field.
@@ -188,7 +188,7 @@ public struct EZThreadSafety<Value: Sendable>: EZConstantPropertyWrapperProtocol
     
     /// Atomically updates the stored value and returns a result (async).
     ///
-    /// Deprecated: prefer the overload that takes `EZAccess<Value>` instead, especially for noncopyable values.
+    /// Deprecated: prefer the overload that takes `EZBorrowedAccess<Value>` instead, especially for noncopyable values.
     ///
     /// ### Example
     /// ```swift
@@ -197,7 +197,7 @@ public struct EZThreadSafety<Value: Sendable>: EZConstantPropertyWrapperProtocol
     ///     return current
     /// }
     /// ```
-    @available(*, deprecated, message: "Use update(_ closure: @Sendable (borrowing EZAccess<Value>) throws -> R) async rethrows -> R instead")
+    @available(*, deprecated, message: "Use update(_ closure: @Sendable (borrowing EZBorrowedAccess<Value>) throws -> R) async rethrows -> R instead")
     @discardableResult
     @_disfavoredOverload
     @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
@@ -205,7 +205,7 @@ public struct EZThreadSafety<Value: Sendable>: EZConstantPropertyWrapperProtocol
         try await value.update { try closure(&$0.value) }
     }
     
-    /// Preferred async `update` overload that exposes the underlying value via `EZAccess<Value>`.
+    /// Preferred async `update` overload that exposes the underlying value via `EZBorrowedAccess<Value>`.
     ///
     /// Works well with noncopyable (`~Copyable`) values and keeps the whole mutation atomic.
     ///
@@ -219,16 +219,16 @@ public struct EZThreadSafety<Value: Sendable>: EZConstantPropertyWrapperProtocol
     @discardableResult
     @_disfavoredOverload
     @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
-    public func update<R: Sendable>(_ closure: @Sendable (borrowing EZAccess<Value>) throws -> (R)) async rethrows -> R where R: ~Copyable {
+    public func update<R: Sendable>(_ closure: @Sendable (borrowing EZBorrowedAccess<Value>) throws -> (R)) async rethrows -> R where R: ~Copyable {
         try await value.update(closure)
     }
     
     /// Atomically updates the stored value and returns a result (sync).
     ///
-    /// Deprecated: prefer the overload that takes `EZAccess<Value>` instead, especially for noncopyable values.
+    /// Deprecated: prefer the overload that takes `EZBorrowedAccess<Value>` instead, especially for noncopyable values.
     ///
     /// Safe to call from any thread.
-    @available(*, deprecated, message: "Use update(_ closure: @Sendable (borrowing EZAccess<Value>) throws -> R) instead")
+    @available(*, deprecated, message: "Use update(_ closure: @Sendable (borrowing EZBorrowedAccess<Value>) throws -> R) instead")
     @_disfavoredOverload
     @discardableResult
     @available(*, noasync, message: "use await $property.update")
@@ -236,7 +236,7 @@ public struct EZThreadSafety<Value: Sendable>: EZConstantPropertyWrapperProtocol
         try value.update { try closure(&$0.value) }
     }
     
-    /// Preferred sync `update` overload that exposes the underlying value via `EZAccess<Value>`.
+    /// Preferred sync `update` overload that exposes the underlying value via `EZBorrowedAccess<Value>`.
     ///
     /// Safe to call from any thread and supports noncopyable (`~Copyable`) values.
     ///
@@ -249,7 +249,7 @@ public struct EZThreadSafety<Value: Sendable>: EZConstantPropertyWrapperProtocol
     /// ```
     @discardableResult
     @available(*, noasync, message: "use await $property.update")
-    public func update<R>(_ closure: @Sendable (borrowing EZAccess<Value>) throws -> (R)) rethrows -> R where R: ~Copyable {
+    public func update<R>(_ closure: @Sendable (borrowing EZBorrowedAccess<Value>) throws -> (R)) rethrows -> R where R: ~Copyable {
         try value.update(closure)
     }
     
@@ -435,13 +435,13 @@ actor ActorIsolatedValue<Value: Sendable>: EZThreadSafetyIsolatedValueProtocol {
     @inline(__always)
     @discardableResult
     nonisolated
-    func update<R: Sendable>(_ closure: @Sendable (borrowing EZAccess<Value>) throws -> (R)) async rethrows -> R where R: ~Copyable  {
+    func update<R: Sendable>(_ closure: @Sendable (borrowing EZBorrowedAccess<Value>) throws -> (R)) async rethrows -> R where R: ~Copyable  {
         try await isolatedUpdate(closure)
     }
     
     @inline(__always)
     @discardableResult
-    private func isolatedUpdate<R>(_ closure: (borrowing EZAccess<Value>) throws -> (R)) rethrows -> R where R: ~Copyable  {
+    private func isolatedUpdate<R>(_ closure: (borrowing EZBorrowedAccess<Value>) throws -> (R)) rethrows -> R where R: ~Copyable  {
         try _value.withLock(closure)
     }
     
@@ -449,14 +449,14 @@ actor ActorIsolatedValue<Value: Sendable>: EZThreadSafetyIsolatedValueProtocol {
     @inline(__always)
     @discardableResult
     nonisolated
-    func update<R>(_ closure: @Sendable (borrowing EZAccess<Value>) throws -> (R)) rethrows -> R where R: ~Copyable {
+    func update<R>(_ closure: @Sendable (borrowing EZBorrowedAccess<Value>) throws -> (R)) rethrows -> R where R: ~Copyable {
         try nonisolatedUpdate(closure)
     }
     
     @inline(__always)
     @discardableResult
     nonisolated
-    private func nonisolatedUpdate<R>(_ closure: (borrowing EZAccess<Value>) throws -> (R)) rethrows -> R where R: ~Copyable {
+    private func nonisolatedUpdate<R>(_ closure: (borrowing EZBorrowedAccess<Value>) throws -> (R)) rethrows -> R where R: ~Copyable {
         try _value.withLock(closure)
     }
     

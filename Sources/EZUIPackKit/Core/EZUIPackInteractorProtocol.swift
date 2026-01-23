@@ -14,14 +14,6 @@ public protocol EZUIPackBaseInteractorProtocol: UIViewController, EZTransitionCo
     associatedtype CustomInitData = Void
     
     var pack: (any EZUIPackProtocol) { get }
-    
-    init(pack: some EZUIPackProtocol, customData: CustomInitData)
-}
-
-extension EZUIPackBaseInteractorProtocol where CustomInitData == Void {
-    public init(pack: some EZUIPackProtocol) {
-        self.init(pack: pack, customData: ())
-    }
 }
 
 extension EZUIPackBaseInteractorProtocol {
@@ -34,10 +26,10 @@ extension EZUIPackBaseInteractorProtocol {
 @MainActor
 public protocol EZUIPackInteractorProtocol: EZUIPackBaseInteractorProtocol, EZSharingProtocol {
     associatedtype Mediator: EZUIPackMediatorProtocol
-    var access: Mediator.AccessI! { get set }
+    var access: Mediator.AccessI { get }
     
+    func makeContext() -> Mediator.ContextI
     func didInitialize()
-    func setupActions() -> Mediator.IActionProvider
     func start()
     func didCreate()
     func willOpen()
@@ -52,18 +44,13 @@ extension EZUIPackInteractorProtocol {
 }
 
 extension EZUIPackInteractorProtocol {
-    public var storage: Mediator.Storage {
-        _read { yield access.storage }
-        _modify { yield &access.storage }
-    }
-    
     public var viewModel: Mediator.ViewModel {
         _read { yield access.viewModel }
         _modify { yield &access.viewModel }
     }
     
-    public var vActions: Mediator.VActionProvider {
-        _read { yield access.vActions }
+    public var inputV: Mediator.InputV {
+        _read { yield access.inputV }
     }
 }
 
@@ -76,10 +63,6 @@ extension EZUIPackInteractorProtocol {
     public func didInstall(){}
     public func willClose(){}
     public func didClose(){}
-}
-
-extension EZUIPackInteractorProtocol where Mediator.IActionProvider == Void {
-    public func setupActions() -> Mediator.IActionProvider { () }
 }
 
 #endif

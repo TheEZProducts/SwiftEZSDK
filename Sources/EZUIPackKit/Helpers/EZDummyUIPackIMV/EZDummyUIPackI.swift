@@ -9,7 +9,15 @@ import Foundation
 
 final public class EZDummyUIPackI<
     Mediator: EZUIPackMediatorProtocol
->: EZUIPackI where Mediator.IActionProvider == Void {
-    public var access: Mediator.AccessI!
+>: EZUIPackI where
+    Mediator.ContextI == EZUIPackMediatorContextI<Mediator>,
+    Mediator.InputI == Void,
+    Mediator.ViewModel == Void
+{
+    public let access = Mediator.accessI
+    
+    public func makeContext() -> Mediator.ContextI {
+        .init(actions: (), viewModel: ())
+    }
 }
 #endif

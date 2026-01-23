@@ -10,7 +10,7 @@ import Foundation
 /// A convenience alias for `EZLockingMutex` using `NSLock` as the underlying lock.
 ///
 /// `EZMutex` gives you a simple mutex-protected box for a single `Value`, backed by `NSLock`
-/// and compatible with noncopyable (`~Copyable`) values via `EZAccess<Value>`.
+/// and compatible with noncopyable (`~Copyable`) values via `EZBorrowedAccess<Value>`.
 ///
 /// ### Example
 /// ```swift

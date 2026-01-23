@@ -301,7 +301,21 @@ final class EZAsyncKitTest: XCTestCase, @unchecked Sendable {
         await t.result.get()
     }
     
+    func test_a() async {
+//        var testClass: TestClass? = .init()
+//        print("1", CFGetRetainCount(testClass!))
+//        await testClass?.likeFunc3 {
+//            weak let value = testClass
+//            
+//            print("2", CFGetRetainCount(value!))
+//            testClass = nil
+//            print("3", CFGetRetainCount(value!))
+//        }
         
+       
+        try? await Task.sleep(for: .seconds(12))
+    }
+    
 //    @available(iOS 18.0, tvOS 18.0, *)
 //    func testM7() async {
 //        let a = EZRecursiveMutex([0])
@@ -325,6 +339,10 @@ final class EZAsyncKitTest: XCTestCase, @unchecked Sendable {
     
 }
 
+
+
+
+
 public protocol TestProtocol {
     associatedtype T
     var value: T { get }
@@ -342,6 +360,14 @@ struct RequestContext: Sendable {
     
 }
 
+class Testfsdf {
+    weak let a: RequestContext1?
+    
+    init(a: RequestContext1?) {
+        self.a = a
+    }
+}
+
 public protocol FDGdg {}
 
 final class RequestContext1: Sendable {
@@ -351,6 +377,16 @@ final class RequestContext1: Sendable {
     
     //    @EZThreadSafety fileprivate private(set) static var id: String!
 }
+
+class ExampleService {
+    private var onAction: () -> Void = {}
+    
+    func setAction(_ onAction: @escaping () -> Void) {
+        self.onAction = onAction
+    }
+}
+
+
 
 import EZMacrosKit
 //import EZObservableKit
@@ -457,3 +493,4 @@ protocol Tesf {
 class Test2: Tesf {
     @Test private(set) var text1: String = "Hello"
 }
+

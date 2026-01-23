@@ -10,19 +10,22 @@ import UIKit
 import Foundation
 
 class MainPackI: EZUINavigationPackI {
-    var access: MainPackM.AccessI!
+    let access = MainPackM.accessI
     
-    func setupActions() -> (any MainPackM.IActionProvider)? { self }
+    func makeContext() -> Mediator.ContextI {
+        .init(actions: self, viewModel: .init())
+    }
     
-    var firstPac = FirstPac.make()
+    var firstPac = FirstPac.make(interactor: .init())
     
     
     func didInstall() {
-        let r = self.transit
-            .present(FirstPac.make())
-//            .navigationSet([FirstPac.make()])
-            .animation(.ezAppearance)
-            .transit()
+            let r = self.transit
+                .present(FirstPac.make(interactor: FirstPacI()))
+            //            .navigationSet([FirstPac.make()])
+            //            .animate()
+            //            .animation(.ezAppearance)
+                .transit()
     }
     
     func start() {
@@ -128,7 +131,7 @@ class MainPackI: EZUINavigationPackI {
 }
 
 //MARK: - Actions
-extension MainPackI: MainPackM.IActionProvider{
+extension MainPackI: MainPackM.IAction {
     func test() {
         print("Test")
     }
@@ -148,52 +151,43 @@ struct DGsg{
 }
 
 class MainPackM: EZUIPackM {
-    
-    init(test: DGsg){
-        viewModel = .init(sdf: test)
-        super.init()
-    }
-    
-    required init() {
-        viewModel = .init(sdf: .init())
-        super.init()
-    }
-    
     var storage: Void = ()
     
     var viewModel: ViewModel
     @MainActor struct ViewModel {
         var test: Int = 10
-        var sdf: DGsg
+        var sdf: DGsg = .init()
     }
         
-    weak var iActions: IActionProvider?
-    @MainActor protocol IActionProvider: AnyObject{
+    weak var inputI: IAction?
+    @MainActor protocol IAction: AnyObject{
         func test()
     }
     
-    weak var vActions: VActionProvider?
-    @MainActor protocol VActionProvider: AnyObject{
+    weak var inputV: VAction?
+    @MainActor protocol VAction: AnyObject{
         func test()
     }
     
-    var shared: EZSharedStorage? {
-        .init([
-            .init(key: .mainPackMChain.test, value: viewModel.test)
-        ])
+    required init(contextI: BaseContextI, contextV: BaseContextV) {
+        viewModel = contextI.viewModel
+        inputI = contextI.actions
+        inputV = contextV.actions
     }
 }
 
 
 class MainPackV: EZUIPackV {
-    var access: MainPackM.AccessV!
+    let access = MainPackM.accessV
     
-    func setupActions() -> MainPackM.VActionProvider? { self }
+    func makeContext() -> Mediator.ContextV {
+        .init(actions: self)
+    }
     
     func create() {
         createSelf()
         
-        iActions?.test()
+        inputI?.test()
     }
     
     func willOpen() {
@@ -213,7 +207,7 @@ class MainPackV: EZUIPackV {
     }
 }
 
-extension MainPackV: MainPackM.VActionProvider{
+extension MainPackV: MainPackM.VAction {
     func test() {
         print("MainPackV", "Test")
     }

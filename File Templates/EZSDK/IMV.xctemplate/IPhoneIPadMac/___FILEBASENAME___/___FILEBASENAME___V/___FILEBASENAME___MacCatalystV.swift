@@ -18,7 +18,7 @@ class ___VARIABLE_productName:identifier___MacCatalystV: EZUIPackV {
     func didClose() {}
     
     func didInitialize() {}
-    func setupActions() {}
+    func makeContext() {}
     
     func create() {}
 }

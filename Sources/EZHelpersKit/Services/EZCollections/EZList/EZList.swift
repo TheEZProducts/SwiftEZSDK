@@ -48,7 +48,7 @@ extension EZList {
         ///     access.value += 1
         /// }
         /// ```
-        public func update<R>(_ body: (borrowing EZAccess<T>) throws -> R) rethrows -> R {
+        public func update<R>(_ body: (borrowing EZBorrowedAccess<T>) throws -> R) rethrows -> R {
             try _value.withLock(body)
         }
         

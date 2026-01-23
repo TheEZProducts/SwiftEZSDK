@@ -17,7 +17,7 @@ public protocol EZUINavigationInteractorProtocol: UINavigationController, EZUIPa
 public typealias EZUINavigationPackI = EZUINavigationPackInteractor & EZUINavigationInteractorProtocol
 
 open class EZUINavigationPackInteractor: UINavigationController, EZUIPackBaseInteractorProtocol {
-    public var pack: (any EZUIPackProtocol)
+    public var pack: (any EZUIPackProtocol) = EZPackMaker.getPack()
     
     public var defaultChildrenPushTransitionAnimation: (any UIViewControllerAnimatedTransitioning)?
     public var defaultChildrenPopTransitionAnimation: (any UIViewControllerAnimatedTransitioning)?
@@ -132,15 +132,6 @@ open class EZUINavigationPackInteractor: UINavigationController, EZUIPackBaseInt
         wrappDelegateForChildTransition {_ in 
             super.setViewControllers(viewControllers, animated: animated)
         }
-    }
-    
-    public required init(pack: some EZUIPackProtocol, customData: ()) {
-        self.pack = pack
-        super.init(nibName: nil, bundle: nil)
-    }
-    
-    public required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
     }
 }
 

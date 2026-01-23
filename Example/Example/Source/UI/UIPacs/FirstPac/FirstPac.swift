@@ -42,16 +42,18 @@ class ColorSeter<Subject>{
 typealias FirstPac = EZUIPack<FirstPacI, FirstPacM, FirstPacV>
 
 class FirstPacV: EZUIPackPlatformsV<FirstPacM>{
-    override var iOS: (any EZUIPackViewProtocol<FirstPacM>)? { FirstPacIOSV(mediator: mediator) }
-    override var macCatalyst: (any EZUIPackViewProtocol<FirstPacM>)? { FirstPacIOSV(mediator: mediator) }
+    override var iOS: (any EZUIPackViewProtocol<FirstPacM>)? { FirstPacIOSV() }
+    override var macCatalyst: (any EZUIPackViewProtocol<FirstPacM>)? { FirstPacIOSV() }
 }
 
 
-class FirstPacI: EZUITabBarPackI {
-    var access: FirstPacM.AccessI!
+class FirstPacI: EZUIPackI {
+    let access = FirstPacM.accessI
     
-    func setupActions() -> FirstPacM.iAction {
-        .init()
+    var value: Int = 10
+    
+    func makeContext() -> Mediator.ContextI {
+        .init(actions: .init(), viewModel: .init())
     }
     
     
@@ -64,14 +66,15 @@ class FirstPacI: EZUITabBarPackI {
     }
     
     func didCreate() {
-        self.transit
-            .tabBarSet([.tabBarWrapper([SecondPac.make(), SecondPac.make(), SecondPac.make()])])
-            .unsafeTransition()
-            .animation(.ezOpen)
-            .transit()
+//        self.transit
+//            .present(.tabBarWrapper([SecondPac.make(), SecondPac.make(), SecondPac.make()]))
+//            .unsafeTransition()
+//            .animation(.ezOpen)
+//            .transit()
     
-    
-        self.transit()
+       
+            self.transit()
+        
         
 //        packBridge.tabBarPack?.toolbarItems = []
 //        packBridge.tabBarPack?.tabBar.isHidden = true
@@ -96,7 +99,7 @@ class FirstPacI: EZUITabBarPackI {
     }
     
     func didInstall() {
-        
+       
     }
     
     func willOpen() {
@@ -165,6 +168,7 @@ class FirstPacI: EZUITabBarPackI {
                     )
 //                    .presentationStyle(.automatic)
                     .unsafeTransition()
+                    .animate()
 //                    .animate()
 //                    .animation(.ezOpen)
                 
@@ -174,6 +178,16 @@ class FirstPacI: EZUITabBarPackI {
 //        }
 //        }
         
+    }
+    
+    
+    
+    init() {
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    @MainActor required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
 }
 
@@ -245,31 +259,38 @@ extension FirstPacI: EZTransitionControllerProtocol{
 }
 
 class FirstPacM: EZUIPackM {
-    var viewModel = ViewModel()
+    var viewModel: ViewModel
     @MainActor struct ViewModel {
+        var test: Int = 10
+        
         var testView: EZContainerView = .init()
     }
     
     
-    var iActions = iAction()
-    struct iAction {
+    var inputI = IAction()
+    struct IAction {
         
     }
     
-    var vActions = VAction()
-    struct VAction {
-        
+    required init(contextI: EZUIPackMediatorContextI<FirstPacM>, contextV: EZUIPackMediatorContextV<FirstPacM>) {
+        viewModel = contextI.viewModel
+        inputI = contextI.actions
     }
 }
  
-extension UIView{
+extension UIView {
     var isPortrait: Bool { bounds.width < bounds.height }
 }
 
-class FirstPacIOSV: EZUIPackV{
+class FirstPacIOSV: EZUIPackV {
     var supportedInterfaceOrientations: UIInterfaceOrientationMask? { .all }
     
-    var access: FirstPacM.AccessV!
+    let access = FirstPacM.accessV
+    
+    func makeContext() -> EZUIPackKit.EZUIPackMediatorContextV<FirstPacM> {
+        .init(actions: ())
+    }
+    
     
     func create() {
         createSelf()

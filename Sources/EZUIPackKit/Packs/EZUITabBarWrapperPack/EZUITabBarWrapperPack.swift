@@ -10,8 +10,8 @@ import UIKit
 
 public typealias EZUITabBarWrapperPack = EZUIPack<
     EZUITabBarWrapperPackI,
-    EZUITabBarWrapperPackM,
-    EZDummyUIPackV<EZUITabBarWrapperPackM>
+    EZDummyUIPackM,
+    EZDummyUIPackV<EZDummyUIPackM>
 >
 
 extension UIViewController {
@@ -26,26 +26,25 @@ extension UIViewController {
 
 extension EZUITabBarWrapperPack {
     public static func make(_ controllers: [UIViewController]) -> Interactor {
-        let mediator = Mediator()
-        mediator.storage.controllers = controllers
-        return make(mediator)
+        return make(interactor: .init(controllers))
     }
 }
 
 public class EZUITabBarWrapperPackI: EZUITabBarPackI {
-    public var access: EZUITabBarWrapperPackM.AccessI!
+    public let access = EZDummyUIPackM.accessI
     
-    public func didInitialize() {
-        guard let controllers = storage.controllers else { return }
-        storage.controllers = nil
-        transit.tabBarSet(controllers).unsafeTransition().transit()
+    public func makeContext() -> Mediator.ContextI {
+        .init(actions: (), viewModel: ())
     }
+    
+     public init(_ controllers: [UIViewController]) {
+         super.init(nibName: nil, bundle: nil)
+         transit.tabBarSet(controllers).unsafeTransition().transit()
+     }
+     
+     @MainActor required init?(coder aDecoder: NSCoder) {
+         fatalError("init(coder:) has not been implemented")
+     }
 }
 
-public class EZUITabBarWrapperPackM: EZUIPackMediator, EZUIPackMediatorProtocol {
-    public var storage = Storage()
-    public struct Storage {
-        public var controllers: [UIViewController]?
-    }
-}
 #endif

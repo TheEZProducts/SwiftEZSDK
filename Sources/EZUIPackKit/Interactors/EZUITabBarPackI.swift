@@ -16,7 +16,7 @@ public protocol EZUITabBarInteractorProtocol: UITabBarController, EZUIPackIntera
 public typealias EZUITabBarPackI = EZUITabBarPackInteractor & EZUITabBarInteractorProtocol
 
 open class EZUITabBarPackInteractor: UITabBarController, EZUIPackBaseInteractorProtocol {
-    public var pack: (any EZUIPackProtocol)
+    public var pack: (any EZUIPackProtocol) = EZPackMaker.getPack()
     
     public var defaultChildrenTransitionAnimation: (any UIViewControllerAnimatedTransitioning)?
     
@@ -123,15 +123,6 @@ open class EZUITabBarPackInteractor: UITabBarController, EZUIPackBaseInteractorP
     open override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         pack.viewDidDisappear(animated)
-    }
-    
-    public required init(pack: some EZUIPackProtocol, customData: ()) {
-        self.pack = pack
-        super.init(nibName: nil, bundle: nil)
-    }
-    
-    public required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
     }
 }
 #endif

@@ -21,7 +21,7 @@ public protocol MediatorProtocol: AnyObject {
     var storage: Storage { get set }
     var viewModel: ViewModel { get set }
     
-    var iActions: IActionProvider { get set }
+    var inputI: IActionProvider { get set }
     var vActions: VActionProvider { get set }
 }
 
@@ -62,8 +62,8 @@ public struct EZMediatorWrapperV<Mediator: MediatorProtocol> {
         nonmutating _modify { yield &_mediator.viewModel }
     }
     
-    public var iActions: Mediator.IActionProvider {
-        _read { yield _mediator.iActions }
+    public var inputI: Mediator.IActionProvider {
+        _read { yield _mediator.inputI }
     }
     
     init(mediator: Mediator) {

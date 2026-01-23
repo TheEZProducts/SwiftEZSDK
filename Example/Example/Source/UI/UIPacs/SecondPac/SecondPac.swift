@@ -11,17 +11,17 @@ import EZSwiftUIBridgeKit
 import EZObservableKit
 import SwiftUI
 
-typealias SecondPac = EZUIPack<SecondPacI, SecondPacM, SecondPacSV>
+typealias SecondPac = EZUIPack<SecondPacI, SecondPacM, SecondPacSV1>
 
 class SecondPacI: EZUIPackI {
-    var access: SecondPacM.AccessI!
+    var access = SecondPacM.accessI
     
-    func setupActions() -> SecondPacM.IAction {
-        var iActions = SecondPacM.IAction()
-        iActions.next = {[weak self] in self?.next() }
-        iActions.back = {[weak self] in self?.back() }
-        iActions.close = {[weak self] in self?.close() }
-        return iActions
+    func makeContext() -> Mediator.ContextI {
+        var inputI = SecondPacM.IAction()
+        inputI.next = {[weak self] in self?.next() }
+        inputI.back = {[weak self] in self?.back() }
+        inputI.close = {[weak self] in self?.close() }
+        return .init(actions: inputI, viewModel: .init())
     }
     
     func start() {
@@ -84,32 +84,53 @@ class SecondPacI: EZUIPackI {
 
 
 class SecondPacM: EZUIPackM {
-    var storage: Void = ()
-    
-    var viewModel = ViewModel()
+    var viewModel: ViewModel
     class ViewModel: ObservableObject {
         var color: Color = Color(uiColor: .init(red: .random(in: 0...1), green: .random(in: 0...1), blue: .random(in: 0...1), alpha: 1))
         @Published var count: Int = 0
         @Published var count1: Bool = false
     }
     
-    var iActions = IAction()
+    var inputI: IAction
+    struct IAction {
+        var next = {}
+        var back = {}
+        var close = {}
+    }
+        
+    required init(contextI: EZUIPackMediatorContextI<SecondPacM>, contextV: EZUIPackMediatorContextV<SecondPacM>) {
+        viewModel = contextI.viewModel
+        inputI = contextI.actions
+    }
+}
+
+class SecondPacM1: EZUIPackM {
+    var viewModel: ViewModel
+    class ViewModel: ObservableObject {
+        var color: Color = Color(uiColor: .init(red: .random(in: 0...1), green: .random(in: 0...1), blue: .random(in: 0...1), alpha: 1))
+        @Published var count: Int = 0
+        @Published var count1: Bool = false
+    }
+    
+    var inputI: IAction
     struct IAction {
         var next = {}
         var back = {}
         var close = {}
     }
     
-    var vActions = VAction()
-    struct VAction {
-        var next = {}
+    required init(contextI: ContextI, contextV: ContextV) {
+        viewModel = contextI.viewModel
+        inputI = contextI.actions
     }
 }
 
-class SecondPacV: EZUIPackV{
+class SecondPacV: EZUIPackV {
     var supportedInterfaceOrientations: UIInterfaceOrientationMask? { .all }
     
-    var access: SecondPacM.AccessV!
+    var access = SecondPacM.accessV
+    
+    func makeContext() -> Mediator.ContextV { .init(actions: ()) }
     
     func animateOpen() {
         print("aaaaa")
@@ -146,11 +167,15 @@ class MyViewStates: ObservableObject{
     }
 }
 
-class SecondPacSV1: EZUIPackSUIV{
-    var access: SecondPacM.AccessV!
+class SecondPacSV1: EZUIPackSUIV {
+    var access = SecondPacM.accessV
     
     var viewStorage = MyViewStates()
     var additionalObservableObjects: [any ObservableObject] {[viewStorage]}
+    
+    func makeContext() -> Mediator.ContextV {
+        .init(actions: ())
+    }
     
     var body: some View{
         ZStack{
@@ -176,12 +201,16 @@ class SecondPacSV1: EZUIPackSUIV{
 
 struct SecondPacSV: EZUIPackSV {
     var supportedInterfaceOrientations: UIInterfaceOrientationMask? { .all }
-    var access: SecondPacM.AccessV!
+    var access = SecondPacM.accessV
     
     @ObservedObject var viewStorage1 = MyViewStates()
     
     @Environment(\.colorScheme) var color
     @State var count: Int = 0
+    
+    func makeContext() -> Mediator.ContextV {
+        .init(actions: ())
+    }
     
     func create() {
 //        print("create", uiView?.bounds, parentShered[.mainPackMChain.test])
@@ -214,14 +243,14 @@ struct SecondPacSV: EZUIPackSV {
                 Spacer()
             
                 Button{
-                    iActions.back()
+                    inputI.back()
                 } label: {
                     Text("Back")
                 }
                 
                 Button{
                     print("tut")
-                    iActions.next()
+                    inputI.next()
                 } label: {
                     Text("Next")
                 }
@@ -230,7 +259,7 @@ struct SecondPacSV: EZUIPackSV {
                     //.onReceive(router.$count1, perform: {_ in})
                 //.update(count: router.count)
                 Button{
-                    iActions.close()
+                    inputI.close()
                     //packBridge.pack?.rootWindow?.windowScene?.requestGeometryUpdate(.iOS(interfaceOrientations: .portrait))
                 } label: {
                     Text("Test")

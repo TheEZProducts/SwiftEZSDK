@@ -6,7 +6,7 @@ class ___VARIABLE_productName:identifier___I: EZUIPackI {
     var mediator: ___VARIABLE_productName:identifier___M!
     
     func didInitialize() {}
-    func setupActions() {}
+    func makeContext() {}
     
     func willOpen() {}
     func didOpen() {}

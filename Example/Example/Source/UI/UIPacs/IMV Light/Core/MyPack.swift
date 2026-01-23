@@ -28,7 +28,7 @@ final class MyPackI: UIViewController, InteractorProtocol {
         self.access = mediator.accessI
         self.rootView = view
         super.init(nibName: nil, bundle: nil)
-        mediator.iActions = self
+        mediator.inputI = self
     }
 
     required init?(coder: NSCoder) {
@@ -36,7 +36,7 @@ final class MyPackI: UIViewController, InteractorProtocol {
     }
 }
 
-extension MyPackI: MyPackM.IActions {
+extension MyPackI: MyPackM.inputI {
     func didCreate() {
         access.viewModel.counter = access.storage.counter
         access.viewModel.title = "MyPack demo"
@@ -71,8 +71,8 @@ final class MyPackM: MediatorProtocol {
         }
     }
 
-    weak var iActions: IActions?
-    @MainActor protocol IActions: AnyObject {
+    weak var inputI: inputI?
+    @MainActor protocol inputI: AnyObject {
         func didCreate()
         func didTapIncrement()
         func didTapReset()
@@ -108,11 +108,11 @@ final class MyPackV: UIView, ViewProtocol {
     }
 
     @objc private func onIncrement() {
-        access.iActions?.didTapIncrement()
+        access.inputI?.didTapIncrement()
     }
 
     @objc private func onReset() {
-        access.iActions?.didTapReset()
+        access.inputI?.didTapReset()
     }
 }
 
@@ -130,7 +130,7 @@ extension MyPackV: MyPackM.VActions {
         bind(to: access.viewModel)
 
         // Сообщаем интерактору, что View готова
-        access.iActions?.didCreate()
+        access.inputI?.didCreate()
     }
 
     private func setupSubviews() {

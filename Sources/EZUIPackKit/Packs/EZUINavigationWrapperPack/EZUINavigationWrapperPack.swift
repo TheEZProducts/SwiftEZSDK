@@ -10,8 +10,8 @@ import UIKit
 
 public typealias EZUINavigationWrapperPack = EZUIPack<
     EZUINavigationWrapperPackI,
-    EZUINavigationWrapperPackM,
-    EZDummyUIPackV<EZUINavigationWrapperPackM>
+    EZDummyUIPackM,
+    EZDummyUIPackV<EZDummyUIPackM>
 >
 
 extension UIViewController {
@@ -26,26 +26,25 @@ extension UIViewController {
 
 extension EZUINavigationWrapperPack {
     public static func make(_ controllers: [UIViewController]) -> Interactor {
-        let mediator = Mediator()
-        mediator.storage.controllers = controllers
-        return make(mediator)
+        make(interactor: .init(controllers))
     }
 }
 
 public class EZUINavigationWrapperPackI: EZUINavigationPackI {
-    public var access: EZUINavigationWrapperPackM.AccessI!
+    public let access = EZDummyUIPackM.accessI
     
-    public func didInitialize() {
-        guard let controllers = storage.controllers else { return }
-        storage.controllers = nil
+    public func makeContext() -> Mediator.ContextI {
+        .init(actions: (), viewModel: ())
+    }
+   
+    public init(_ controllers: [UIViewController]) {
+        super.init(nibName: nil, bundle: nil)
         transit.navigationSet(controllers).unsafeTransition().transit()
+    }
+    
+    @MainActor required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
 }
 
-public class EZUINavigationWrapperPackM: EZUIPackMediator, EZUIPackMediatorProtocol{
-    public var storage = Storage()
-    public struct Storage {
-        public var controllers: [UIViewController]?
-    }
-}
 #endif

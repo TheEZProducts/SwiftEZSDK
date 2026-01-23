@@ -10,9 +10,15 @@ import UIKit
 
 open class EZDummyTabBarController: UITabBarController {
     var viewDidAppearAction: (() -> ())?
+    private var wasDisappeared: Bool = false
     
     open override func viewDidAppear(_ animated: Bool) {
+        guard wasDisappeared else { return }
         viewDidAppearAction?()
+    }
+    
+    open override func viewDidDisappear(_ animated: Bool) {
+        wasDisappeared = true
     }
 }
 
@@ -77,13 +83,15 @@ open class EZContainerView: UIView {
         else { return }
         dummyController.viewDidAppearAction = nil
         parentViewController.addChild(dummyController)
-        if currentViewController == nil{
+        if currentViewController == nil {
             dummyController.view.frame = bounds
             addSubview(dummyController.view)
         }
         dummyController.didMove(toParent: parentViewController)
-        dummyController.viewDidAppearAction = {[weak self] in
-            self?.removeDummyController()
+        Task {
+            dummyController.viewDidAppearAction = {[weak self] in
+                self?.removeDummyController()
+            }
         }
         currentViewController = parentViewController
     }

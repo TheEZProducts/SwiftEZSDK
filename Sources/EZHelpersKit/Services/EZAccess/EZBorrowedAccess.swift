@@ -1,5 +1,5 @@
 //
-//  EZAccess.swift
+//  EZBorrowedAccess.swift
 //  EZSDK
 //
 //  Created by Александр Сенин on 11.12.2025.
@@ -8,7 +8,7 @@
 import Foundation
 
 #if compiler(>=6.2) && hasFeature(Lifetimes)
-public struct EZAccess<Value>: ~Copyable, ~Escapable where Value: ~Copyable {
+public struct EZBorrowedAccess<Value>: ~Copyable, ~Escapable where Value: ~Copyable {
     private let ptr: UnsafeMutablePointer<Value>
 
     @_lifetime(borrow ptr)
@@ -22,7 +22,7 @@ public struct EZAccess<Value>: ~Copyable, ~Escapable where Value: ~Copyable {
     }
 }
 #else
-public struct EZAccess<Value>: ~Copyable where Value: ~Copyable {
+public struct EZBorrowedAccess<Value>: ~Copyable where Value: ~Copyable {
     private let ptr: UnsafeMutablePointer<Value>
 
     public init(_ ptr: borrowing UnsafeMutablePointer<Value>) {

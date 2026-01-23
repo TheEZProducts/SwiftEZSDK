@@ -39,7 +39,7 @@ import Cocoa
 /// // Use `group` as a single `ObservableObject` dependency.
 /// ```
 @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
-public class EZObservableObjectGroup: ObservableObject{
+public class EZObservableObjectGroup: ObservableObject {
     /// Objects whose `objectWillChange` events are forwarded.
     public var objects: [any ObservableObject]
     /// Stored subscriptions to keep forwarding alive.
@@ -84,7 +84,7 @@ extension EZView{
     public static func ezWrap<V: View, ObservObj: ObservableObject>(
         _ observable: ObservObj = EZViewWraperObservable(),
         view: V
-    ) -> EZView{ .ezWrap(observable){_ in view} }
+    ) -> EZView { .ezWrap(observable){_ in view} }
     
     /// Wraps a SwiftUI `View` builder into an `EZView` and observes an `ObservableObject`.
     ///
@@ -101,7 +101,7 @@ extension EZView{
     public static func ezWrap<V: View, ObservObj: ObservableObject>(
         _ observable: ObservObj = EZViewWraperObservable(),
         @ViewBuilder view: @escaping ()->V
-    ) -> EZView{ .ezWrap(observable){_ in view()} }
+    ) -> EZView { .ezWrap(observable){_ in view()} }
     
     /// Wraps a SwiftUI `View` builder that receives the observed object.
     ///
@@ -128,10 +128,10 @@ extension EZView{
     public static func ezWrap<V: View, ObservObj: ObservableObject>(
         _ observable: ObservObj = EZViewWraperObservable(),
         @ViewBuilder view: @escaping (ObservObj)->V
-    ) -> EZView{
+    ) -> EZView {
         if #available(iOS 16.0, tvOS 16.0, *) {
 #if canImport(UIKit)
-            return UIHostingConfiguration{
+            return UIHostingConfiguration {
                 EZObserveView(observable, view)
                     .ignoresSafeArea()
             }
@@ -140,7 +140,7 @@ extension EZView{
 #elseif canImport(Cocoa)
             return NSHostingView(rootView: EZObserveView(observable, view))
 #endif
-        }else{
+        } else {
             let ezController = EZHostingController(rootView: EZObserveView(observable, view))
             
 #if canImport(UIKit)
@@ -173,23 +173,24 @@ extension EZView{
 /// driver.update() // forces the wrapped SwiftUI view to refresh
 /// _ = wrapped
 /// ```
-public class EZViewWraperObservable: ObservableObject{
+public class EZViewWraperObservable: ObservableObject {
     /// Triggers `objectWillChange`, causing the hosted SwiftUI view to update.
-    public func update(){ objectWillChange.send() }
+    public func update() { objectWillChange.send() }
     /// Creates a new update driver.
     public init(){}
 }
 
 @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
-struct EZObserveView<V: View, ObservObj: ObservableObject>: View {
+public struct EZObserveView<V: View, ObservObj: ObservableObject>: View {
     @ObservedObject var obj: ObservObj
     private var view: (ObservObj)->V?
     
-    init(_ obj: ObservObj, _ view: @escaping (ObservObj)->V){
+    public init(_ obj: ObservObj, _ view: @escaping (ObservObj)->V){
         self.view = view
         self.obj = obj
     }
-    var body: some View {
+    
+    public var body: some View {
         view(obj)
     }
 }

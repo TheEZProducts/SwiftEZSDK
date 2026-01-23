@@ -15,7 +15,7 @@ public protocol EZUIPackProtocol: AnyObject {
     associatedtype View: EZUIPackViewProtocol where View.Mediator == Mediator
     
     var interactor: Interactor? { get }
-    var mediator: Mediator { get }
+    var mediator: Mediator? { get }
     var view: View { get }
     
     var transitionController: EZTransitionControllerProtocol? { get set }
@@ -33,6 +33,10 @@ public protocol EZUIPackProtocol: AnyObject {
 
     func viewWillDisappear(_ animated: Bool)
     func viewDidDisappear(_ animated: Bool)
+    
+    func setup(interactor: Interactor)
+    
+    init(view: View)
 }
 
 @MainActor
@@ -41,8 +45,8 @@ open class EZUIPack<
     M: EZUIPackMediatorProtocol,
     V: EZUIPackViewProtocol
 >: EZUIPackProtocol where I.Mediator == M, V.Mediator == M {
-    public weak var interactor: I?
-    public let mediator: M
+    public private(set) weak var interactor: I?
+    public private(set) var mediator: M?
     public let view: V
     
     public var transitionController: (any EZTransitionControllerProtocol)?
@@ -53,19 +57,25 @@ open class EZUIPack<
     public var willAppear: Bool = false
     private var openAction: (() -> Void)?
     
-    public init(mediator: M, view: V) {
-        self.mediator = mediator
+    public required init(view: V) {
         self.view = view
     }
     
     open func setup(interactor: I) {
-        self.interactor = interactor
+        let mediator = M(
+            contextI: interactor.makeContext(),
+            contextV: view.makeContext()
+        )
         mediator.packBridge.pack = self
+        interactor.access.setMediator(mediator)
+        view.access.setMediator(mediator)
+        
+        self.interactor = interactor
+        self.mediator = mediator
+        
         mediator.didInitialize()
         interactor.didInitialize()
         view.didInitialize()
-        mediator.iActions = interactor.setupActions()
-        if let actions = view.setupActions() { mediator.vActions = actions }
     }
     
     open func loadView(frame: CGRect) -> UIView {
@@ -161,8 +171,10 @@ open class EZUIPack<
         var animated = false
         if
             let transitionCoordinator = interactor?.firstTransitionCoordinator ??
-                parentController?.firstTransitionCoordinator
+                parentController?.firstTransitionCoordinator,
+            transitionCoordinator.transitionDuration > 0
         {
+            
             animated = transitionCoordinator.animate {_ in
                 action()
             }
@@ -174,38 +186,63 @@ open class EZUIPack<
     }
 }
 
-extension EZUIPack {
-    public static func make(customData: Interactor.CustomInitData) -> I {
-        make(.init(), customData: customData)
-    }
+@MainActor
+public final class EZPackMaker: Sendable {
+    private static var currentSession = [(any MakeSessionProtocol)]()
     
-    public static func make(_ mediator: M, customData: Interactor.CustomInitData) -> I {
-        let view = makeView(mediator: mediator)
-        let pack = EZUIPack(mediator: mediator, view: view)
+    public static func make<Pack: EZUIPackProtocol>(
+        packType: Pack.Type = Pack.self,
+        interactor maker: () -> Pack.Interactor
+    ) -> Pack.Interactor {
+        let session = MakeSession<Pack>()
         
-        let interactor = makeInteractor(pack: pack, customData: customData)
-        interactor.access = mediator.accessI
-        pack.setup(interactor: interactor)
+        currentSession.append(session)
+        defer { currentSession.removeLast() }
         
-        return interactor
+        return session.make(interactor: maker)
     }
     
-    public static func makeInteractor(pack: EZUIPack, customData: Interactor.CustomInitData) -> I {
-        .init(pack: pack, customData: customData)
+    private static func getCurrentSession() -> any MakeSessionProtocol {
+        guard let currentSession = currentSession.last else { fatalError("Call EZPackMaker.make(...) first.") }
+        return currentSession
     }
     
-    public static func makeView(mediator: M) -> V {
-        .init(mediator: mediator)
+    public static func getPack() -> (any EZUIPackProtocol) {
+        getCurrentSession().getPack()
+    }
+    
+    @MainActor
+    protocol MakeSessionProtocol {
+        func getPack() -> (any EZUIPackProtocol)
+    }
+    
+    @MainActor
+    final class MakeSession<Pack: EZUIPackProtocol>: MakeSessionProtocol, Sendable {
+        private var pack: Pack = .init(view: .init())
+        
+        func getPack() -> any EZUIPackProtocol { pack }
+        
+        func make(interactor maker: () -> Pack.Interactor) -> Pack.Interactor {
+            let interactor = maker()
+            pack.setup(interactor: interactor)
+            return interactor
+        }
+   
+        init() {}
     }
 }
 
-extension EZUIPack where I.CustomInitData == () {
-    public static func make() -> I {
-        make(customData: ())
+extension EZUIPack {
+    public static func make(
+        interactor maker: @autoclosure () -> I = I(nibName: nil, bundle: nil)
+    ) -> I {
+        EZPackMaker.make(packType: Self.self, interactor: maker)
     }
     
-    public static func make(_ mediator: M) -> I {
-        make(mediator, customData: ())
+    public static func make(
+        interactor maker: () -> I
+    ) -> I {
+        EZPackMaker.make(packType: Self.self, interactor: maker)
     }
 }
 

@@ -191,7 +191,7 @@ public struct EZObservable<Value>: EZConstantPropertyWrapperProtocol, EZObservab
     /// _ = old
     /// ```
     @discardableResult
-    public func update<R>(type: EZSetType = .common, _ closure: (borrowing EZAccess<Value>) throws -> (R)) rethrows -> R {
+    public func update<R>(type: EZSetType = .common, _ closure: (borrowing EZBorrowedAccess<Value>) throws -> (R)) rethrows -> R {
         try storage.update(type: type, closure)
     }
     

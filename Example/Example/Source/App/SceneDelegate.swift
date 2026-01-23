@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import SwiftUI
 import EZUIPackKit
 
 extension EZUIPackViewProtocol{

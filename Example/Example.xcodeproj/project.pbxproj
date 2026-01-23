@@ -24,6 +24,7 @@
 		51A18C202EFBE87B003CF083 /* All in Frameworks */ = {isa = PBXBuildFile; productRef = 51A18C1F2EFBE87B003CF083 /* All */; };
 		51A18C242EFD70F0003CF083 /* IMV.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51A18C232EFD70E8003CF083 /* IMV.swift */; };
 		51A18C262EFD9BC9003CF083 /* MyPack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51A18C252EFD9BC1003CF083 /* MyPack.swift */; };
+		51A18F612F0E9542003CF083 /* SwiftUIIMV.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51A18F602F0E953F003CF083 /* SwiftUIIMV.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -46,6 +47,7 @@
 		51753CB02A374B4A0033DDA9 /* Example.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Example.entitlements; sourceTree = "<group>"; };
 		51A18C232EFD70E8003CF083 /* IMV.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IMV.swift; sourceTree = "<group>"; };
 		51A18C252EFD9BC1003CF083 /* MyPack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyPack.swift; sourceTree = "<group>"; };
+		51A18F602F0E953F003CF083 /* SwiftUIIMV.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftUIIMV.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -99,6 +101,7 @@
 		515023D72A2C8845008255CA /* UIPacs */ = {
 			isa = PBXGroup;
 			children = (
+				51A18F5F2F0E952C003CF083 /* SwiftUI IMV */,
 				51A18C212EFD70D0003CF083 /* IMV Light */,
 				514585CC2D625C0000C1241B /* MainPack */,
 				515023DB2A2C8F98008255CA /* SecondPac */,
@@ -214,6 +217,14 @@
 			path = Core;
 			sourceTree = "<group>";
 		};
+		51A18F5F2F0E952C003CF083 /* SwiftUI IMV */ = {
+			isa = PBXGroup;
+			children = (
+				51A18F602F0E953F003CF083 /* SwiftUIIMV.swift */,
+			);
+			path = "SwiftUI IMV";
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -301,6 +312,7 @@
 				514741152E81EC3D00270B84 /* Invocation.swift in Sources */,
 				514741162E81EC3D00270B84 /* Dynamic.swift in Sources */,
 				514585D02D625C2600C1241B /* MainPack.swift in Sources */,
+				51A18F612F0E9542003CF083 /* SwiftUIIMV.swift in Sources */,
 				514585CE2D625C1800C1241B /* MainPackI.swift in Sources */,
 				5147410D2E81EBCA00270B84 /* NSWindowConfig.swift in Sources */,
 				515023DA2A2C8865008255CA /* FirstPac.swift in Sources */,
