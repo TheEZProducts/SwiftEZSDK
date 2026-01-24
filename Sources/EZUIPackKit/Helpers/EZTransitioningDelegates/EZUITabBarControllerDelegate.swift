@@ -8,12 +8,49 @@
 #if canImport(UIKit) && !os(watchOS)
 import UIKit
 
+/// A wrapper delegate for `UITabBarControllerDelegate` that adds custom animations and interactive transitions.
+///
+/// `EZUITabBarControllerDelegate` wraps an existing tab bar controller delegate and allows you to
+/// inject custom animations and interactive transitions for tab switching without replacing the
+/// original delegate's functionality. It forwards all delegate methods to the original delegate,
+/// using your custom values when provided.
+///
+/// ### Example: Wrapping a delegate with custom animation
+///
+/// ```swift
+/// let customAnimation = EZShiftAnimation.ezShift(direction: .left)
+/// let wrapper = EZUITabBarControllerDelegate(
+///     delegate: originalDelegate,
+///     animation: customAnimation
+/// )
+/// tabBarController.delegate = wrapper
+/// ```
+///
+/// - Note: This is typically used internally by `wrappDelegateForChildTransition` extension method.
 open class EZUITabBarControllerDelegate: NSObject, UITabBarControllerDelegate {
+    /// The original delegate being wrapped.
+    ///
+    /// All delegate methods are forwarded to this delegate if custom values aren't provided.
     public weak var delegate: UITabBarControllerDelegate?
     
+    /// Custom animation to use for tab switching transitions.
+    ///
+    /// If provided, this animation will be used instead of the delegate's animation or the
+    /// interactor's `defaultChildrenTransitionAnimation`.
     public var animation: (any UIViewControllerAnimatedTransitioning)?
+    
+    /// Custom interactive transition controller.
+    ///
+    /// If provided, this interactive transition will be used.
+    /// If `nil`, the delegate's interactive transition (if any) will be used.
     public var interactive: UIPercentDrivenInteractiveTransition?
     
+    /// Creates a wrapper delegate.
+    ///
+    /// - Parameters:
+    ///   - delegate: The original delegate to wrap (can be `nil`).
+    ///   - animation: Optional custom animation to use for tab switching.
+    ///   - interactive: Optional interactive transition controller.
     public init(
         delegate: UITabBarControllerDelegate?,
         animation: (any UIViewControllerAnimatedTransitioning)? = nil,

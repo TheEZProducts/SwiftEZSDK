@@ -23,5 +23,5 @@ class ___VARIABLE_productName:identifier___I: EZUIPackI {
     func didCreate() {}
 }
 
-extension ___VARIABLE_productName:identifier___I: ___VARIABLE_productName:identifier___M.IAction {
+extension ___VARIABLE_productName:identifier___I: ___VARIABLE_productName:identifier___M.InputIProtocol {
 }

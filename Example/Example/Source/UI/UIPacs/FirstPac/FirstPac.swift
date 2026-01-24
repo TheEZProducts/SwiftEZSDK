@@ -66,7 +66,7 @@ class FirstPacI: EZUIPackI {
     }
     
     func didCreate() {
-//        self.transit
+//        self.ezTransit
 //            .present(.tabBarWrapper([SecondPac.make(), SecondPac.make(), SecondPac.make()]))
 //            .unsafeTransition()
 //            .animation(.ezOpen)
@@ -78,7 +78,7 @@ class FirstPacI: EZUIPackI {
         
 //        packBridge.tabBarPack?.toolbarItems = []
 //        packBridge.tabBarPack?.tabBar.isHidden = true
-//        transit
+//        ezTransit
 //            .tabBarSet(
 //                [
 //                    UIViewController().apply(template: .custom{ $0.view.backgroundColor = .init(red: .random(in: 0...1), green: .random(in: 0...1), blue: .random(in: 0...1), alpha: 1) }),
@@ -87,7 +87,7 @@ class FirstPacI: EZUIPackI {
 //            .transit()
         
 //        DispatchQueue.main.asyncAfter(deadline: .now() + 2){
-//            self.transit
+//            self.ezTransit
 //                .tabBarSet([.tabBarWrapper([SecondPac.make(), SecondPac.make(), SecondPac.make()])])
 //                .unsafeTransition()
 //                .animation(.ezOpen)
@@ -113,7 +113,7 @@ class FirstPacI: EZUIPackI {
     private func transit(){
 //        DispatchQueue.main.asyncAfter(deadline: .now() + 2){
 //            let navigation = UINavigationController()
-//            self.mediator.testView.transit
+//            self.mediator.testView.ezTransit
 //                .present(navigation)
 //                .unsafeTransition()
 //                .animation(.coverVertical)
@@ -132,7 +132,7 @@ class FirstPacI: EZUIPackI {
             print()
             print()
             print()
-        let tansition = self.viewModel.testView.transit
+        let tansition = self.viewModel.testView.ezTransit
 //            .present(SecondPac())
                     .present(
                         .tabBarWrapper([SecondPac.make(), SecondPac.make(), SecondPac.make()])
@@ -198,7 +198,7 @@ extension FirstPacI: EZTransitionControllerProtocol{
     
     private func transitNavigation(context: EZCustomTransitionContext) -> Bool{
         if context.transitionType == .ezNext{
-            return context.fromController?.transit
+            return context.fromController?.ezTransit
                 .navigationPush(SecondPac.make())
                 .animate()
                 .completion {
@@ -207,7 +207,7 @@ extension FirstPacI: EZTransitionControllerProtocol{
                 }
                 .transit() ?? false
         }else if context.transitionType == .ezBack{
-            return context.fromController?.transit
+            return context.fromController?.ezTransit
                 .navigationPop()
                 .animate()
                 .completion {
@@ -216,7 +216,7 @@ extension FirstPacI: EZTransitionControllerProtocol{
                 }
                 .transit() ?? false
         }else if context.transitionType == .ezClose{
-            return context.fromController?.transit
+            return context.fromController?.ezTransit
                 .dismiss()
                 .completion {
                     context.completion?()
@@ -228,7 +228,7 @@ extension FirstPacI: EZTransitionControllerProtocol{
     
     private func transitTabBar(context: EZCustomTransitionContext) -> Bool{
         if context.transitionType == .ezNext{
-            return context.fromController?.transit
+            return context.fromController?.ezTransit
                 .tabBarNext()
                 .animation(.ezShift(direction: .up))
                 .completion {
@@ -237,7 +237,7 @@ extension FirstPacI: EZTransitionControllerProtocol{
                 }
                 .transit() ?? false
         }else if context.transitionType == .ezBack{
-            return context.fromController?.transit
+            return context.fromController?.ezTransit
                 .tabBarBack()
                 .animation(.ezShift(direction: .down))
                 .completion {
@@ -246,7 +246,7 @@ extension FirstPacI: EZTransitionControllerProtocol{
                 }
                 .transit() ?? false
         }else if context.transitionType == .ezClose{
-            return context.fromController?.transit
+            return context.fromController?.ezTransit
                 .dismiss()
                 .animation(.ezDisappearance(duration: 1))
                 .completion {

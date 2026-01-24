@@ -20,7 +20,7 @@ class MainPackI: EZUINavigationPackI {
     
     
     func didInstall() {
-            let r = self.transit
+            let r = self.ezTransit
                 .present(FirstPac.make(interactor: FirstPacI()))
             //            .navigationSet([FirstPac.make()])
             //            .animate()
@@ -91,7 +91,7 @@ class MainPackI: EZUINavigationPackI {
         
         
 //        DispatchQueue.main.asyncAfter(deadline: .now() + 5){
-//            let r = self.transit
+//            let r = self.ezTransit
 //                .tabBarSet([UIViewController()])
 //                .animation(.ezOpen)
 //                .transit()
@@ -102,7 +102,7 @@ class MainPackI: EZUINavigationPackI {
 //                print()
 //                print()
 //                print()
-//                self.transit
+//                self.ezTransit
 //                    .present(
 ////                        FirstPac()
 //                        self.firstPac

@@ -1,5 +1,5 @@
 //
-//  UIViewController + parentShered.swift
+//  UIViewController + ezParentShered.swift
 //  EZSDK
 //
 //  Created by Александр Сенин on 25.12.2025.
@@ -9,7 +9,22 @@
 import UIKit
 
 extension UIViewController {
-    public var parentShered: EZSharedStorage {
+    /// Access to shared storage from parent view controllers.
+    ///
+    /// Searches up the view controller hierarchy (parent or presenting view controllers)
+    /// for view controllers that conform to `EZSharingProtocol` and returns their combined
+    /// shared storage. Returns an empty storage if no parent provides shared data.
+    ///
+    /// ### Example
+    /// ```swift
+    /// // In a child pack mediator:
+    /// func start() {
+    ///     if let userID = ezParentShered[.userID] {
+    ///         // Use parent's user ID
+    ///     }
+    /// }
+    /// ```
+    public var ezParentShered: EZSharedStorage {
         checkShared(ezSourceViewController) ?? .init()
     }
     

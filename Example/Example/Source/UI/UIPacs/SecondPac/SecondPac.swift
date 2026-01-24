@@ -47,7 +47,7 @@ class SecondPacI: EZUIPackI {
 ////            .animation(.ezOpen)
 //            .transit()
         
-        transit
+        ezTransit
             .custom()
             .transitionType(.ezNext)
             .animate()
@@ -64,7 +64,7 @@ class SecondPacI: EZUIPackI {
 //            .animate()
 //            .transit()
         
-        transit
+        ezTransit
             .custom()
             .transitionType(.ezBack)
             .animate()
@@ -73,7 +73,7 @@ class SecondPacI: EZUIPackI {
     
     private func close(){
         print("close")
-        transit
+        ezTransit
             .custom()
             .transitionType(.ezClose)
             .animate()
@@ -213,7 +213,7 @@ struct SecondPacSV: EZUIPackSV {
     }
     
     func create() {
-//        print("create", uiView?.bounds, parentShered[.mainPackMChain.test])
+//        print("create", uiView?.bounds, ezParentShered[.mainPackMChain.test])
         print("huh", UIView.inheritedAnimationDuration)
     }
     

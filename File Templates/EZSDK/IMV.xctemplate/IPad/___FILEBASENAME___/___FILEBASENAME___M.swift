@@ -8,13 +8,13 @@ class ___VARIABLE_productName:identifier___M: EZUIPackM {
         
     }
         
-    weak let inputI: IAction?
-    @MainActor protocol IAction: AnyObject {
+    weak let inputI: InputIProtocol?
+    @MainActor protocol InputIProtocol: AnyObject {
       
     }
     
-    weak let inputV: VAction?
-    @MainActor protocol VAction: AnyObject {
+    weak let inputV: InputVProtocol?
+    @MainActor protocol InputVProtocol: AnyObject {
       
     }
     

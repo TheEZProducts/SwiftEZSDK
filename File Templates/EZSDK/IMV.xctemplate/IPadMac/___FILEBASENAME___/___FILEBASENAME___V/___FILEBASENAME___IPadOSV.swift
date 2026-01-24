@@ -26,5 +26,5 @@ class ___VARIABLE_productName:identifier___IPadOSV: EZUIPackV {
     func create() {}
 }
 
-extension ___VARIABLE_productName:identifier___IPadOSV: ___VARIABLE_productName:identifier___M.VAction {
+extension ___VARIABLE_productName:identifier___IPadOSV: ___VARIABLE_productName:identifier___M.InputVProtocol {
 }

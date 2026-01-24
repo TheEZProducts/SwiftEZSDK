@@ -9,15 +9,99 @@ import Foundation
 #if canImport(UIKit) && !os(watchOS)
 import UIKit
 
+/// Protocol for tab bar controller interactors in the IMV architecture.
+///
+/// Extends `EZUIPackInteractorProtocol` with tab bar-specific transition animations.
+/// Use this when creating packs that use `UITabBarController` as their interactor.
+///
+/// ### Example
+/// ```swift
+/// class MainTabBarPackI: EZUITabBarPackI {
+///     let access = MainTabBarPackM.accessI
+///     
+///     var defaultChildrenTransitionAnimation: UIViewControllerAnimatedTransitioning?
+///     
+///     func makeContext() -> Mediator.ContextI {
+///         .init(actions: self, viewModel: .init())
+///     }
+/// }
+/// ```
 public protocol EZUITabBarInteractorProtocol: UITabBarController, EZUIPackInteractorProtocol {
+    /// Default transition animation for switching between tabs.
+    ///
+    /// Set this to provide a custom animation when switching tabs.
+    /// If `nil`, uses the default UIKit tab switching animation.
     var defaultChildrenTransitionAnimation: UIViewControllerAnimatedTransitioning? { get set }
 }
 
+/// The primary type for creating tab bar controller interactors in the IMV architecture.
+///
+/// `EZUITabBarPackI` is a type alias that combines `EZUITabBarPackInteractor` and
+/// `EZUITabBarInteractorProtocol`, providing everything you need to create a tab bar-based
+/// pack. This is the **recommended base type** for all tab bar controller implementations.
+///
+/// A tab bar interactor created with this type:
+/// - Integrates `UITabBarController` with the IMV pattern
+/// - Supports custom tab switching transition animations
+/// - Automatically handles delegate wrapping for child transitions
+/// - Provides all standard `EZUIPackI` functionality
+///
+/// ## Example: Complete tab bar interactor implementation
+///
+/// ```swift
+/// class MainTabBarPackI: EZUITabBarPackI {
+///     let access = MainTabBarPackM.accessI
+///     
+///     func makeContext() -> Mediator.ContextI {
+///         .init(actions: self, viewModel: .init())
+///     }
+///     
+///     func start() {
+///         // Set up tabs
+///         let homeVC = HomePack.make()
+///         let profileVC = ProfilePack.make()
+///         let settingsVC = SettingsPack.make()
+///         viewControllers = [homeVC, profileVC, settingsVC]
+///     }
+/// }
+/// ```
+///
+/// ## Custom Transitions
+///
+/// Set `defaultChildrenTransitionAnimation` to provide a custom animation for tab switching.
+/// This animation will be used automatically when switching between tabs.
+///
+/// - Note: Always use `EZUITabBarPackI` as your base type for tab bar-based packs.
+///   It provides proper integration with UIKit's tab bar controller and the IMV architecture.
 public typealias EZUITabBarPackI = EZUITabBarPackInteractor & EZUITabBarInteractorProtocol
 
+/// Base class for tab bar controller interactors in the IMV architecture.
+///
+/// This class integrates `UITabBarController` with the IMV pattern, providing:
+/// - Automatic pack lifecycle integration
+/// - Custom transition animations for tab switching
+/// - Proper delegate wrapping for child transitions
+///
+/// ### Example
+/// ```swift
+/// class MainTabBarPackI: EZUITabBarPackInteractor, EZUITabBarInteractorProtocol {
+///     let access = MainTabBarPackM.accessI
+///     
+///     func makeContext() -> Mediator.ContextI {
+///         .init(actions: self, viewModel: .init())
+///     }
+/// }
+/// ```
 open class EZUITabBarPackInteractor: UITabBarController, EZUIPackBaseInteractorProtocol {
+    /// The pack that manages this interactor.
+    ///
+    /// Automatically retrieved during initialization via `EZPackMaker.getPack()`.
     public var pack: (any EZUIPackProtocol) = EZPackMaker.getPack()
     
+    /// Default transition animation for switching between tabs.
+    ///
+    /// Set this to provide a custom animation when switching tabs.
+    /// If `nil`, uses the default UIKit tab switching animation.
     public var defaultChildrenTransitionAnimation: (any UIViewControllerAnimatedTransitioning)?
     
 #if !os(tvOS) && !os(visionOS)

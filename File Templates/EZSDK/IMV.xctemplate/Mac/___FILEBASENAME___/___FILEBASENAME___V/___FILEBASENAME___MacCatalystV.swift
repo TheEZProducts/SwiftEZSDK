@@ -26,5 +26,5 @@ class ___VARIABLE_productName:identifier___MacCatalystV: EZUIPackV {
     func create() {}
 }
 
-extension ___VARIABLE_productName:identifier___MacCatalystV: ___VARIABLE_productName:identifier___M.VAction {
+extension ___VARIABLE_productName:identifier___MacCatalystV: ___VARIABLE_productName:identifier___M.InputVProtocol {
 }
