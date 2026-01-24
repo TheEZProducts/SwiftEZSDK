@@ -152,7 +152,7 @@ open class EZContainerView: UIView {
             addSubview(dummyController.view)
         }
         dummyController.didMove(toParent: parentViewController)
-        Task {
+        DispatchQueue.main.async {
             dummyController.viewDidAppearAction = {[weak self] in
                 self?.removeDummyController()
             }
