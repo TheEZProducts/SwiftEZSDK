@@ -121,7 +121,7 @@ extension UIViewController {
     /// ### Example
     /// ```swift
     /// viewController.wrappDelegateForTransition(
-    ///     animation: EZOpenAnimation.ezOpen(direction: .up),
+    ///     animation: .ezOpen(direction: .up),
     ///     interactive: true
     /// ) { interactive in
     ///     present(otherVC, animated: true)

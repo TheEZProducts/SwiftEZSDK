@@ -148,14 +148,24 @@ extension EZUIPackInteractorProtocol {
     /// Override this to provide shared data that child packs can access via their mediator's `ezParentShered` property.
     /// Returns `nil` by default.
     ///
-    /// ### Example
-    /// ```swift
-    /// var shared: EZSharedStorage? {
-    ///     let storage = EZSharedStorage()
-    ///     storage.set(key: .userID, value: currentUserID)
-    ///     return storage
-    /// }
-    /// ```
+/// ### Example
+/// ```swift
+/// extension EZSharedKeyChain<OnboardingPackI> {
+///     var onboardingStatus: EZSharedKey<Self, OnboardingStatus> { .init(key: "OnboardingStatus") }
+///     var onboardingActions: EZSharedKey<Self, OnboardingActions> { .init(key: "OnboardingActions") }
+/// }
+///
+/// extension EZSharedKey {
+///     static var onboardingChain: EZSharedKeyChain<OnboardingPackI> { .init() }
+/// }
+///
+/// var shared: EZSharedStorage? {
+///     .init([
+///         .init(key: .onboardingChain.onboardingStatus, value: currentStatus),
+///         .init(key: .onboardingChain.onboardingActions, value: actions)
+///     ])
+/// }
+/// ```
     public var shared: EZSharedStorage? { nil }
 }
 

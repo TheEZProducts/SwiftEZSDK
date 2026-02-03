@@ -316,6 +316,15 @@ final class EZAsyncKitTest: XCTestCase, @unchecked Sendable {
         try? await Task.sleep(for: .seconds(12))
     }
     
+    func test_deinit() {
+        var testClass: DeinitClass? = DeinitClass()
+        weak var b = testClass
+        
+        b.doSumfing {
+            testClass = nil
+        }
+    }
+    
 //    @available(iOS 18.0, tvOS 18.0, *)
 //    func testM7() async {
 //        let a = EZRecursiveMutex([0])
@@ -336,6 +345,7 @@ final class EZAsyncKitTest: XCTestCase, @unchecked Sendable {
 //        for task in t { await _ = task.value }
 //        a.withLock { print($0.value.count) }
 //    }
+    
     
 }
 
@@ -376,6 +386,20 @@ final class RequestContext1: Sendable {
     
     
     //    @EZThreadSafety fileprivate private(set) static var id: String!
+}
+
+class DeinitClass {
+    deinit {
+        print("die")
+    }
+}
+
+extension Optional<DeinitClass> {
+    mutating func doSumfing(closure: () -> Void) {
+        print("start")
+        closure()
+        print("end")
+    }
 }
 
 class ExampleService {

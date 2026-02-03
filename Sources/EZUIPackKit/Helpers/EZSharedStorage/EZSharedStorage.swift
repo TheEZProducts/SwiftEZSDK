@@ -7,38 +7,55 @@
 
 import Foundation
 
-/// Protocol for objects that can provide shared storage to child packs.
+/// Protocol for objects that can provide shared storage to child view controllers.
 ///
-/// Implement this protocol to allow child packs to access data from their parent.
+/// Implement this protocol to allow child view controllers to access data from their parent.
+/// Works with any `UIViewController` that conforms to this protocol.
 @MainActor
 public protocol EZSharingProtocol {
-    /// Shared storage that child packs can access via their mediator's `ezParentShered` property.
+    /// Shared storage that child view controllers can access via `ezParentShered` property.
     var shared: EZSharedStorage? { get }
 }
 
-/// A type-safe storage for sharing data between parent and child packs.
+/// A type-safe storage for sharing data between parent and child view controllers.
 ///
 /// `EZSharedStorage` provides a dictionary-like interface using `EZSharedKey` for type-safe access.
-/// Use this to pass data from a parent pack's interactor to child packs.
+/// Use this to pass data from a parent view controller (that conforms to `EZSharingProtocol`) to child view controllers.
 ///
 /// ### Example: Using shared storage
 /// ```swift
-/// // In parent pack interactor:
-/// var shared: EZSharedStorage? {
-///     var storage = EZSharedStorage()
-///     storage[.userID] = currentUserID
-///     storage[.sessionToken] = sessionToken
-///     return storage
+/// // 1. Define keys for the view controller's shared storage
+/// extension EZSharedKeyChain<OnboardingViewController> {
+///     var onboardingStatus: EZSharedKey<Self, OnboardingStatus> { .init(key: "OnboardingStatus") }
+///     var onboardingActions: EZSharedKey<Self, OnboardingActions> { .init(key: "OnboardingActions") }
 /// }
 ///
-/// // In child pack mediator:
-/// func start() {
-///     if let userID = ezParentShered[.userID] {
-///         // Use parent's user ID
+/// extension EZSharedKey {
+///     static var onboardingChain: EZSharedKeyChain<OnboardingViewController> { .init() }
+/// }
+///
+/// // 2. In parent view controller (any UIViewController that conforms to EZSharingProtocol):
+/// class OnboardingViewController: UIViewController, EZSharingProtocol {
+///     var shared: EZSharedStorage? {
+///         .init([
+///             .init(key: .onboardingChain.onboardingStatus, value: currentStatus),
+///             .init(key: .onboardingChain.onboardingActions, value: actions)
+///         ])
+///     }
+/// }
+///
+/// // 3. In child view controller:
+/// class OnboardingStepViewController: UIViewController {
+///     override func viewWillAppear(_ animated: Bool) {
+///         super.viewWillAppear(animated)
+///         if let status = ezParentShered[.onboardingChain.onboardingStatus] {
+///             // Use parent's onboarding status
+///         }
+///         ezParentShered[.onboardingChain.onboardingActions]?.next()
 ///     }
 /// }
 /// ```
-public struct EZSharedStorage{
+public struct EZSharedStorage {
     private var storage = [String: Any]()
     
     /// Accesses a value in the storage using a type-safe key.
@@ -46,11 +63,11 @@ public struct EZSharedStorage{
     /// - Parameter key: The key to access.
     /// - Returns: The value associated with the key, or `nil` if not found.
     ///
-    /// ### Example
-    /// ```swift
-    /// storage[.userID] = 123
-    /// let id: Int? = storage[.userID]
-    /// ```
+/// ### Example
+/// ```swift
+/// storage[.onboardingChain.onboardingStatus] = currentStatus
+/// let status: OnboardingStatus? = storage[.onboardingChain.onboardingStatus]
+/// ```
     public subscript<C, T>(_ key: EZSharedKey<C, T>) -> T? {
         set(value){ storage[key.key] = value }
         get{ storage[key.key] as? T }
@@ -119,12 +136,21 @@ public struct EZSharedStorage{
 ///
 /// ### Example
 /// ```swift
+/// extension EZSharedKeyChain<OnboardingViewController> {
+///     var onboardingStatus: EZSharedKey<Self, OnboardingStatus> { .init(key: "OnboardingStatus") }
+///     var onboardingActions: EZSharedKey<Self, OnboardingActions> { .init(key: "OnboardingActions") }
+/// }
+///
+/// extension EZSharedKey {
+///     static var onboardingChain: EZSharedKeyChain<OnboardingViewController> { .init() }
+/// }
+///
 /// let storage = EZSharedStorage([
-///     EZSharedContainer(key: .userID, value: 123),
-///     EZSharedContainer(key: .sessionToken, value: "abc")
+///     EZSharedContainer(key: .onboardingChain.onboardingStatus, value: currentStatus),
+///     EZSharedContainer(key: .onboardingChain.onboardingActions, value: actions)
 /// ])
 /// ```
-public struct EZSharedContainer{
+public struct EZSharedContainer {
     private(set) var key: any EZSharedKeyProtocol
     private(set) var value: Any
     

@@ -15,15 +15,19 @@ extension UIViewController {
     /// for view controllers that conform to `EZSharingProtocol` and returns their combined
     /// shared storage. Returns an empty storage if no parent provides shared data.
     ///
-    /// ### Example
-    /// ```swift
-    /// // In a child pack mediator:
-    /// func start() {
-    ///     if let userID = ezParentShered[.userID] {
-    ///         // Use parent's user ID
-    ///     }
-    /// }
-    /// ```
+/// ### Example
+/// ```swift
+/// // In any child view controller:
+/// class OnboardingStepViewController: UIViewController {
+///     override func viewWillAppear(_ animated: Bool) {
+///         super.viewWillAppear(animated)
+///         if let status = ezParentShered[.onboardingChain.onboardingStatus] {
+///             // Use parent's onboarding status
+///         }
+///         ezParentShered[.onboardingChain.onboardingActions]?.next()
+///     }
+/// }
+/// ```
     public var ezParentShered: EZSharedStorage {
         checkShared(ezSourceViewController) ?? .init()
     }

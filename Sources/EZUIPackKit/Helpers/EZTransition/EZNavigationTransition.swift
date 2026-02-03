@@ -248,7 +248,7 @@ extension EZTransitionProtocol<EZChildTransitionContext>{
 /// ### Example
 /// ```swift
 /// let transition = viewController.ezTransit.navigationPush(otherVC)
-///     .animation(EZOpenAnimation.ezOpen(direction: .right))
+///     .animation(.ezOpen(direction: .right))
 ///     .transit()
 /// ```
 public struct EZNavigationPushTransition: EZNavigationTransitionProtocol{
@@ -313,7 +313,7 @@ public struct EZNavigationPushTransition: EZNavigationTransitionProtocol{
 /// ### Example
 /// ```swift
 /// let transition = viewController.ezTransit.navigationPop()
-///     .animation(EZCloseAnimation.ezClose(direction: .right))
+///     .animation(.ezClose(direction: .right))
 ///     .transit()
 /// ```
 public struct EZNavigationPopTransition: EZNavigationTransitionProtocol{

@@ -354,7 +354,7 @@ extension EZCustomTransitionType{
 /// Strategy for searching for a transition controller delegate in the view controller hierarchy.
 ///
 /// Used to determine where to look for a transition controller when executing custom transitions.
-public enum EZTransitionControllerDelegateSearchType{
+public enum EZTransitionControllerDelegateSearchType {
     /// Search only in the controller itself.
     case selfDelegate
     
@@ -404,7 +404,7 @@ public enum EZTransitionControllerDelegateSearchType{
 ///     }
 /// }
 /// ```
-public struct EZCustomTransitionContext: EZTransitionContextProtocol{
+public struct EZCustomTransitionContext: EZTransitionContextProtocol {
     /// The transition controller to use for this transition.
     ///
     /// If `nil`, the controller will be searched based on `transitionDelegateSearchType`.
@@ -617,7 +617,7 @@ extension EZTransitionProtocol<EZCustomTransitionContext>{
 /// ```swift
 /// let transition = viewController.ezTransit.customTo(controller: targetVC)
 ///     .transitionType(.ezToController)
-///     .animation(EZOpenAnimation.ezOpen(direction: .right))
+///     .animation(.ezOpen(direction: .right))
 ///     .transit()
 /// ```
 public struct EZCustomTransition: EZTransitionProtocol{
