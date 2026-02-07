@@ -457,8 +457,7 @@ public struct EZTabBarReplaceTransition: EZReplaceTransitionProtocol, EZTabBarTr
     @discardableResult
     public func transit() -> Bool {
         guard
-            let tabBarController = container.tabBarController,
-            let index = tabBarController.viewControllers?.firstIndex(of: controller)
+            let tabBarController = container.tabBarController
         else { return false }
         
         if
@@ -466,10 +465,20 @@ public struct EZTabBarReplaceTransition: EZReplaceTransitionProtocol, EZTabBarTr
             container.transitionCoordinator != nil
         { return false }
         
-        indexTransit(
-            tabBarController: tabBarController,
-            index: index
-        )
+        if let index = tabBarController.viewControllers?.firstIndex(of: controller){
+            indexTransit(
+                tabBarController: tabBarController,
+                index: index
+            )
+        }else if
+            let controllers = tabBarController.viewControllers,
+            tabBarController.selectedIndex < controllers.count
+        {
+            replaceTransit(
+                tabBarController: tabBarController,
+                controllers: controllers
+            )
+        } else { return false }
         
         return true
     }
@@ -485,12 +494,36 @@ public struct EZTabBarReplaceTransition: EZReplaceTransitionProtocol, EZTabBarTr
         ) { animator in
             animator.map { context._interactive?($0) }
             tabBarController.selectedIndex = index
+            if let transitionCoordinator = tabBarController.transitionCoordinator{
+                transitionCoordinator.animate(
+                    alongsideTransition: nil,
+                    completion: {_ in context._completion?() }
+                )
+            }else{
+                context._completion?()
+            }
+        }
+    }
+    
+    @MainActor
+    private func replaceTransit(
+        tabBarController: UITabBarController,
+        controllers: [UIViewController]
+    ) {
+        var controllers = controllers
+        controllers[tabBarController.selectedIndex] = controller
+        tabBarController.wrappDelegateForChildTransition(
+            animation: context._animation,
+            interactive: context._interactive != nil
+        ) { animator in
+            animator.map { context._interactive?($0) }
+            tabBarController.setViewControllers(controllers, animated: context._animate)
             if let transitionCoordinator = tabBarController.transitionCoordinator {
                 transitionCoordinator.animate(
                     alongsideTransition: nil,
                     completion: {_ in context._completion?() }
                 )
-            } else {
+            }else{
                 context._completion?()
             }
         }

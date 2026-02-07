@@ -17,7 +17,7 @@
 
 ## Введение
 
-Доступны восемь типов переходов:
+Доступны семь типов переходов:
 
 - **Движение по стеку:** push, pop, popTo, popToRoot.
 - **Замена стека:** set, replace, replaceTop.
@@ -112,71 +112,13 @@ navigationController.ezTransit.navigationSet([rootVC, vc1, vc2])
 
 Методы **`animation(...)`** и **`animate()`** ведут себя согласованно: `animation(UIViewControllerAnimatedTransitioning)` автоматически включает анимацию, отдельно вызывать `animate()` после него не нужно.
 
-**Запуск:**
-
-- **`transit() -> Bool`** — выполнить переход на текущем потоке; возвращает `true`, если переход запущен.
-- **`asyncTransit() async -> Bool`** (iOS 13+) — выполнить переход и дождаться завершения; возвращает `true`, если переход был успешно инициирован.
+**Запуск** — см. [transit() и asyncTransit()](../README.md#запуск-перехода-transit-и-asynctransit).
 
 ---
 
 ## Дополнительные сценарии
 
-### Кастомная анимация
-
-Можно передать свою анимацию — класс, реализующий `UIViewControllerAnimatedTransitioning`. Минимальный пример для навигации (например, fade при push):
-
-```swift
-final class FadePushAnimation: NSObject, UIViewControllerAnimatedTransitioning {
-    func transitionDuration(using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
-        0.3
-    }
-
-    func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
-        guard let toView = transitionContext.view(forKey: .to) else {
-            transitionContext.completeTransition(false)
-            return
-        }
-        toView.alpha = 0
-        UIView.animate(withDuration: 0.3, animations: {
-            toView.alpha = 1
-        }) { _ in
-            transitionContext.completeTransition(!transitionContext.transitionWasCancelled)
-        }
-    }
-}
-
-// Использование:
-navigationController.ezTransit.navigationPush(detailVC)
-    .animation(FadePushAnimation())
-    .transit()
-```
-
-Подробнее о создании кастомной анимации см. пример в [EZBaseTransition](../EZBaseTransition/README.md). В EZUIPackKit доступны готовые анимации с ez-префиксом:
-
-```swift
-.animation(.ezOpen(direction: .right))
-.animation(.ezClose(direction: .left))
-```
-
-### Ожидание завершения перехода (async/await)
-
-Если нужно дождаться окончания перехода:
-
-```swift
-let success = await navigationController.ezTransit.navigationPush(detailVC)
-    .animation(.ezOpen(direction: .right))
-    .asyncTransit()
-
-if success {
-    print("Переход выполнен")
-}
-```
-
-Если переход не удалось запустить, `asyncTransit()` вернёт `false`.
-
-### Защита от повторного вызова
-
-По умолчанию переход безопасный: повторный вызов `transit()` во время уже идущего перехода не выполняется и возвращает `false`. Для особых случаев можно вызвать **`unsafeTransition()`** или **`safeTransition(false)`** — тогда проверка игнорируется.
+Общие для всех переходов концепции (кастомные анимации, async/await, защита от повторного вызова) описаны в [Общие концепции переходов](../README.md).
 
 ### Когда transit() возвращает false
 
@@ -193,7 +135,8 @@ if success {
 
 ## Связанные темы
 
-- [EZBaseTransition](../EZBaseTransition/README.md) — базовые модальные переходы (present/dismiss); референс по структуре документации и общим концепциям (completion, интерактивные переходы, кастомные анимации).
+- [Общие концепции переходов](../README.md) — fluent API, transit(), asyncTransit(), анимации.
+- [EZTransitionAnimations](../EZTransitionAnimations/README.md) — готовые анимации (ezOpen, ezClose, ezShift и др.).
+- [EZBaseTransition](../EZBaseTransition/README.md) — базовые модальные переходы (present/dismiss).
+- [EZTabBarTransition](../EZTabBarTransition/README.md) — переходы для UITabBarController.
 - [EZCustomTransition](../EZCustomTransition/README.md) — кастомные переходы через EZTransitionController.
-
-Кастомные анимации переходов (в том числе ezOpen/ezClose) описываются в документации по анимациям EZUIPackKit.

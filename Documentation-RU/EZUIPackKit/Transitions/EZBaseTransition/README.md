@@ -100,72 +100,13 @@ containerView.ezTransit.present(childVC)
 | **`unsafeTransition()`** | Разрешить запуск перехода во время другого перехода. По умолчанию повторный вызов в такой ситуации блокируется и `transit()` вернёт `false`. |
 | **`interactive(_ value: (UIPercentDrivenInteractiveTransition) -> Void)`** | Обработчик интерактивного перехода: в closure передаётся объект, которым можно управлять прогрессом (свайп назад и т.п.). |
 
-**Запуск:**
-
-- **`transit() -> Bool`** — выполнить переход на текущем потоке; возвращает `true`, если переход запущен.
-- **`asyncTransit() async -> Bool`** (iOS 13+) — выполнить переход и дождаться его завершения; возвращает `true`, если переход был успешно инициирован.
+**Запуск** — см. [transit() и asyncTransit()](../README.md#запуск-перехода-transit-и-asynctransit).
 
 ---
 
 ## Дополнительные сценарии
 
-### Кастомная анимация
-
-Вместо системного стиля можно передать свою анимацию — класс, реализующий `UIViewControllerAnimatedTransitioning`. Минимальный пример:
-
-```swift
-final class FadeAnimation: NSObject, UIViewControllerAnimatedTransitioning {
-    func transitionDuration(using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
-        0.3
-    }
-
-    func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
-        guard let toView = transitionContext.view(forKey: .to) else {
-            transitionContext.completeTransition(false)
-            return
-        }
-        toView.alpha = 0
-        UIView.animate(withDuration: 0.3, animations: {
-            toView.alpha = 1
-        }) { _ in
-            transitionContext.completeTransition(!transitionContext.transitionWasCancelled)
-        }
-    }
-}
-
-// Использование:
-viewController.ezTransit.present(detailVC)
-    .presentationStyle(.fullScreen)
-    .animation(FadeAnimation())
-    .transit()
-```
-
-В EZUIPackKit по умолчанию доступны анимации кастомные анимации, для удобства они помечены ez префиксом. Пример:
-
-```swift
-.animation(.ezOpen(direction: .up))
-.animation(.ezClose(direction: .down))
-```
-
-### Ожидание завершения перехода (async/await)
-
-Если нужно дождаться окончания present/dismiss:
-
-```swift
-let success = await viewController.ezTransit.present(detailVC)
-    .animation(.coverVertical)
-    .asyncTransit()
-
-if success {
-    print("Экран показан")
-}
-```
-
-Если переход не удалось запустить (например, уже идёт другой), `asyncTransit()` вернёт `false`.
-
-### Защита от повторного вызова
-
-По умолчанию повторный вызов `transit()` во время уже идущего перехода не выполняется и возвращает `false`. Для особых случаев можно вызвать **`unsafeTransition()`** — тогда проверка игнорируется.
+Общие для всех переходов концепции (кастомные анимации, async/await, защита от повторного вызова) описаны в [Общие концепции переходов](../README.md).
 
 ### Present из контейнера (EZContainerView)
 
@@ -175,7 +116,8 @@ if success {
 
 ## Связанные темы
 
-- [EZCustomTransition](../EZCustomTransition/README.md) — кастомные переходы через EZTransitionController.
+- [Общие концепции переходов](../README.md) — fluent API, transit(), asyncTransit(), анимации.
+- [EZTransitionAnimations](../EZTransitionAnimations/README.md) — готовые анимации (ezOpen, ezClose, ezShift и др.).
 - [EZNavigationTransition](../EZNavigationTransition/README.md) — переходы в UINavigationController (push/pop и др.).
-
-Кастомные анимации переходов (в том числе ezOpen/ezClose) описываются в документации по анимациям EZUIPackKit.
+- [EZTabBarTransition](../EZTabBarTransition/README.md) — переходы для UITabBarController.
+- [EZCustomTransition](../EZCustomTransition/README.md) — кастомные переходы через EZTransitionController.

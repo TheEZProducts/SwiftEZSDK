@@ -112,70 +112,13 @@ tabBarController.ezTransit.tabBarBack()
 
 Метод **`animation(...)`** автоматически включает анимацию, отдельно вызывать `animate()` после него не нужно.
 
-**Запуск:**
-
-- **`transit() -> Bool`** — выполнить переход на текущем потоке; возвращает `true`, если переход запущен.
-- **`asyncTransit() async -> Bool`** (iOS 13+) — выполнить переход и дождаться завершения; возвращает `true`, если переход был успешно инициирован.
+**Запуск** — см. [transit() и asyncTransit()](../README.md#запуск-перехода-transit-и-asynctransit).
 
 ---
 
 ## Дополнительные сценарии
 
-### Кастомная анимация
-
-Можно передать свою анимацию — класс, реализующий `UIViewControllerAnimatedTransitioning`. Минимальный пример для таббара:
-
-```swift
-final class FadeTabAnimation: NSObject, UIViewControllerAnimatedTransitioning {
-    func transitionDuration(using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
-        0.3
-    }
-
-    func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
-        guard let toView = transitionContext.view(forKey: .to) else {
-            transitionContext.completeTransition(false)
-            return
-        }
-        toView.alpha = 0
-        UIView.animate(withDuration: 0.3, animations: {
-            toView.alpha = 1
-        }) { _ in
-            transitionContext.completeTransition(!transitionContext.transitionWasCancelled)
-        }
-    }
-}
-
-// Использование:
-tabBarController.ezTransit.tabBarSelect(1)
-    .animation(FadeTabAnimation())
-    .transit()
-```
-
-В EZUIPackKit доступны готовые анимации с ez-префиксом, например:
-
-```swift
-.animation(.ezShift(direction: .left))
-```
-
-### Ожидание завершения перехода (async/await)
-
-Если нужно дождаться окончания перехода:
-
-```swift
-let success = await tabBarController.ezTransit.tabBarSelect(profileVC)
-    .animation(.ezShift(direction: .left))
-    .asyncTransit()
-
-if success {
-    print("Таб выбран")
-}
-```
-
-Если переход не удалось запустить, `asyncTransit()` вернёт `false`.
-
-### Защита от повторного вызова
-
-По умолчанию переход безопасный: повторный вызов `transit()` во время уже идущего перехода не выполняется и возвращает `false`. Для особых случаев можно вызвать **`unsafeTransition()`** или **`safeTransition(false)`** — тогда проверка игнорируется.
+Общие для всех переходов концепции (кастомные анимации, async/await, защита от повторного вызова) описаны в [Общие концепции переходов](../README.md).
 
 ### Когда transit() возвращает false
 
@@ -186,14 +129,14 @@ if success {
 - **tabBarNext:** уже выбран последний таб (`(selectedIndex + 1) >= viewControllers.count`);
 - **tabBarBack:** уже выбран первый таб (`selectedIndex - 1 < 0`);
 - **tabBarSelect(controller):** переданный контроллер не найден в `viewControllers` таббара;
-- **tabBarReplace:** у контейнера нет `tabBarController` (вызов нужно делать у дочернего VC, у которого есть `tabBarController`); либо массив табов пуст или индекс выбранного таба некорректен для замены.
+- **tabBarReplace:** у контейнера нет `tabBarController`; либо контроллер не найден в табах и массив табов пуст или индекс выбранного таба некорректен для замены.
 
 ---
 
 ## Связанные темы
 
+- [Общие концепции переходов](../README.md) — fluent API, transit(), asyncTransit(), анимации.
+- [EZTransitionAnimations](../EZTransitionAnimations/README.md) — готовые анимации (ezOpen, ezClose, ezShift и др.).
 - [EZBaseTransition](../EZBaseTransition/README.md) — базовые модальные переходы (present/dismiss).
 - [EZNavigationTransition](../EZNavigationTransition/README.md) — переходы в UINavigationController (push/pop и др.).
 - [EZCustomTransition](../EZCustomTransition/README.md) — кастомные переходы через EZTransitionController.
-
-Кастомные анимации переходов (в том числе ezShift) описываются в документации по анимациям EZUIPackKit.

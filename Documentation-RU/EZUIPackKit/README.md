@@ -50,17 +50,23 @@
 
 ## Переходы
 
+Подробная документация — [Система переходов (EZTransition)](Transitions/README.md).
+
 | Класс / Метод | Описание |
 |---------------|----------|
 | `ezTransit` | Точка входа для системы переходов |
-| `navigationPush` / `navigationPop` | Переходы в navigation stack |
-| `tabBarSelect` / `tabBarNext` / `tabBarBack` | Переходы между табами |
 | `present` / `dismiss` | Модальные переходы |
+| `navigationPush` / `navigationPop` / `navigationSet` | Переходы в navigation stack |
+| `tabBarSelect` / `tabBarNext` / `tabBarBack` | Переходы между табами |
+| `pageSet` | Переходы для UIPageViewController |
+| `replace` | Универсальная замена контроллера |
 | `custom` | Кастомные переходы через `EZTransitionController` |
 
 ---
 
 ## Анимации переходов
+
+Подробная документация — [EZTransitionAnimations](Transitions/EZTransitionAnimations/README.md).
 
 | Класс | Описание |
 |-------|----------|

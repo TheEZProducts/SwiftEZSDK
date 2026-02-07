@@ -249,12 +249,17 @@ viewController.ezTransit.custom()
 | `transitionType(_:)` | Устанавливает тип кастомного перехода (`.ezNext`, `.ezBack` и т.д.) |
 | `customData(_:)` | Устанавливает произвольные данные для передачи |
 | `transitionDelegateSearchType(_:)` | Устанавливает стратегию поиска transition controller'а (`.parent`, `.hierarchy`, `.selfDelegate`) |
-| `animation(_:)` | Устанавливает кастомную анимацию и автоматически включает анимацию |
+| `animation(_ value: UIViewControllerAnimatedTransitioning)` | Устанавливает кастомную анимацию и автоматически включает анимацию |
+| `animation(_ value: UIModalTransitionStyle)` | Устанавливает системную анимацию (`.coverVertical`, `.crossDissolve` и т.д.) и автоматически включает анимацию |
 | `animate()` | Включает анимацию для перехода |
 | `presentationStyle(_:)` | Устанавливает стиль модальной презентации |
 | `completion(_:)` | Устанавливает обработчик завершения перехода |
+| `safeTransition(_ value: Bool)` | `true` — блокировать переход во время другого перехода (по умолчанию). `false` — разрешить |
+| `unsafeTransition()` | Разрешить запуск перехода во время другого перехода |
 
-**Важно:** Метод `.animation()` автоматически включает анимацию, поэтому после него не нужно вызывать `.animate()`.
+**Важно:** Методы `.animation()` автоматически включают анимацию, поэтому после них не нужно вызывать `.animate()`.
+
+**Запуск** — см. [transit() и asyncTransit()](../README.md#запуск-перехода-transit-и-asynctransit).
 
 ---
 
@@ -314,8 +319,9 @@ class ModalViewController: UIViewController {
 
 ---
 
-## Заключение
+## Связанные темы
 
-`EZCustomTransition` предоставляет гибкий механизм для делегирования управления переходами родительским контроллерам. Это особенно полезно для модальных окон, навигационных стеков и онбординга, где дочерние экраны должны сообщать родителям о необходимости выполнения переходов.
-
-Используйте кастомные переходы для создания более гибкой и расширяемой архитектуры навигации в вашем приложении.
+- [Общие концепции переходов](../README.md) — fluent API, transit(), asyncTransit(), анимации.
+- [EZBaseTransition](../EZBaseTransition/README.md) — базовые модальные переходы (present/dismiss).
+- [EZNavigationTransition](../EZNavigationTransition/README.md) — переходы в UINavigationController.
+- [EZTabBarTransition](../EZTabBarTransition/README.md) — переходы для UITabBarController.
