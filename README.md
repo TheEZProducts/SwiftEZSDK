@@ -295,4 +295,5 @@ final class ReadOnlyExample: Sendable {
 
 ## Documentation
 
-1. [ru documentation](Documentation-RU/README.md)
+- [English](docs/en/README.md)
+- [Русский](docs/ru/README.md)

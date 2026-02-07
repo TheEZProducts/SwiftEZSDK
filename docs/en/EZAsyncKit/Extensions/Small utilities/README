@@ -1,0 +1,111 @@
+# Small utilities: Array / Optional / Equatable
+
+Small utilities for more convenient work with collections and checks:
+- safe extraction of the first element of an array;
+- `unwrap` for `Optional` with an informative error;
+- equality check for `Equatable` with a convenient error.
+
+> Availability: macOS 10.15+, iOS 13+, watchOS 6+, tvOS 13+
+
+---
+
+## Array
+
+### `ezSafeRemoveFirst()`
+
+```swift
+extension Array {
+    public mutating func ezSafeRemoveFirst() -> Element?
+}
+```
+
+Removes and returns the first element of the array, or `nil` if the array is empty.
+
+**Example:**
+```swift
+var items = [1, 2, 3]
+print(items.ezSafeRemoveFirst()) // Optional(1)
+print(items) // [2, 3]
+
+var empty: [Int] = []
+print(empty.ezSafeRemoveFirst()) // nil
+```
+
+---
+
+## Optional
+
+### `EZOptionalError`
+
+```swift
+public struct EZOptionalError: LocalizedError, Sendable, Equatable
+```
+
+An error for the case when an `Optional` turns out to be `nil`.
+By default, it includes information about the file/function/line.
+
+### `ezUnwrap(...)`
+
+```swift
+extension Optional {
+    public func ezUnwrap(
+        file: StaticString = #file,
+        functionName: StaticString = #function,
+        line: UInt = #line,
+        _ customError: Error? = nil
+    ) throws -> Wrapped
+}
+```
+
+Returns the value if it is not `nil`, otherwise throws:
+- `customError`, if provided;
+- or `EZOptionalError.isNil(...)`.
+
+**Example:**
+```swift
+let value: Int? = 10
+let v = try value.ezUnwrap()
+print(v) // 10
+
+let missing: String? = nil
+do {
+    _ = try missing.ezUnwrap()
+} catch {
+    print(error) // EZOptionalError: Value is nil, file:..., function:..., line:...
+}
+```
+
+---
+
+## Equatable
+
+### `EZEquatableError`
+
+```swift
+public struct EZEquatableError: LocalizedError, Sendable, Equatable
+```
+
+An error for the case when values are not equal (`a != b`).
+
+### `ezEquals(with:_:)`
+
+```swift
+extension Equatable {
+    public func ezEquals(with value: Self, _ customError: Error? = nil) throws
+}
+```
+
+Checks `self == value`. If not equal, throws:
+- `customError`, if provided;
+- or `EZEquatableError.isNotEqual(v:v1:)`.
+
+**Example:**
+```swift
+try 5.ezEquals(with: 5) // ok
+
+do {
+    try "a".ezEquals(with: "b")
+} catch {
+    print(error) // EZEquatableError: a != b
+}
+```
