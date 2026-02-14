@@ -40,23 +40,22 @@ extension EZUIPackBaseInteractorProtocol {
 ///
 /// An interactor handles business logic and user actions. It:
 /// - Manages the connection to the mediator via `access`
-/// - Provides context for mediator initialization via `makeContext()`
+/// - Provides input for mediator initialization via `makeInput()`
+/// - Optionally provides additional context via `makeContext()`
 /// - Responds to lifecycle events: `start()`, `didCreate()`, `willOpen()`, `didOpen()`, etc.
 ///
 /// ### Example: Basic interactor implementation
 /// ```swift
 /// class ProfilePackI: EZUIPackI {
 ///     let access = ProfilePackM.accessI
-///     
-///     func makeContext() -> Mediator.ContextI {
-///         .init(actions: self, viewModel: .init())
-///     }
-///     
+///
+///     func makeInput() -> Mediator.InputI { self }
+///
 ///     func start() {
 ///         // Load initial data
 ///         loadProfile()
 ///     }
-///     
+///
 ///     func didOpen() {
 ///         // Refresh data when pack becomes visible
 ///         refreshProfile()
@@ -76,29 +75,37 @@ extension EZUIPackBaseInteractorProtocol {
 public protocol EZUIPackInteractorProtocol: EZUIPackBaseInteractorProtocol, EZSharingProtocol {
     /// The type of mediator that manages communication and state for this interactor.
     associatedtype Mediator: EZUIPackMediatorProtocol
-    
+
+    /// Additional context type passed to the mediator during initialization.
+    ///
+    /// Defaults to `Void`. Override to provide custom initialization parameters
+    /// beyond the standard `InputI`.
+    associatedtype Context = Void
+
     /// Access object providing controlled access to the mediator.
     ///
     /// Use this to read/write the view model and access the view's action interface.
     var access: Mediator.AccessI { get }
-    
-    /// Creates the context needed to initialize the mediator.
+
+    /// Creates the input needed to initialize the mediator.
     ///
-    /// This context contains the interactor's action interface (typically `self`) and
-    /// the initial view model state.
+    /// The input is the interactor's action interface (typically `self`).
     ///
-    /// - Returns: A context containing actions and initial view model.
+    /// - Returns: The interactor's action interface.
     ///
     /// ### Example
     /// ```swift
-    /// func makeContext() -> Mediator.ContextI {
-    ///     .init(
-    ///         actions: self,  // The interactor implements InputIProtocol
-    ///         viewModel: .init(profile: nil, isLoading: false)
-    ///     )
-    /// }
+    /// func makeInput() -> Mediator.InputI { self }
     /// ```
-    func makeContext() -> Mediator.ContextI
+    func makeInput() -> Mediator.InputI
+
+    /// Creates additional context for the mediator initialization.
+    ///
+    /// Override this to provide extra data beyond the standard `InputI`.
+    /// Defaults to `Void` when `Context == Void`.
+    ///
+    /// - Returns: Additional context for mediator initialization.
+    func makeContext() -> Context
     
     /// Called after the mediator is created and connected, but before `start()`.
     ///
@@ -140,6 +147,27 @@ public protocol EZUIPackInteractorProtocol: EZUIPackBaseInteractorProtocol, EZSh
     ///
     /// Use this to clean up resources or stop timers.
     func didClose()
+}
+
+extension EZUIPackInteractorProtocol where Context == Void {
+    /// Default implementation when `Context` is `Void`.
+    ///
+    /// Returns `()` when no additional context is needed.
+    public func makeContext() -> Context { () }
+}
+
+extension EZUIPackInteractorProtocol where Mediator.InputI == Void {
+    /// Default implementation when `InputI` is `Void`.
+    ///
+    /// Returns `()` when no interactor actions are needed.
+    public func makeInput() -> Mediator.InputI { () }
+}
+
+extension EZUIPackInteractorProtocol where Mediator.InputI == Self {
+    /// Default implementation when the interactor itself is the input interface.
+    ///
+    /// Returns `self` when the interactor conforms to `InputIProtocol` directly.
+    public func makeInput() -> Mediator.InputI { self }
 }
 
 extension EZUIPackInteractorProtocol {

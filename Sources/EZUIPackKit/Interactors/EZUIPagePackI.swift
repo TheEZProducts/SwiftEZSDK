@@ -8,24 +8,11 @@
 #if canImport(UIKit) && !os(watchOS)
 import UIKit
 
-/// Protocol for page view controller packs in the IMV architecture.
-///
-/// Combines `UIPageViewController` with `EZUIPackProtocol` to create page-based navigation packs.
-/// Use this when creating packs that use `UIPageViewController` for swipable page navigation.
-///
-/// ### Example
-/// ```swift
-/// class TutorialPack: EZUIPagePackProtocol {
-///     // Implement pack requirements
-/// }
-/// ```
-public protocol EZUIPagePackProtocol: UIPageViewController, EZUIPackProtocol {}
-
 /// The primary type for creating page view controller interactors in the IMV architecture.
 ///
-/// `EZUIPagePackI` is a type alias that combines `EZUIPagePackInteractor` and `EZUIPagePackProtocol`,
-/// providing everything you need to create a page-based pack. This is the **recommended base type**
-/// for all page view controller implementations.
+/// `EZUIPagePackI` is a type alias that combines `EZUIPagePackInteractor` and
+/// `EZUIPackInteractorProtocol`, providing everything you need to create a page-based
+/// interactor. This is the **recommended base type** for all page view controller implementations.
 ///
 /// A page interactor created with this type:
 /// - Integrates `UIPageViewController` with the IMV pattern
@@ -38,11 +25,9 @@ public protocol EZUIPagePackProtocol: UIPageViewController, EZUIPackProtocol {}
 /// ```swift
 /// class TutorialPagePackI: EZUIPagePackI {
 ///     let access = TutorialPagePackM.accessI
-///     
-///     func makeContext() -> Mediator.ContextI {
-///         .init(actions: self, viewModel: .init())
-///     }
-///     
+///
+///     func makeInput() -> Mediator.InputI { self }
+///
 ///     func start() {
 ///         // Set up initial page
 ///         let firstPage = TutorialPage1Pack.make()
@@ -51,9 +36,9 @@ public protocol EZUIPagePackProtocol: UIPageViewController, EZUIPackProtocol {}
 /// }
 /// ```
 ///
-/// - Note: Always use `EZUIPagePackI` as your base type for page-based packs.
+/// - Note: Always use `EZUIPagePackI` as your base type for page-based interactors.
 ///   It provides proper integration with UIKit's page view controller and the IMV architecture.
-public typealias EZUIPagePackI = EZUIPagePackInteractor & EZUIPagePackProtocol
+public typealias EZUIPagePackI = EZUIPagePackInteractor & EZUIPackInteractorProtocol
 
 /// Base class for page view controller interactors in the IMV architecture.
 ///
@@ -63,8 +48,10 @@ public typealias EZUIPagePackI = EZUIPagePackInteractor & EZUIPagePackProtocol
 ///
 /// ### Example
 /// ```swift
-/// class TutorialPackI: EZUIPagePackInteractor, EZUIPagePackProtocol {
-///     // Implement pack requirements
+/// class TutorialPackI: EZUIPagePackInteractor, EZUIPackInteractorProtocol {
+///     let access = TutorialPagePackM.accessI
+///
+///     func makeInput() -> Mediator.InputI { self }
 /// }
 /// ```
 open class EZUIPagePackInteractor: UIPageViewController, EZUIPackBaseInteractorProtocol {

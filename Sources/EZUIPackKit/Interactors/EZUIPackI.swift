@@ -27,21 +27,19 @@ import UIKit
 /// ```swift
 /// class ProfilePackI: EZUIPackI {
 ///     let access = ProfilePackM.accessI
-///     
-///     func makeContext() -> Mediator.ContextI {
-///         .init(actions: self, viewModel: .init())
-///     }
-///     
+///
+///     func makeInput() -> Mediator.InputI { self }
+///
 ///     func start() {
 ///         // Load initial data
 ///         loadProfile()
 ///     }
-///     
+///
 ///     func didOpen() {
 ///         // Refresh when pack becomes visible
 ///         refreshProfile()
 ///     }
-///     
+///
 ///     private func loadProfile() {
 ///         viewModel.isLoading = true
 ///         // ... load data
@@ -54,7 +52,7 @@ import UIKit
 ///     func editProfile() {
 ///         // Navigate to edit screen
 ///     }
-///     
+///
 ///     func deleteProfile() {
 ///         // Handle deletion
 ///     }
@@ -87,10 +85,8 @@ public typealias EZUIPackI = EZUIPackInteractor & EZUIPackInteractorProtocol
 /// ```swift
 /// class ProfilePackI: EZUIPackInteractor, EZUIPackInteractorProtocol {
 ///     let access = ProfilePackM.accessI
-///     
-///     func makeContext() -> Mediator.ContextI {
-///         .init(actions: self, viewModel: .init())
-///     }
+///
+///     func makeInput() -> Mediator.InputI { self }
 /// }
 /// ```
 open class EZUIPackInteractor: UIViewController, EZUIPackBaseInteractorProtocol {

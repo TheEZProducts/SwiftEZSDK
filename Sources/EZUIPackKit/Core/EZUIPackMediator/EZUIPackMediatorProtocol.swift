@@ -8,8 +8,6 @@
 #if canImport(UIKit) && !os(watchOS)
 import Foundation
 
-import EZHelpersKit
-
 /// Base protocol for mediators in the IMV architecture.
 ///
 /// Provides access to the pack bridge. Typically you should use `EZUIPackMediatorProtocol`
@@ -38,23 +36,23 @@ public protocol EZUIPackBaseMediatorProtocol: AnyObject {
 ///         var profile: Profile?
 ///         var isLoading = false
 ///     }
-///     
+///
 ///     weak let inputI: InputIProtocol?
 ///     @MainActor protocol InputIProtocol: AnyObject {
 ///         func loadProfile()
 ///         func editProfile()
 ///     }
-///     
+///
 ///     weak let inputV: InputVProtocol?
 ///     @MainActor protocol InputVProtocol: AnyObject {
 ///         func showError(message: String)
 ///         func refreshUI()
 ///     }
-///     
-///     required init(contextI: BaseContextI, contextV: BaseContextV) {
-///         viewModel = contextI.viewModel
-///         inputI = contextI.actions
-///         inputV = contextV.actions
+///
+///     init(inputI: InputI, inputV: InputV) {
+///         self.inputI = inputI
+///         self.inputV = inputV
+///         self.viewModel = .init()
 ///     }
 /// }
 /// ```
@@ -63,100 +61,39 @@ public protocol EZUIPackBaseMediatorProtocol: AnyObject {
 @MainActor
 public protocol EZUIPackMediatorProtocol: EZUIPackBaseMediatorProtocol {
     //MARK: - Required Objects
-    /// The type of view model that holds shared state between interactor and view.
     associatedtype ViewModel
-    
-    /// The view model instance holding shared state.
-    ///
-    /// Both interactor and view can read and write to this property to share state.
     var viewModel: ViewModel { get set }
-    
-    /// The type of input interface from the interactor.
-    ///
-    /// Typically a protocol (like `InputIProtocol`) that the interactor implements.
+
     associatedtype InputI
-    
-    /// The interactor's action interface instance.
     var inputI: InputI { get }
-    
-    /// The type of input interface from the view.
-    ///
-    /// Typically a protocol (like `InputVProtocol`) that the view implements.
+
     associatedtype InputV
-    
-    /// The view's action interface instance.
     var inputV: InputV { get }
-    
+
     //MARK: - Access
-    /// Type alias for the access object used by interactors.
-    typealias AccessI = EZMediatorAccessI<Self, AccessMapI>
-    
-    /// Type alias for the access object used by views.
-    typealias AccessV = EZMediatorAccessV<Self, AccessMapV>
-    
-    /// The type of access map for interactors.
-    ///
-    /// Controls what parts of the mediator are accessible to the interactor.
-    /// Use `()` for default access (all properties via access object).
+    typealias AccessI = EZUIMediatorAccessI<Self, AccessMapI>
+    typealias AccessV = EZUIMediatorAccessV<Self, AccessMapV>
+
     associatedtype AccessMapI
-    
-    /// The access map instance for interactors.
-    ///
-    /// Defines what parts of the mediator the interactor can access.
-    /// Defaults to `()` which provides standard access.
     static var accessMapI: AccessMapI { get }
-    
-    /// The type of access map for views.
-    ///
-    /// Controls what parts of the mediator are accessible to the view.
-    /// Use `()` for default access (all properties via access object).
+
     associatedtype AccessMapV
-    
-    /// The access map instance for views.
-    ///
-    /// Defines what parts of the mediator the view can access.
-    /// Defaults to `()` which provides standard access.
     static var accessMapV: AccessMapV { get }
-    
-    /// Called after the mediator is created and all components are connected.
-    ///
-    /// Override this to perform initialization that requires all components to be set up.
+
     func didInitialize()
-    
-    //MARK: - Init
-    /// Type alias for the base context type from interactor.
-    typealias BaseContextI = EZUIPackMediatorContextI<Self>
-    
-    /// The type of context passed from the interactor during initialization.
-    ///
-    /// Defaults to `BaseContextI`. Override if you need a custom context type.
-    associatedtype ContextI = BaseContextI
-    
-    /// Type alias for the base context type from view.
-    typealias BaseContextV = EZUIPackMediatorContextV<Self>
-    
-    /// The type of context passed from the view during initialization.
-    ///
-    /// Defaults to `BaseContextV`. Override if you need a custom context type.
-    associatedtype ContextV = BaseContextV
-    
-    /// Creates a mediator with contexts from both interactor and view.
-    ///
-    /// - Parameters:
-    ///   - contextI: Context from the interactor containing actions and initial view model.
-    ///   - contextV: Context from the view containing actions.
-    ///
-    /// ### Example
-    /// ```swift
-    /// required init(contextI: BaseContextI, contextV: BaseContextV) {
-    ///     viewModel = contextI.viewModel
-    ///     inputI = contextI.actions
-    ///     inputV = contextV.actions
-    /// }
-    /// ```
-    init(contextI: ContextI, contextV: ContextV)
 }
 
+extension EZUIPackMediatorProtocol {
+    public func didInitialize() {}
+}
+
+extension EZUIPackMediatorProtocol where InputI == Void {
+    public var inputI: InputI { () }
+}
+
+extension EZUIPackMediatorProtocol where InputV == Void {
+    public var inputV: InputV { () }
+}
 
 extension EZUIPackMediatorProtocol {
     /// Access to the parent pack's shared storage, if available.
@@ -175,11 +112,6 @@ extension EZUIPackMediatorProtocol {
     public var parentShered: EZSharedStorage {
         packBridge.pack?.interactor?.ezParentShered ?? .init()
     }
-    
-    /// Called after the mediator is created and all components are connected.
-    ///
-    /// Override this to perform initialization that requires all components to be set up.
-    public func didInitialize() {}
 }
 
 extension EZUIPackMediatorProtocol where ViewModel == Void {
@@ -190,20 +122,6 @@ extension EZUIPackMediatorProtocol where ViewModel == Void {
         set {}
         get { () }
     }
-}
-
-extension EZUIPackMediatorProtocol where InputI == Void {
-    /// Default implementation when `InputI` is `Void`.
-    ///
-    /// Returns `()` when no interactor actions are needed.
-    public var inputI: InputI { () }
-}
-
-extension EZUIPackMediatorProtocol where InputV == Void {
-    /// Default implementation when `InputV` is `Void`.
-    ///
-    /// Returns `()` when no view actions are needed.
-    public var inputV: InputV { () }
 }
 
 
@@ -224,7 +142,7 @@ open class EZUIPackMediator: EZUIPackBaseMediatorProtocol {
     ///
     /// Used internally to maintain the relationship between mediator, pack, and components.
     public var packBridge = EZUIPackBridge()
-    
+
     /// Creates a new mediator instance.
     public init(){}
 }
@@ -265,7 +183,7 @@ open class EZUIPackMediator: EZUIPackBaseMediatorProtocol {
 ///         var isLoading = false
 ///         var errorMessage: String?
 ///     }
-///     
+///
 ///     // 2. Define the interactor's action interface as a protocol
 ///     weak let inputI: InputIProtocol?
 ///     @MainActor protocol InputIProtocol: AnyObject {
@@ -273,7 +191,7 @@ open class EZUIPackMediator: EZUIPackBaseMediatorProtocol {
 ///         func editProfile()
 ///         func deleteProfile()
 ///     }
-///     
+///
 ///     // 3. Define the view's action interface as a protocol
 ///     weak let inputV: InputVProtocol?
 ///     @MainActor protocol InputVProtocol: AnyObject {
@@ -281,12 +199,12 @@ open class EZUIPackMediator: EZUIPackBaseMediatorProtocol {
 ///         func refreshUI()
 ///         func navigateToEditScreen()
 ///     }
-///     
-///     // 4. Initialize with contexts from interactor and view
-///     required init(contextI: BaseContextI, contextV: BaseContextV) {
-///         viewModel = contextI.viewModel
-///         inputI = contextI.actions
-///         inputV = contextV.actions
+///
+///     // 4. Initialize with inputs from interactor and view
+///     init(inputI: InputI, inputV: InputV) {
+///         self.inputI = inputI
+///         self.inputV = inputV
+///         self.viewModel = .init()
 ///     }
 /// }
 /// ```
@@ -297,23 +215,23 @@ open class EZUIPackMediator: EZUIPackBaseMediatorProtocol {
 /// class ProfilePackM: EZUIPackM {
 ///     var viewModel: ViewModel
 ///     @MainActor struct ViewModel { }
-///     
+///
 ///     // Protocol for UIKit interactor (class)
 ///     weak let inputI: InputIProtocol?
 ///     @MainActor protocol InputIProtocol: AnyObject {
 ///         func loadProfile()
 ///     }
-///     
+///
 ///     // Struct for SwiftUI view (struct)
 ///     let inputV: InputV
 ///     @MainActor struct InputV {
 ///         var showError: (String) -> Void
 ///     }
-///     
-///     required init(contextI: BaseContextI, contextV: BaseContextV) {
-///         viewModel = contextI.viewModel
-///         inputI = contextI.actions
-///         inputV = contextV.actions
+///
+///     init(inputI: InputI, inputV: InputV) {
+///         self.inputI = inputI
+///         self.inputV = inputV
+///         self.viewModel = .init()
 ///     }
 /// }
 /// ```
@@ -326,10 +244,8 @@ open class EZUIPackMediator: EZUIPackBaseMediatorProtocol {
 /// // In Interactor:
 /// class ProfilePackI: EZUIPackI {
 ///     let access = ProfilePackM.accessI
-///     
-///     func makeContext() -> Mediator.ContextI {
-///         .init(actions: self, viewModel: .init())
-///     }
+///
+///     func makeInput() -> Mediator.InputI { self }
 /// }
 ///
 /// extension ProfilePackI: ProfilePackM.InputIProtocol {
@@ -340,10 +256,8 @@ open class EZUIPackMediator: EZUIPackBaseMediatorProtocol {
 /// // In UIKit View:
 /// class ProfileIOSV: EZUIPackV {
 ///     let access = ProfilePackM.accessV
-///     
-///     func makeContext() -> Mediator.ContextV {
-///         .init(actions: self)
-///     }
+///
+///     func makeInput() -> Mediator.InputV { self }
 /// }
 ///
 /// extension ProfileIOSV: ProfilePackM.InputVProtocol {
@@ -358,18 +272,18 @@ open class EZUIPackMediator: EZUIPackBaseMediatorProtocol {
 /// // In SwiftUI View:
 /// struct ProfileIOSV: View, EZUIPackSViewProtocol {
 ///     let access = ProfilePackM.accessV
-///     
-///     func makeContext() -> Mediator.ContextV {
-///         .init(actions: .init(
+///
+///     func makeInput() -> Mediator.InputV {
+///         .init(
 ///             showError: { message in
 ///                 // Show error
 ///             },
 ///             refreshUI: {
 ///                 // Refresh UI
 ///             }
-///         ))
+///         )
 ///     }
-///     
+///
 ///     var body: some View {
 ///         // SwiftUI content
 ///     }
@@ -382,17 +296,17 @@ open class EZUIPackMediator: EZUIPackBaseMediatorProtocol {
 /// class SimplePackM: EZUIPackM {
 ///     var viewModel: ViewModel
 ///     @MainActor struct ViewModel { }
-///     
+///
 ///     weak let inputI: InputIProtocol?
 ///     @MainActor protocol InputIProtocol: AnyObject { }
-///     
+///
 ///     weak let inputV: InputVProtocol?
 ///     @MainActor protocol InputVProtocol: AnyObject { }
-///     
-///     required init(contextI: BaseContextI, contextV: BaseContextV) {
-///         viewModel = contextI.viewModel
-///         inputI = contextI.actions
-///         inputV = contextV.actions
+///
+///     init(inputI: InputI, inputV: InputV) {
+///         self.inputI = inputI
+///         self.inputV = inputV
+///         self.viewModel = .init()
 ///     }
 /// }
 /// ```

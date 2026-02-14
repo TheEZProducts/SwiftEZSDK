@@ -24,20 +24,18 @@ import SwiftUI
 /// ```swift
 /// class ProfileIOSV: EZUIPackV {
 ///     let access = ProfilePackM.accessV
-///     
-///     func makeContext() -> Mediator.ContextV {
-///         .init(actions: self)
-///     }
-///     
+///
+///     func makeInput() -> Mediator.InputV { self }
+///
 ///     func create() {
 ///         backgroundColor = .systemBackground
 ///         setupSubviews()
 ///     }
-///     
+///
 ///     func willOpen() {
 ///         // Prepare for appearance
 ///     }
-///     
+///
 ///     func animateOpen() {
 ///         // Animate appearance
 ///         UIView.animate(withDuration: 0.3) {

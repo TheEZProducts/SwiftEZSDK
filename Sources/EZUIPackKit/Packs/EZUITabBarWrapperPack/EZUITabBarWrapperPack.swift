@@ -84,8 +84,12 @@ extension EZUITabBarWrapperPack {
     ///
     /// - Parameter controllers: The view controllers to display as tabs.
     /// - Returns: A fully initialized tab bar controller interactor.
-    public static func make(_ controllers: [UIViewController]) -> Interactor {
-        return make(interactor: .init(controllers))
+    public static func make(_ controllers: [UIViewController]) -> EZUITabBarWrapperPackI {
+        EZPackMaker.make(
+            interactor: { EZUITabBarWrapperPackI(controllers) },
+            mediator: { inputI, inputV in EZDummyUIPackM(inputI: inputI, inputV: inputV) },
+            view: { EZDummyUIPackV<EZDummyUIPackM>() }
+        )
     }
 }
 
@@ -94,10 +98,6 @@ extension EZUITabBarWrapperPack {
 /// Automatically sets up the tab bar with the provided view controllers.
 public class EZUITabBarWrapperPackI: EZUITabBarPackI {
     public let access = EZDummyUIPackM.accessI
-    
-    public func makeContext() -> Mediator.ContextI {
-        .init(actions: (), viewModel: ())
-    }
     
     /// Creates a tab bar wrapper with the given view controllers.
     ///

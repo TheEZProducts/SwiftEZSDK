@@ -1,18 +1,60 @@
 //
-//  EZMediatorAccess.swift
-//  EZSDK
+//  EZSUIPackMediatorAccess.swift
+//  EZSUIPackKit
 //
-//  Created by Александр Сенин on 07.01.2026.
+//  Created by Александр Сенин on 07.02.2026.
 //
 
-#if canImport(UIKit) && !os(watchOS)
-
+#if canImport(SwiftUI)
 import Foundation
 
+// MARK: - Base Mediator Protocol
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
+@MainActor
+public protocol EZPackMediatorBaseProtocol: AnyObject {
+    //MARK: - Required Objects
+    associatedtype ViewModel
+    var viewModel: ViewModel { get set }
+
+    associatedtype InputI
+    var inputI: InputI { get }
+
+    associatedtype InputV
+    var inputV: InputV { get }
+
+    //MARK: - Access
+    typealias AccessI = EZPackMediatorAccessI<Self, AccessMapI>
+    typealias AccessV = EZPackMediatorAccessV<Self, AccessMapV>
+
+    associatedtype AccessMapI
+    static var accessMapI: AccessMapI { get }
+
+    associatedtype AccessMapV
+    static var accessMapV: AccessMapV { get }
+
+    func didInitialize()
+}
+
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
+extension EZPackMediatorBaseProtocol {
+    public func didInitialize() {}
+}
+
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
+extension EZPackMediatorBaseProtocol where InputI == Void {
+    public var inputI: InputI { () }
+}
+
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
+extension EZPackMediatorBaseProtocol where InputV == Void {
+    public var inputV: InputV { () }
+}
+
 // MARK: - MappedAccess
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 @MainActor
 @dynamicMemberLookup
-public class EZUIMappedAccess<Object: AnyObject, AccessMap> {
+public class EZPackMappedAccess<Object: AnyObject, AccessMap> {
     private let object: () -> (Object)
     private let map: AccessMap
 
@@ -36,8 +78,9 @@ public class EZUIMappedAccess<Object: AnyObject, AccessMap> {
 }
 
 // MARK: - Mediator Container (deferred mediator assignment)
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 @MainActor
-class EZUIMediatorContainer<Value> {
+class EZPackMediatorContainer<Value> {
     private var value: Value?
     private let errorMessage: String
 
@@ -54,11 +97,12 @@ class EZUIMediatorContainer<Value> {
 }
 
 // MARK: - AccessI
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 @MainActor
-public class EZUIMediatorAccessI<
-    Mediator: EZUIPackMediatorProtocol, AccessMap
->: EZUIMappedAccess<Mediator, AccessMap> {
-    private var container = EZUIMediatorContainer<Mediator>(
+public class EZPackMediatorAccessI<
+    Mediator: EZPackMediatorBaseProtocol, AccessMap
+>: EZPackMappedAccess<Mediator, AccessMap> {
+    private var container = EZPackMediatorContainer<Mediator>(
         errorMessage: "Use the access only after the `didInitialize()` was called."
     )
     public var mediator: Mediator { container.get() }
@@ -81,11 +125,12 @@ public class EZUIMediatorAccessI<
 }
 
 // MARK: - AccessV
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 @MainActor
-public class EZUIMediatorAccessV<
-    Mediator: EZUIPackMediatorProtocol, AccessMap
->: EZUIMappedAccess<Mediator, AccessMap> {
-    private var container = EZUIMediatorContainer<Mediator>(
+public class EZPackMediatorAccessV<
+    Mediator: EZPackMediatorBaseProtocol, AccessMap
+>: EZPackMappedAccess<Mediator, AccessMap> {
+    private var container = EZPackMediatorContainer<Mediator>(
         errorMessage: "Use the access only after the `didInitialize()` was called."
     )
     public var mediator: Mediator { container.get() }
@@ -103,11 +148,6 @@ public class EZUIMediatorAccessV<
         get { mediator.inputI }
     }
 
-    /// Access to the pack bridge.
-    public var packBridge: EZUIPackBridge {
-        get { mediator.packBridge }
-    }
-
     init(_ mediator: Mediator? = nil, accessMap: AccessMap) {
         super.init({[container] in container.get() }, accessMap: accessMap)
         mediator.map { container.set($0) }
@@ -115,21 +155,25 @@ public class EZUIMediatorAccessV<
 }
 
 // MARK: - Static factories
-extension EZUIPackMediatorProtocol {
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
+extension EZPackMediatorBaseProtocol {
     public static var accessI: AccessI { .init(accessMap: accessMapI) }
     public static var accessV: AccessV { .init(accessMap: accessMapV) }
 }
 
-extension EZUIPackMediatorProtocol where AccessMapI == () {
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
+extension EZPackMediatorBaseProtocol where AccessMapI == () {
     public static var accessMapI: AccessMapI { () }
 }
 
-extension EZUIPackMediatorProtocol where AccessMapV == () {
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
+extension EZPackMediatorBaseProtocol where AccessMapV == () {
     public static var accessMapV: AccessMapV { () }
 }
 
 // MARK: - Key helpers
-extension EZUIPackMediatorProtocol {
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
+extension EZPackMediatorBaseProtocol {
     public static func rKey<Value>(
         _ keyPath: KeyPath<Self, Value>
     ) -> KeyPath<Self, Value> { keyPath }
@@ -138,5 +182,4 @@ extension EZUIPackMediatorProtocol {
         _ keyPath: ReferenceWritableKeyPath<Self, Value>
     ) -> ReferenceWritableKeyPath<Self, Value> { keyPath }
 }
-
 #endif

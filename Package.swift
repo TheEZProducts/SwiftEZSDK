@@ -16,6 +16,7 @@ let package = Package(
         .library(name: EZBuilderKit.name, targets: [EZBuilderKit.name]),
         .library(name: EZSwiftUIBridgeKit.name, targets: [EZSwiftUIBridgeKit.name]),
         .library(name: EZUIPackKit.name, targets: [EZUIPackKit.name]),
+        .library(name: EZSUIPackKit.name, targets: [EZSUIPackKit.name]),
         //MARK: - Experimental
         .library(name: EZJsonStriderKit._name, targets: [EZJsonStriderKit.name]),
         .plugin(name: EZJsonKeysPlugin._name, targets: [EZJsonKeysPlugin.name])
@@ -31,7 +32,8 @@ let package = Package(
                 .target(name: EZObservableKit.name, condition: EZObservableKit.condition),
                 .target(name: EZBuilderKit.name, condition: EZBuilderKit.condition),
                 .target(name: EZSwiftUIBridgeKit.name, condition: EZSwiftUIBridgeKit.condition),
-                .target(name: EZUIPackKit.name, condition: EZUIPackKit.condition)
+                .target(name: EZUIPackKit.name, condition: EZUIPackKit.condition),
+                .target(name: EZSUIPackKit.name, condition: EZSUIPackKit.condition)
             ]
         ),
         //MARK: - EZAssociatedKit
@@ -123,6 +125,12 @@ let package = Package(
                 .target(name: EZHelpersKit.name, condition: EZHelpersKit.condition)
             ]
         ),
+
+        //MARK: - EZSUIPackKit
+        .target(
+            name: EZSUIPackKit.name,
+            dependencies: []
+        ),
         
         //MARK: - Macros
         .macro(
@@ -203,6 +211,11 @@ struct EZHelpersKit: EZTargetProtocol {}
 //MARK: EZUIPackKit
 struct EZUIPackKit: EZTargetProtocol {
     static var condition: TargetDependencyCondition? {.when(platforms: [.iOS, .macCatalyst, .visionOS, .tvOS])}
+}
+
+//MARK: EZSUIPackKit
+struct EZSUIPackKit: EZTargetProtocol {
+    static var condition: TargetDependencyCondition? {.when(platforms: [.iOS, .macCatalyst, .visionOS, .macOS, .tvOS, .watchOS])}
 }
 
 struct EZSwiftUIBridgeKit: EZTargetProtocol {

@@ -19,9 +19,7 @@ import UIKit
 /// class MainNavigationPackI: EZUINavigationPackI {
 ///     let access = MainNavigationPackM.accessI
 ///     
-///     func makeContext() -> Mediator.ContextI {
-///         .init(actions: self, viewModel: .init())
-///     }
+///     func makeInput() -> Mediator.InputI { self }
 /// }
 /// ```
 public protocol EZUINavigationInteractorProtocol: UINavigationController, EZUIPackInteractorProtocol {
@@ -59,9 +57,7 @@ public protocol EZUINavigationInteractorProtocol: UINavigationController, EZUIPa
 ///     var defaultChildrenPushTransitionAnimation: UIViewControllerAnimatedTransitioning?
 ///     var defaultChildrenPopTransitionAnimation: UIViewControllerAnimatedTransitioning?
 ///     
-///     func makeContext() -> Mediator.ContextI {
-///         .init(actions: self, viewModel: .init())
-///     }
+///     func makeInput() -> Mediator.InputI { self }
 ///     
 ///     func start() {
 ///         // Set up initial navigation stack
@@ -93,9 +89,7 @@ public typealias EZUINavigationPackI = EZUINavigationPackInteractor & EZUINaviga
 /// class MainNavigationPackI: EZUINavigationPackInteractor, EZUINavigationInteractorProtocol {
 ///     let access = MainNavigationPackM.accessI
 ///     
-///     func makeContext() -> Mediator.ContextI {
-///         .init(actions: self, viewModel: .init())
-///     }
+///     func makeInput() -> Mediator.InputI { self }
 /// }
 /// ```
 open class EZUINavigationPackInteractor: UINavigationController, EZUIPackBaseInteractorProtocol {

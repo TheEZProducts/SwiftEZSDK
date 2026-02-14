@@ -26,9 +26,62 @@
 		516035EC2A2C82C700349188 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 516035EB2A2C82C700349188 /* Assets.xcassets */; };
 		516035EF2A2C82C700349188 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 516035ED2A2C82C700349188 /* LaunchScreen.storyboard */; };
 		51A18C202EFBE87B003CF083 /* All in Frameworks */ = {isa = PBXBuildFile; productRef = 51A18C1F2EFBE87B003CF083 /* All */; };
+		AA0000E2E0000002000AA001 /* EZSUIPackKit in Frameworks */ = {isa = PBXBuildFile; productRef = AA0000E2E0000001000AA001 /* EZSUIPackKit */; };
 		51A18C242EFD70F0003CF083 /* IMV.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51A18C232EFD70E8003CF083 /* IMV.swift */; };
 		51A18C262EFD9BC9003CF083 /* MyPack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51A18C252EFD9BC1003CF083 /* MyPack.swift */; };
 		51A18F612F0E9542003CF083 /* SwiftUIIMV.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51A18F602F0E953F003CF083 /* SwiftUIIMV.swift */; };
+		AA00000200000007000AA001 /* CounterPack.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000100000007000AA001 /* CounterPack.swift */; };
+		AA00000200000008000AA001 /* CounterPackI.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000100000008000AA001 /* CounterPackI.swift */; };
+		AA00000200000009000AA001 /* CounterPackM.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000100000009000AA001 /* CounterPackM.swift */; };
+		AA0000020000000A000AA001 /* CounterPackV.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000010000000A000AA001 /* CounterPackV.swift */; };
+		AA0000020000000B000AA001 /* RootPackM.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000010000000B000AA001 /* RootPackM.swift */; };
+		AA0000020000000C000AA001 /* RootPackI.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000010000000C000AA001 /* RootPackI.swift */; };
+		AA0000020000000D000AA001 /* RootPackV.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000010000000D000AA001 /* RootPackV.swift */; };
+		AA0000020000000E000AA001 /* RootPack.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000010000000E000AA001 /* RootPack.swift */; };
+		AA0000020000000F000AA001 /* WelcomePackM.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000010000000F000AA001 /* WelcomePackM.swift */; };
+		AA00000200000010000AA001 /* WelcomePackI.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000100000010000AA001 /* WelcomePackI.swift */; };
+		AA00000200000011000AA001 /* WelcomePackV.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000100000011000AA001 /* WelcomePackV.swift */; };
+		AA00000200000012000AA001 /* WelcomePack.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000100000012000AA001 /* WelcomePack.swift */; };
+		AA00000200000013000AA001 /* OnboardingPackM.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000100000013000AA001 /* OnboardingPackM.swift */; };
+		AA00000200000014000AA001 /* OnboardingPackI.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000100000014000AA001 /* OnboardingPackI.swift */; };
+		AA00000200000015000AA001 /* OnboardingPackV.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000100000015000AA001 /* OnboardingPackV.swift */; };
+		AA00000200000016000AA001 /* OnboardingPack.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000100000016000AA001 /* OnboardingPack.swift */; };
+		AA00000200000017000AA001 /* OnboardingStep1PackM.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000100000017000AA001 /* OnboardingStep1PackM.swift */; };
+		AA00000200000018000AA001 /* OnboardingStep1PackI.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000100000018000AA001 /* OnboardingStep1PackI.swift */; };
+		AA00000200000019000AA001 /* OnboardingStep1PackV.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000100000019000AA001 /* OnboardingStep1PackV.swift */; };
+		AA0000020000001A000AA001 /* OnboardingStep1Pack.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000010000001A000AA001 /* OnboardingStep1Pack.swift */; };
+		AA0000020000001B000AA001 /* OnboardingStep2PackM.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000010000001B000AA001 /* OnboardingStep2PackM.swift */; };
+		AA0000020000001C000AA001 /* OnboardingStep2PackI.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000010000001C000AA001 /* OnboardingStep2PackI.swift */; };
+		AA0000020000001D000AA001 /* OnboardingStep2PackV.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000010000001D000AA001 /* OnboardingStep2PackV.swift */; };
+		AA0000020000001E000AA001 /* OnboardingStep2Pack.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000010000001E000AA001 /* OnboardingStep2Pack.swift */; };
+		AA0000020000001F000AA001 /* PaywallPackM.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000010000001F000AA001 /* PaywallPackM.swift */; };
+		AA00000200000020000AA001 /* PaywallPackI.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000100000020000AA001 /* PaywallPackI.swift */; };
+		AA00000200000021000AA001 /* PaywallPackV.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000100000021000AA001 /* PaywallPackV.swift */; };
+		AA00000200000022000AA001 /* PaywallPack.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000100000022000AA001 /* PaywallPack.swift */; };
+		AA00000200000023000AA001 /* AppContentPackM.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000100000023000AA001 /* AppContentPackM.swift */; };
+		AA00000200000024000AA001 /* AppContentPackI.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000100000024000AA001 /* AppContentPackI.swift */; };
+		AA00000200000025000AA001 /* AppContentPackV.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000100000025000AA001 /* AppContentPackV.swift */; };
+		AA00000200000026000AA001 /* AppContentPack.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000100000026000AA001 /* AppContentPack.swift */; };
+		AA00000200000027000AA001 /* HomePackM.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000100000027000AA001 /* HomePackM.swift */; };
+		AA00000200000028000AA001 /* HomePackI.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000100000028000AA001 /* HomePackI.swift */; };
+		AA00000200000029000AA001 /* HomePackV.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000100000029000AA001 /* HomePackV.swift */; };
+		AA0000020000002A000AA001 /* HomePack.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000010000002A000AA001 /* HomePack.swift */; };
+		AA0000020000002B000AA001 /* RecordingPackM.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000010000002B000AA001 /* RecordingPackM.swift */; };
+		AA0000020000002C000AA001 /* RecordingPackI.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000010000002C000AA001 /* RecordingPackI.swift */; };
+		AA0000020000002D000AA001 /* RecordingPackV.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000010000002D000AA001 /* RecordingPackV.swift */; };
+		AA0000020000002E000AA001 /* RecordingPack.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000010000002E000AA001 /* RecordingPack.swift */; };
+		AA0000020000002F000AA001 /* NotePackM.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000010000002F000AA001 /* NotePackM.swift */; };
+		AA00000200000030000AA001 /* NotePackI.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000100000030000AA001 /* NotePackI.swift */; };
+		AA00000200000031000AA001 /* NotePackV.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000100000031000AA001 /* NotePackV.swift */; };
+		AA00000200000032000AA001 /* NotePack.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000100000032000AA001 /* NotePack.swift */; };
+		AA00000200000033000AA001 /* SettingsPackM.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000100000033000AA001 /* SettingsPackM.swift */; };
+		AA00000200000034000AA001 /* SettingsPackI.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000100000034000AA001 /* SettingsPackI.swift */; };
+		AA00000200000035000AA001 /* SettingsPackV.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000100000035000AA001 /* SettingsPackV.swift */; };
+		AA00000200000036000AA001 /* SettingsPack.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000100000036000AA001 /* SettingsPack.swift */; };
+		AA00000200000037000AA001 /* ProfilePackM.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000100000037000AA001 /* ProfilePackM.swift */; };
+		AA00000200000038000AA001 /* ProfilePackI.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000100000038000AA001 /* ProfilePackI.swift */; };
+		AA00000200000039000AA001 /* ProfilePackV.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000100000039000AA001 /* ProfilePackV.swift */; };
+		AA0000020000003A000AA001 /* ProfilePack.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000010000003A000AA001 /* ProfilePack.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -56,6 +109,58 @@
 		51A18C232EFD70E8003CF083 /* IMV.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IMV.swift; sourceTree = "<group>"; };
 		51A18C252EFD9BC1003CF083 /* MyPack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyPack.swift; sourceTree = "<group>"; };
 		51A18F602F0E953F003CF083 /* SwiftUIIMV.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftUIIMV.swift; sourceTree = "<group>"; };
+		AA00000100000007000AA001 /* CounterPack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CounterPack.swift; sourceTree = "<group>"; };
+		AA00000100000008000AA001 /* CounterPackI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CounterPackI.swift; sourceTree = "<group>"; };
+		AA00000100000009000AA001 /* CounterPackM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CounterPackM.swift; sourceTree = "<group>"; };
+		AA0000010000000A000AA001 /* CounterPackV.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CounterPackV.swift; sourceTree = "<group>"; };
+		AA0000010000000B000AA001 /* RootPackM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootPackM.swift; sourceTree = "<group>"; };
+		AA0000010000000C000AA001 /* RootPackI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootPackI.swift; sourceTree = "<group>"; };
+		AA0000010000000D000AA001 /* RootPackV.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootPackV.swift; sourceTree = "<group>"; };
+		AA0000010000000E000AA001 /* RootPack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootPack.swift; sourceTree = "<group>"; };
+		AA0000010000000F000AA001 /* WelcomePackM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomePackM.swift; sourceTree = "<group>"; };
+		AA00000100000010000AA001 /* WelcomePackI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomePackI.swift; sourceTree = "<group>"; };
+		AA00000100000011000AA001 /* WelcomePackV.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomePackV.swift; sourceTree = "<group>"; };
+		AA00000100000012000AA001 /* WelcomePack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomePack.swift; sourceTree = "<group>"; };
+		AA00000100000013000AA001 /* OnboardingPackM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingPackM.swift; sourceTree = "<group>"; };
+		AA00000100000014000AA001 /* OnboardingPackI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingPackI.swift; sourceTree = "<group>"; };
+		AA00000100000015000AA001 /* OnboardingPackV.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingPackV.swift; sourceTree = "<group>"; };
+		AA00000100000016000AA001 /* OnboardingPack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingPack.swift; sourceTree = "<group>"; };
+		AA00000100000017000AA001 /* OnboardingStep1PackM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingStep1PackM.swift; sourceTree = "<group>"; };
+		AA00000100000018000AA001 /* OnboardingStep1PackI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingStep1PackI.swift; sourceTree = "<group>"; };
+		AA00000100000019000AA001 /* OnboardingStep1PackV.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingStep1PackV.swift; sourceTree = "<group>"; };
+		AA0000010000001A000AA001 /* OnboardingStep1Pack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingStep1Pack.swift; sourceTree = "<group>"; };
+		AA0000010000001B000AA001 /* OnboardingStep2PackM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingStep2PackM.swift; sourceTree = "<group>"; };
+		AA0000010000001C000AA001 /* OnboardingStep2PackI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingStep2PackI.swift; sourceTree = "<group>"; };
+		AA0000010000001D000AA001 /* OnboardingStep2PackV.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingStep2PackV.swift; sourceTree = "<group>"; };
+		AA0000010000001E000AA001 /* OnboardingStep2Pack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingStep2Pack.swift; sourceTree = "<group>"; };
+		AA0000010000001F000AA001 /* PaywallPackM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallPackM.swift; sourceTree = "<group>"; };
+		AA00000100000020000AA001 /* PaywallPackI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallPackI.swift; sourceTree = "<group>"; };
+		AA00000100000021000AA001 /* PaywallPackV.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallPackV.swift; sourceTree = "<group>"; };
+		AA00000100000022000AA001 /* PaywallPack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallPack.swift; sourceTree = "<group>"; };
+		AA00000100000023000AA001 /* AppContentPackM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppContentPackM.swift; sourceTree = "<group>"; };
+		AA00000100000024000AA001 /* AppContentPackI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppContentPackI.swift; sourceTree = "<group>"; };
+		AA00000100000025000AA001 /* AppContentPackV.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppContentPackV.swift; sourceTree = "<group>"; };
+		AA00000100000026000AA001 /* AppContentPack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppContentPack.swift; sourceTree = "<group>"; };
+		AA00000100000027000AA001 /* HomePackM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomePackM.swift; sourceTree = "<group>"; };
+		AA00000100000028000AA001 /* HomePackI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomePackI.swift; sourceTree = "<group>"; };
+		AA00000100000029000AA001 /* HomePackV.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomePackV.swift; sourceTree = "<group>"; };
+		AA0000010000002A000AA001 /* HomePack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomePack.swift; sourceTree = "<group>"; };
+		AA0000010000002B000AA001 /* RecordingPackM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordingPackM.swift; sourceTree = "<group>"; };
+		AA0000010000002C000AA001 /* RecordingPackI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordingPackI.swift; sourceTree = "<group>"; };
+		AA0000010000002D000AA001 /* RecordingPackV.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordingPackV.swift; sourceTree = "<group>"; };
+		AA0000010000002E000AA001 /* RecordingPack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordingPack.swift; sourceTree = "<group>"; };
+		AA0000010000002F000AA001 /* NotePackM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotePackM.swift; sourceTree = "<group>"; };
+		AA00000100000030000AA001 /* NotePackI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotePackI.swift; sourceTree = "<group>"; };
+		AA00000100000031000AA001 /* NotePackV.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotePackV.swift; sourceTree = "<group>"; };
+		AA00000100000032000AA001 /* NotePack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotePack.swift; sourceTree = "<group>"; };
+		AA00000100000033000AA001 /* SettingsPackM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsPackM.swift; sourceTree = "<group>"; };
+		AA00000100000034000AA001 /* SettingsPackI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsPackI.swift; sourceTree = "<group>"; };
+		AA00000100000035000AA001 /* SettingsPackV.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsPackV.swift; sourceTree = "<group>"; };
+		AA00000100000036000AA001 /* SettingsPack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsPack.swift; sourceTree = "<group>"; };
+		AA00000100000037000AA001 /* ProfilePackM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfilePackM.swift; sourceTree = "<group>"; };
+		AA00000100000038000AA001 /* ProfilePackI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfilePackI.swift; sourceTree = "<group>"; };
+		AA00000100000039000AA001 /* ProfilePackV.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfilePackV.swift; sourceTree = "<group>"; };
+		AA0000010000003A000AA001 /* ProfilePack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfilePack.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -65,6 +170,7 @@
 			files = (
 				51A18C202EFBE87B003CF083 /* All in Frameworks */,
 				515023D52A2C87E3008255CA /* All in Frameworks */,
+				AA0000E2E0000002000AA001 /* EZSUIPackKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -121,6 +227,7 @@
 			isa = PBXGroup;
 			children = (
 				515023D72A2C8845008255CA /* UIPacs */,
+				AA00000300000001000AA001 /* EZSUIPack */,
 			);
 			path = UI;
 			sourceTree = "<group>";
@@ -253,6 +360,177 @@
 			path = "SwiftUI IMV";
 			sourceTree = "<group>";
 		};
+		AA00000300000001000AA001 /* EZSUIPack */ = {
+			isa = PBXGroup;
+			children = (
+				AA00000300000003000AA001 /* Demo */,
+				AA00000300000004000AA001 /* Packs */,
+			);
+			path = EZSUIPack;
+			sourceTree = "<group>";
+		};
+		AA00000300000003000AA001 /* Demo */ = {
+			isa = PBXGroup;
+			children = (
+				AA00000100000007000AA001 /* CounterPack.swift */,
+				AA00000100000008000AA001 /* CounterPackI.swift */,
+				AA00000100000009000AA001 /* CounterPackM.swift */,
+				AA0000010000000A000AA001 /* CounterPackV.swift */,
+			);
+			path = Demo;
+			sourceTree = "<group>";
+		};
+		AA00000300000004000AA001 /* Packs */ = {
+			isa = PBXGroup;
+			children = (
+				AA00000300000005000AA001 /* Root */,
+				AA00000300000006000AA001 /* Welcome */,
+				AA00000300000007000AA001 /* Onboarding */,
+				AA0000030000000A000AA001 /* Paywall */,
+				AA0000030000000B000AA001 /* AppContent */,
+				AA0000030000000C000AA001 /* Home */,
+				AA0000030000000D000AA001 /* Recording */,
+				AA0000030000000E000AA001 /* Note */,
+				AA0000030000000F000AA001 /* Settings */,
+				AA00000300000010000AA001 /* Profile */,
+			);
+			path = Packs;
+			sourceTree = "<group>";
+		};
+		AA00000300000005000AA001 /* Root */ = {
+			isa = PBXGroup;
+			children = (
+				AA0000010000000B000AA001 /* RootPackM.swift */,
+				AA0000010000000C000AA001 /* RootPackI.swift */,
+				AA0000010000000D000AA001 /* RootPackV.swift */,
+				AA0000010000000E000AA001 /* RootPack.swift */,
+			);
+			path = Root;
+			sourceTree = "<group>";
+		};
+		AA00000300000006000AA001 /* Welcome */ = {
+			isa = PBXGroup;
+			children = (
+				AA0000010000000F000AA001 /* WelcomePackM.swift */,
+				AA00000100000010000AA001 /* WelcomePackI.swift */,
+				AA00000100000011000AA001 /* WelcomePackV.swift */,
+				AA00000100000012000AA001 /* WelcomePack.swift */,
+			);
+			path = Welcome;
+			sourceTree = "<group>";
+		};
+		AA00000300000007000AA001 /* Onboarding */ = {
+			isa = PBXGroup;
+			children = (
+				AA00000100000013000AA001 /* OnboardingPackM.swift */,
+				AA00000100000014000AA001 /* OnboardingPackI.swift */,
+				AA00000100000015000AA001 /* OnboardingPackV.swift */,
+				AA00000100000016000AA001 /* OnboardingPack.swift */,
+				AA00000300000008000AA001 /* Step1 */,
+				AA00000300000009000AA001 /* Step2 */,
+			);
+			path = Onboarding;
+			sourceTree = "<group>";
+		};
+		AA00000300000008000AA001 /* Step1 */ = {
+			isa = PBXGroup;
+			children = (
+				AA00000100000017000AA001 /* OnboardingStep1PackM.swift */,
+				AA00000100000018000AA001 /* OnboardingStep1PackI.swift */,
+				AA00000100000019000AA001 /* OnboardingStep1PackV.swift */,
+				AA0000010000001A000AA001 /* OnboardingStep1Pack.swift */,
+			);
+			path = Step1;
+			sourceTree = "<group>";
+		};
+		AA00000300000009000AA001 /* Step2 */ = {
+			isa = PBXGroup;
+			children = (
+				AA0000010000001B000AA001 /* OnboardingStep2PackM.swift */,
+				AA0000010000001C000AA001 /* OnboardingStep2PackI.swift */,
+				AA0000010000001D000AA001 /* OnboardingStep2PackV.swift */,
+				AA0000010000001E000AA001 /* OnboardingStep2Pack.swift */,
+			);
+			path = Step2;
+			sourceTree = "<group>";
+		};
+		AA0000030000000A000AA001 /* Paywall */ = {
+			isa = PBXGroup;
+			children = (
+				AA0000010000001F000AA001 /* PaywallPackM.swift */,
+				AA00000100000020000AA001 /* PaywallPackI.swift */,
+				AA00000100000021000AA001 /* PaywallPackV.swift */,
+				AA00000100000022000AA001 /* PaywallPack.swift */,
+			);
+			path = Paywall;
+			sourceTree = "<group>";
+		};
+		AA0000030000000B000AA001 /* AppContent */ = {
+			isa = PBXGroup;
+			children = (
+				AA00000100000023000AA001 /* AppContentPackM.swift */,
+				AA00000100000024000AA001 /* AppContentPackI.swift */,
+				AA00000100000025000AA001 /* AppContentPackV.swift */,
+				AA00000100000026000AA001 /* AppContentPack.swift */,
+			);
+			path = AppContent;
+			sourceTree = "<group>";
+		};
+		AA0000030000000C000AA001 /* Home */ = {
+			isa = PBXGroup;
+			children = (
+				AA00000100000027000AA001 /* HomePackM.swift */,
+				AA00000100000028000AA001 /* HomePackI.swift */,
+				AA00000100000029000AA001 /* HomePackV.swift */,
+				AA0000010000002A000AA001 /* HomePack.swift */,
+			);
+			path = Home;
+			sourceTree = "<group>";
+		};
+		AA0000030000000D000AA001 /* Recording */ = {
+			isa = PBXGroup;
+			children = (
+				AA0000010000002B000AA001 /* RecordingPackM.swift */,
+				AA0000010000002C000AA001 /* RecordingPackI.swift */,
+				AA0000010000002D000AA001 /* RecordingPackV.swift */,
+				AA0000010000002E000AA001 /* RecordingPack.swift */,
+			);
+			path = Recording;
+			sourceTree = "<group>";
+		};
+		AA0000030000000E000AA001 /* Note */ = {
+			isa = PBXGroup;
+			children = (
+				AA0000010000002F000AA001 /* NotePackM.swift */,
+				AA00000100000030000AA001 /* NotePackI.swift */,
+				AA00000100000031000AA001 /* NotePackV.swift */,
+				AA00000100000032000AA001 /* NotePack.swift */,
+			);
+			path = Note;
+			sourceTree = "<group>";
+		};
+		AA0000030000000F000AA001 /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				AA00000100000033000AA001 /* SettingsPackM.swift */,
+				AA00000100000034000AA001 /* SettingsPackI.swift */,
+				AA00000100000035000AA001 /* SettingsPackV.swift */,
+				AA00000100000036000AA001 /* SettingsPack.swift */,
+			);
+			path = Settings;
+			sourceTree = "<group>";
+		};
+		AA00000300000010000AA001 /* Profile */ = {
+			isa = PBXGroup;
+			children = (
+				AA00000100000037000AA001 /* ProfilePackM.swift */,
+				AA00000100000038000AA001 /* ProfilePackI.swift */,
+				AA00000100000039000AA001 /* ProfilePackV.swift */,
+				AA0000010000003A000AA001 /* ProfilePack.swift */,
+			);
+			path = Profile;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -272,6 +550,7 @@
 			packageProductDependencies = (
 				515023D42A2C87E3008255CA /* All */,
 				51A18C1F2EFBE87B003CF083 /* All */,
+				AA0000E2E0000001000AA001 /* EZSUIPackKit */,
 			);
 			productName = Example;
 			productReference = 516035DF2A2C82C600349188 /* Example.app */;
@@ -348,6 +627,58 @@
 				514585CE2D625C1800C1241B /* MainPackI.swift in Sources */,
 				5147410D2E81EBCA00270B84 /* NSWindowConfig.swift in Sources */,
 				515023DA2A2C8865008255CA /* FirstPac.swift in Sources */,
+				AA00000200000007000AA001 /* CounterPack.swift in Sources */,
+				AA00000200000008000AA001 /* CounterPackI.swift in Sources */,
+				AA00000200000009000AA001 /* CounterPackM.swift in Sources */,
+				AA0000020000000A000AA001 /* CounterPackV.swift in Sources */,
+				AA0000020000000B000AA001 /* RootPackM.swift in Sources */,
+				AA0000020000000C000AA001 /* RootPackI.swift in Sources */,
+				AA0000020000000D000AA001 /* RootPackV.swift in Sources */,
+				AA0000020000000E000AA001 /* RootPack.swift in Sources */,
+				AA0000020000000F000AA001 /* WelcomePackM.swift in Sources */,
+				AA00000200000010000AA001 /* WelcomePackI.swift in Sources */,
+				AA00000200000011000AA001 /* WelcomePackV.swift in Sources */,
+				AA00000200000012000AA001 /* WelcomePack.swift in Sources */,
+				AA00000200000013000AA001 /* OnboardingPackM.swift in Sources */,
+				AA00000200000014000AA001 /* OnboardingPackI.swift in Sources */,
+				AA00000200000015000AA001 /* OnboardingPackV.swift in Sources */,
+				AA00000200000016000AA001 /* OnboardingPack.swift in Sources */,
+				AA00000200000017000AA001 /* OnboardingStep1PackM.swift in Sources */,
+				AA00000200000018000AA001 /* OnboardingStep1PackI.swift in Sources */,
+				AA00000200000019000AA001 /* OnboardingStep1PackV.swift in Sources */,
+				AA0000020000001A000AA001 /* OnboardingStep1Pack.swift in Sources */,
+				AA0000020000001B000AA001 /* OnboardingStep2PackM.swift in Sources */,
+				AA0000020000001C000AA001 /* OnboardingStep2PackI.swift in Sources */,
+				AA0000020000001D000AA001 /* OnboardingStep2PackV.swift in Sources */,
+				AA0000020000001E000AA001 /* OnboardingStep2Pack.swift in Sources */,
+				AA0000020000001F000AA001 /* PaywallPackM.swift in Sources */,
+				AA00000200000020000AA001 /* PaywallPackI.swift in Sources */,
+				AA00000200000021000AA001 /* PaywallPackV.swift in Sources */,
+				AA00000200000022000AA001 /* PaywallPack.swift in Sources */,
+				AA00000200000023000AA001 /* AppContentPackM.swift in Sources */,
+				AA00000200000024000AA001 /* AppContentPackI.swift in Sources */,
+				AA00000200000025000AA001 /* AppContentPackV.swift in Sources */,
+				AA00000200000026000AA001 /* AppContentPack.swift in Sources */,
+				AA00000200000027000AA001 /* HomePackM.swift in Sources */,
+				AA00000200000028000AA001 /* HomePackI.swift in Sources */,
+				AA00000200000029000AA001 /* HomePackV.swift in Sources */,
+				AA0000020000002A000AA001 /* HomePack.swift in Sources */,
+				AA0000020000002B000AA001 /* RecordingPackM.swift in Sources */,
+				AA0000020000002C000AA001 /* RecordingPackI.swift in Sources */,
+				AA0000020000002D000AA001 /* RecordingPackV.swift in Sources */,
+				AA0000020000002E000AA001 /* RecordingPack.swift in Sources */,
+				AA0000020000002F000AA001 /* NotePackM.swift in Sources */,
+				AA00000200000030000AA001 /* NotePackI.swift in Sources */,
+				AA00000200000031000AA001 /* NotePackV.swift in Sources */,
+				AA00000200000032000AA001 /* NotePack.swift in Sources */,
+				AA00000200000033000AA001 /* SettingsPackM.swift in Sources */,
+				AA00000200000034000AA001 /* SettingsPackI.swift in Sources */,
+				AA00000200000035000AA001 /* SettingsPackV.swift in Sources */,
+				AA00000200000036000AA001 /* SettingsPack.swift in Sources */,
+				AA00000200000037000AA001 /* ProfilePackM.swift in Sources */,
+				AA00000200000038000AA001 /* ProfilePackI.swift in Sources */,
+				AA00000200000039000AA001 /* ProfilePackV.swift in Sources */,
+				AA0000020000003A000AA001 /* ProfilePack.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -585,6 +916,10 @@
 		51A18C1F2EFBE87B003CF083 /* All */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = All;
+		};
+		AA0000E2E0000001000AA001 /* EZSUIPackKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = EZSUIPackKit;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

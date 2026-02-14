@@ -85,8 +85,12 @@ extension EZUINavigationWrapperPack {
     ///
     /// - Parameter controllers: The view controllers to wrap in the navigation stack.
     /// - Returns: A fully initialized navigation controller interactor.
-    public static func make(_ controllers: [UIViewController]) -> Interactor {
-        make(interactor: .init(controllers))
+    public static func make(_ controllers: [UIViewController]) -> EZUINavigationWrapperPackI {
+        EZPackMaker.make(
+            interactor: { EZUINavigationWrapperPackI(controllers) },
+            mediator: { inputI, inputV in EZDummyUIPackM(inputI: inputI, inputV: inputV) },
+            view: { EZDummyUIPackV<EZDummyUIPackM>() }
+        )
     }
 }
 
@@ -95,10 +99,6 @@ extension EZUINavigationWrapperPack {
 /// Automatically sets up the navigation stack with the provided view controllers.
 public class EZUINavigationWrapperPackI: EZUINavigationPackI {
     public let access = EZDummyUIPackM.accessI
-    
-    public func makeContext() -> Mediator.ContextI {
-        .init(actions: (), viewModel: ())
-    }
    
     /// Creates a navigation wrapper with the given view controllers.
     ///

@@ -31,5 +31,9 @@ import Foundation
 @_exported import EZBuilderKit
 #endif
 
+#if canImport(EZSUIPackKit)
+@_exported import EZSUIPackKit
+#endif
+
 infix operator <-
 prefix operator <-

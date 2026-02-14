@@ -31,18 +31,10 @@ import Foundation
 final public class EZDummyUIPackI<
     Mediator: EZUIPackMediatorProtocol
 >: EZUIPackI where
-    Mediator.ContextI == EZUIPackMediatorContextI<Mediator>,
     Mediator.InputI == Void,
     Mediator.ViewModel == Void
 {
     /// Access to the mediator (provides no functionality for dummy packs).
     public let access = Mediator.accessI
-    
-    /// Creates an empty context with no actions or view model.
-    ///
-    /// - Returns: A context with `Void` actions and view model.
-    public func makeContext() -> Mediator.ContextI {
-        .init(actions: (), viewModel: ())
-    }
 }
 #endif

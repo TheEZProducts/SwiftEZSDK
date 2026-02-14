@@ -92,7 +92,7 @@ open class EZUIPackPlatformsV<M: EZUIPackMediatorProtocol>: EZUIPackViewProtocol
     /// Creates a platform-specific view and selects the appropriate implementation.
     ///
     /// Automatically calls `setView()` to select the correct platform view.
-    required public init() {
+    public init() {
         setView()
     }
     
@@ -138,12 +138,12 @@ open class EZUIPackPlatformsV<M: EZUIPackMediatorProtocol>: EZUIPackViewProtocol
     /// Delegates to the selected platform-specific view.
     open func didInitialize() { view.didInitialize() }
     
-    /// Creates the context needed to initialize the mediator.
+    /// Creates the input needed to initialize the mediator.
     ///
     /// Delegates to the selected platform-specific view.
     ///
-    /// - Returns: A context containing actions.
-    open func makeContext() -> Mediator.ContextV { view.makeContext() }
+    /// - Returns: The view's action interface.
+    open func makeInput() -> M.InputV { view.makeInput() }
     
     /// Called when the view is first created.
     ///
@@ -180,4 +180,5 @@ open class EZUIPackPlatformsV<M: EZUIPackMediatorProtocol>: EZUIPackViewProtocol
     /// Delegates to the selected platform-specific view.
     open func didClose() { view.didClose() }
 }
+
 #endif

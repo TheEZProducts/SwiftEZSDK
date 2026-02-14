@@ -21,9 +21,7 @@ import UIKit
 ///     
 ///     var defaultChildrenTransitionAnimation: UIViewControllerAnimatedTransitioning?
 ///     
-///     func makeContext() -> Mediator.ContextI {
-///         .init(actions: self, viewModel: .init())
-///     }
+///     func makeInput() -> Mediator.InputI { self }
 /// }
 /// ```
 public protocol EZUITabBarInteractorProtocol: UITabBarController, EZUIPackInteractorProtocol {
@@ -52,9 +50,7 @@ public protocol EZUITabBarInteractorProtocol: UITabBarController, EZUIPackIntera
 /// class MainTabBarPackI: EZUITabBarPackI {
 ///     let access = MainTabBarPackM.accessI
 ///     
-///     func makeContext() -> Mediator.ContextI {
-///         .init(actions: self, viewModel: .init())
-///     }
+///     func makeInput() -> Mediator.InputI { self }
 ///     
 ///     func start() {
 ///         // Set up tabs
@@ -87,9 +83,7 @@ public typealias EZUITabBarPackI = EZUITabBarPackInteractor & EZUITabBarInteract
 /// class MainTabBarPackI: EZUITabBarPackInteractor, EZUITabBarInteractorProtocol {
 ///     let access = MainTabBarPackM.accessI
 ///     
-///     func makeContext() -> Mediator.ContextI {
-///         .init(actions: self, viewModel: .init())
-///     }
+///     func makeInput() -> Mediator.InputI { self }
 /// }
 /// ```
 open class EZUITabBarPackInteractor: UITabBarController, EZUIPackBaseInteractorProtocol {

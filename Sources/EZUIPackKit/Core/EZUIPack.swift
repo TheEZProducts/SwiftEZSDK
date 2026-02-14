@@ -22,36 +22,24 @@ import UIKit
 /// ```swift
 /// class MyPackI: EZUIPackI {
 ///     let access = MyPackM.accessI
-///     
-///     func makeContext() -> Mediator.ContextI {
-///         .init(actions: self, viewModel: .init())
-///     }
-/// }
 ///
-/// extension MyPackI: MyPackM.InputIProtocol {
-///     func didTapButton() {
-///         // Handle action
-///     }
+///     func makeInput() -> Mediator.InputI { self }
 /// }
 ///
 /// class MyPackM: EZUIPackM {
 ///     var viewModel: ViewModel
 ///     @MainActor struct ViewModel { }
-///     
+///
 ///     weak let inputI: InputIProtocol?
-///     @MainActor protocol InputIProtocol: AnyObject {
-///         func didTapButton()
-///     }
-///     
+///     @MainActor protocol InputIProtocol: AnyObject { }
+///
 ///     weak let inputV: InputVProtocol?
-///     @MainActor protocol InputVProtocol: AnyObject {
-///         func showError(message: String)
-///     }
-///     
-///     required init(contextI: BaseContextI, contextV: BaseContextV) {
-///         viewModel = contextI.viewModel
-///         inputI = contextI.actions
-///         inputV = contextV.actions
+///     @MainActor protocol InputVProtocol: AnyObject { }
+///
+///     init(inputI: InputI, inputV: InputV) {
+///         self.inputI = inputI
+///         self.inputV = inputV
+///         self.viewModel = .init()
 ///     }
 /// }
 ///
@@ -61,15 +49,18 @@ import UIKit
 ///     }
 /// }
 ///
-/// extension MyPackIOSV: MyPackM.InputVProtocol {
-///     func showError(message: String) {
-///         // Show error
+/// // Create via EZPackMaker:
+/// enum MyPack {
+///     @MainActor
+///     static func make() -> MyPackI {
+///         EZPackMaker.make(
+///             interactor: { MyPackI() },
+///             mediator: { inputI, inputV in MyPackM(inputI: inputI, inputV: inputV) },
+///             view: { MyPackV() }
+///         )
 ///     }
 /// }
 ///
-/// typealias MyPack = EZUIPack<MyPackI, MyPackM, MyPackV>
-///
-/// // Usage:
 /// let interactor = MyPack.make()
 /// ```
 @MainActor
@@ -142,13 +133,15 @@ public protocol EZUIPackProtocol: AnyObject {
     /// - Parameter animated: Whether the disappearance was animated.
     func viewDidDisappear(_ animated: Bool)
     
-    /// Sets up the pack by connecting the interactor and creating the mediator.
+    /// Sets up the pack by connecting the interactor and mediator.
     ///
-    /// This method creates the mediator, connects all components, and calls `didInitialize()`
+    /// This method connects all components and calls `didInitialize()`
     /// on mediator, interactor, and view.
     ///
-    /// - Parameter interactor: The interactor to connect to this pack.
-    func setup(interactor: Interactor)
+    /// - Parameters:
+    ///   - interactor: The interactor to connect to this pack.
+    ///   - mediator: The mediator to connect to this pack.
+    func setup(interactor: Interactor, mediator: Mediator)
     
     /// Creates a pack with the given view.
     ///
@@ -164,7 +157,7 @@ public protocol EZUIPackProtocol: AnyObject {
 /// - `V` (View): Handles UI presentation
 ///
 /// The pack automatically manages the lifecycle:
-/// 1. **Initialization**: `setup(interactor:)` creates the mediator and connects all components
+/// 1. **Initialization**: `setup(interactor:mediator:)` connects all components
 /// 2. **Creation**: `start()` → `create()` → `didCreate()` when the pack first appears
 /// 3. **Opening**: `willOpen()` → `animateOpen()` → `didOpen()` when becoming visible
 /// 4. **Installation**: `didInstall()` after layout completes
@@ -175,61 +168,25 @@ public protocol EZUIPackProtocol: AnyObject {
 /// // 1. Define the Interactor
 /// class ProfilePackI: EZUIPackI {
 ///     let access = ProfilePackM.accessI
-///     
-///     func makeContext() -> Mediator.ContextI {
-///         .init(actions: self, viewModel: .init())
-///     }
-///     
-///     func start() {
-///         loadProfile()
-///     }
-///     
-///     func didOpen() {
-///         refreshProfile()
-///     }
-///     
-///     private func loadProfile() {
-///         viewModel.isLoading = true
-///         // ... load data
-///         viewModel.profile = loadedProfile
-///         viewModel.isLoading = false
-///     }
-/// }
 ///
-/// extension ProfilePackI: ProfilePackM.InputIProtocol {
-///     func editProfile() {
-///         // Navigate to edit screen
-///     }
-///     
-///     func deleteProfile() {
-///         // Handle deletion
-///     }
+///     func makeInput() -> Mediator.InputI { self }
 /// }
 ///
 /// // 2. Define the Mediator
 /// class ProfilePackM: EZUIPackM {
 ///     var viewModel: ViewModel
-///     @MainActor struct ViewModel {
-///         var profile: Profile?
-///         var isLoading = false
-///     }
-///     
+///     @MainActor struct ViewModel { }
+///
 ///     weak let inputI: InputIProtocol?
-///     @MainActor protocol InputIProtocol: AnyObject {
-///         func editProfile()
-///         func deleteProfile()
-///     }
-///     
+///     @MainActor protocol InputIProtocol: AnyObject { }
+///
 ///     weak let inputV: InputVProtocol?
-///     @MainActor protocol InputVProtocol: AnyObject {
-///         func showError(message: String)
-///         func refreshUI()
-///     }
-///     
-///     required init(contextI: BaseContextI, contextV: BaseContextV) {
-///         viewModel = contextI.viewModel
-///         inputI = contextI.actions
-///         inputV = contextV.actions
+///     @MainActor protocol InputVProtocol: AnyObject { }
+///
+///     init(inputI: InputI, inputV: InputV) {
+///         self.inputI = inputI
+///         self.inputV = inputV
+///         self.viewModel = .init()
 ///     }
 /// }
 ///
@@ -238,55 +195,27 @@ public protocol EZUIPackProtocol: AnyObject {
 ///     override var iOS: (any EZUIPackViewProtocol<ProfilePackM>)? {
 ///         ProfileIOSV()
 ///     }
-///     
-///     override var iPadOS: (any EZUIPackViewProtocol<ProfilePackM>)? {
-///         ProfileIPadOSV()
-///     }
 /// }
 ///
-/// class ProfileIOSV: EZUIPackV {
-///     let access = ProfilePackM.accessV
-///     
-///     func makeContext() -> Mediator.ContextV {
-///         .init(actions: self)
-///     }
-///     
-///     func create() {
-///         backgroundColor = .systemBackground
-///         setupSubviews()
-///         observeViewModel()
-///     }
-///     
-///     func animateOpen() {
-///         UIView.animate(withDuration: 0.3) {
-///             self.alpha = 1.0
-///         }
-///     }
-///     
-///     private func observeViewModel() {
-///         // Observe viewModel changes and update UI
+/// // 4. Create the pack via EZPackMaker
+/// enum ProfilePack {
+///     @MainActor
+///     static func make() -> ProfilePackI {
+///         EZPackMaker.make(
+///             interactor: { ProfilePackI() },
+///             mediator: { inputI, inputV in ProfilePackM(inputI: inputI, inputV: inputV) },
+///             view: { ProfilePackV() }
+///         )
 ///     }
 /// }
-///
-/// extension ProfileIOSV: ProfilePackM.InputVProtocol {
-///     func showError(message: String) {
-///         // Display error alert
-///     }
-///     
-///     func refreshUI() {
-///         // Refresh UI elements
-///     }
-/// }
-///
-/// // 4. Create the pack typealias
-/// typealias ProfilePack = EZUIPack<ProfilePackI, ProfilePackM, ProfilePackV>
 ///
 /// // 5. Use the pack
 /// let interactor = ProfilePack.make()
 /// navigationController.pushViewController(interactor, animated: true)
 /// ```
 ///
-/// - Note: Use `EZUIPack.make()` to create packs, as it handles the initialization sequence correctly.
+/// - Note: Use `EZPackMaker.make(interactor:mediator:view:)` to create packs,
+///   as it handles the initialization sequence correctly.
 @MainActor
 open class EZUIPack<
     I: EZUIPackInteractorProtocol,
@@ -295,13 +224,13 @@ open class EZUIPack<
 >: EZUIPackProtocol where I.Mediator == M, V.Mediator == M {
     /// The interactor connected to this pack.
     ///
-    /// Set to `nil` initially and assigned during `setup(interactor:)`.
+    /// Set to `nil` initially and assigned during `setup(interactor:mediator:)`.
     /// Weak reference to avoid retain cycles.
     public private(set) weak var interactor: I?
     
     /// The mediator connected to this pack.
     ///
-    /// Set to `nil` initially and created during `setup(interactor:)`.
+    /// Set to `nil` initially and assigned during `setup(interactor:mediator:)`.
     public private(set) var mediator: M?
     
     /// The view component managed by this pack.
@@ -333,34 +262,31 @@ open class EZUIPack<
     /// Creates a pack with the given view.
     ///
     /// - Parameter view: The view component that will be managed by this pack.
-    /// - Note: Typically you should use `EZUIPack.make()` or `EZPackMaker.make()` instead of
+    /// - Note: Typically you should use `EZPackMaker.make(interactor:mediator:view:)` instead of
     ///   calling this initializer directly.
     public required init(view: V) {
         self.view = view
     }
     
-    /// Sets up the pack by connecting the interactor, creating the mediator, and initializing all components.
+    /// Sets up the pack by connecting the interactor, mediator, and initializing all components.
     ///
     /// This method:
-    /// 1. Creates the mediator using contexts from both interactor and view
-    /// 2. Connects the mediator to the pack bridge
-    /// 3. Sets up access objects for both interactor and view
-    /// 4. Calls `didInitialize()` on mediator, interactor, and view
+    /// 1. Connects the mediator to the pack bridge
+    /// 2. Sets up access objects for both interactor and view
+    /// 3. Calls `didInitialize()` on mediator, interactor, and view
     ///
-    /// - Parameter interactor: The interactor to connect to this pack.
-    /// - Note: This is typically called automatically by `EZUIPack.make()`.
-    open func setup(interactor: I) {
-        let mediator = M(
-            contextI: interactor.makeContext(),
-            contextV: view.makeContext()
-        )
+    /// - Parameters:
+    ///   - interactor: The interactor to connect to this pack.
+    ///   - mediator: The mediator to connect to this pack.
+    /// - Note: This is typically called automatically by `EZPackMaker.make(interactor:mediator:view:)`.
+    open func setup(interactor: I, mediator: M) {
         mediator.packBridge.pack = self
         interactor.access.setMediator(mediator)
         view.access.setMediator(mediator)
-        
+
         self.interactor = interactor
         self.mediator = mediator
-        
+
         mediator.didInitialize()
         interactor.didInitialize()
         view.didInitialize()
@@ -531,66 +457,112 @@ open class EZUIPack<
 }
 
 
-/// A factory for creating packs and their interactors with proper initialization.
+/// A factory for creating packs with proper initialization order.
 ///
 /// `EZPackMaker` manages the creation process to ensure that:
-/// - The pack is created before the interactor
+/// - The view and pack are created before the interactor
 /// - The interactor can access the pack during initialization via `EZPackMaker.getPack()`
 /// - All components are properly connected before use
 ///
 /// ### Example: Creating a pack
 /// ```swift
-/// let interactor = EZPackMaker.make(packType: MyPack.self) {
-///     MyPackI()
+/// enum ProfilePack {
+///     @MainActor
+///     static func make() -> ProfilePackI {
+///         EZPackMaker.make(
+///             interactor: { ProfilePackI() },
+///             mediator: { inputI, inputV in ProfilePackM(inputI: inputI, inputV: inputV) },
+///             view: { ProfilePackV() }
+///         )
+///     }
 /// }
-/// // interactor is fully initialized and ready to use
 /// ```
 ///
-/// - Note: You typically use `EZUIPack.make()` which internally uses `EZPackMaker`.
+/// ### Example: Custom initialization with parameters
+/// ```swift
+/// enum ProfilePack {
+///     @MainActor
+///     static func make(userId: String, theme: Theme) -> ProfilePackI {
+///         EZPackMaker.make(
+///             interactor: { ProfilePackI(userId: userId) },
+///             mediator: { inputI, inputV in ProfilePackM(inputI: inputI, inputV: inputV) },
+///             view: { ProfileIOSV(theme: theme) }
+///         )
+///     }
+/// }
+/// ```
 @MainActor
 public final class EZPackMaker: Sendable {
     private static var currentSession = [(any MakeSessionProtocol)]()
-    
-    /// Creates a pack and its interactor, ensuring proper initialization order.
+
+    /// Creates a pack with three closures for interactor, mediator, and view.
     ///
-    /// This method:
-    /// 1. Creates a pack instance
-    /// 2. Executes the `maker` closure to create the interactor (which can access the pack via `getPack()`)
-    /// 3. Sets up the pack with the interactor
-    /// 4. Returns the fully initialized interactor
+    /// This method manages the creation order: **view → pack → interactor → mediator → setup**.
+    /// The pack is available via `EZPackMaker.getPack()` during interactor initialization.
     ///
     /// - Parameters:
-    ///   - packType: The type of pack to create (defaults to `Pack.self`).
-    ///   - maker: A closure that creates the interactor. The pack is available via `EZPackMaker.getPack()`.
+    ///   - makeI: A closure that creates the interactor. The pack is available via `EZPackMaker.getPack()`.
+    ///   - makeM: A closure that creates the mediator, receiving inputs from interactor and view,
+    ///     plus optional context from the interactor.
+    ///   - makeV: A closure that creates the view.
     /// - Returns: The fully initialized interactor ready to use.
-    ///
-    /// ### Example
-    /// ```swift
-    /// let interactor = EZPackMaker.make(packType: ProfilePack.self) {
-    ///     ProfilePackI()
-    /// }
-    /// ```
-    public static func make<Pack: EZUIPackProtocol>(
-        packType: Pack.Type = Pack.self,
-        interactor maker: () -> Pack.Interactor
-    ) -> Pack.Interactor {
-        let session = MakeSession<Pack>()
-        
-        currentSession.append(session)
+    public static func make<
+        I: EZUIPackInteractorProtocol,
+        M: EZUIPackMediatorProtocol,
+        V: EZUIPackViewProtocol
+    >(
+        interactor makeI: () -> I,
+        mediator makeM: (M.InputI, M.InputV, I.Context) -> M,
+        view makeV: () -> V
+    ) -> I where I.Mediator == M, V.Mediator == M {
+        let view = makeV()
+        let pack = EZUIPack<I, M, V>(view: view)
+
+        currentSession.append(MakeSession(pack: pack))
         defer { currentSession.removeLast() }
-        
-        return session.make(interactor: maker)
+
+        let interactor = makeI()
+        let mediator = makeM(interactor.makeInput(), view.makeInput(), interactor.makeContext())
+        pack.setup(interactor: interactor, mediator: mediator)
+
+        return interactor
     }
-    
+
+    /// Creates a pack with three closures for interactor, mediator, and view.
+    ///
+    /// Convenience overload for interactors with `Context == Void`. The mediator closure
+    /// receives only `InputI` and `InputV`.
+    ///
+    /// - Parameters:
+    ///   - makeI: A closure that creates the interactor. The pack is available via `EZPackMaker.getPack()`.
+    ///   - makeM: A closure that creates the mediator, receiving inputs from interactor and view.
+    ///   - makeV: A closure that creates the view.
+    /// - Returns: The fully initialized interactor ready to use.
+    public static func make<
+        I: EZUIPackInteractorProtocol,
+        M: EZUIPackMediatorProtocol,
+        V: EZUIPackViewProtocol
+    >(
+        interactor makeI: () -> I,
+        mediator makeM: (M.InputI, M.InputV) -> M,
+        view makeV: () -> V
+    ) -> I where I.Mediator == M, V.Mediator == M, I.Context == Void {
+        make(
+            interactor: makeI,
+            mediator: { inputI, inputV, _ in makeM(inputI, inputV) },
+            view: makeV
+        )
+    }
+
     private static func getCurrentSession() -> any MakeSessionProtocol {
         guard let currentSession = currentSession.last else { fatalError("Call EZPackMaker.make(...) first.") }
         return currentSession
     }
-    
+
     /// Gets the current pack being created during the `make()` process.
     ///
     /// This allows interactors to access their pack during initialization.
-    /// Only available within the `maker` closure passed to `make()`.
+    /// Only available within the `interactor` closure passed to `make()`.
     ///
     /// - Returns: The pack currently being created.
     /// - Important: This will crash if called outside of a `make()` call. Use only within
@@ -608,71 +580,17 @@ public final class EZPackMaker: Sendable {
     public static func getPack() -> (any EZUIPackProtocol) {
         getCurrentSession().getPack()
     }
-    
+
     @MainActor
     protocol MakeSessionProtocol {
         func getPack() -> (any EZUIPackProtocol)
     }
-    
-    @MainActor
-    final class MakeSession<Pack: EZUIPackProtocol>: MakeSessionProtocol, Sendable {
-        private var pack: Pack = .init(view: .init())
-        
-        func getPack() -> any EZUIPackProtocol { pack }
-        
-        func make(interactor maker: () -> Pack.Interactor) -> Pack.Interactor {
-            let interactor = maker()
-            pack.setup(interactor: interactor)
-            return interactor
-        }
-   
-        init() {}
-    }
-}
 
-extension EZUIPack {
-    /// Creates a pack and returns its fully initialized interactor.
-    ///
-    /// This is the recommended way to create packs. It handles all initialization automatically.
-    ///
-    /// - Parameter maker: A closure or autoclosure that creates the interactor.
-    ///   Defaults to `I(nibName: nil, bundle: nil)`.
-    /// - Returns: The fully initialized interactor ready to use.
-    ///
-    /// ### Example: Default initialization
-    /// ```swift
-    /// let interactor = ProfilePack.make()
-    /// ```
-    ///
-    /// ### Example: Custom initialization
-    /// ```swift
-    /// let interactor = ProfilePack.make(interactor: ProfilePackI(customData: someData))
-    /// ```
-    public static func make(
-        interactor maker: @autoclosure () -> I = I(nibName: nil, bundle: nil)
-    ) -> I {
-        EZPackMaker.make(packType: Self.self, interactor: maker)
-    }
-    
-    /// Creates a pack and returns its fully initialized interactor.
-    ///
-    /// This overload allows you to pass a closure for more complex initialization.
-    ///
-    /// - Parameter maker: A closure that creates the interactor.
-    /// - Returns: The fully initialized interactor ready to use.
-    ///
-    /// ### Example
-    /// ```swift
-    /// let interactor = ProfilePack.make {
-    ///     let i = ProfilePackI()
-    ///     i.configure(with: data)
-    ///     return i
-    /// }
-    /// ```
-    public static func make(
-        interactor maker: () -> I
-    ) -> I {
-        EZPackMaker.make(packType: Self.self, interactor: maker)
+    @MainActor
+    final class MakeSession: MakeSessionProtocol, Sendable {
+        private let pack: any EZUIPackProtocol
+        func getPack() -> any EZUIPackProtocol { pack }
+        init(pack: any EZUIPackProtocol) { self.pack = pack }
     }
 }
 

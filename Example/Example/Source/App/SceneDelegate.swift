@@ -8,6 +8,7 @@
 import UIKit
 import SwiftUI
 import EZUIPackKit
+import EZSUIPackKit
 
 extension EZUIPackViewProtocol{
     var supportedOrientations: UIInterfaceOrientationMask {.portrait}
@@ -388,34 +389,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 //        v.backgroundColor = .white
 //       
 //        
-        window.rootViewController = MainPack.make()//split
+        window.rootViewController = UIHostingController(rootView: RootPack.make())
         self.window = window
-        
-        Task {
-//            try await Task.sleep(for: .seconds(2))
-//            split.hide(.primary)
-//            try await Task.sleep(for: .seconds(3))
-//            split.show(.primary)
-//            
-//            try await Task.sleep(for: .seconds(1))
-//            split.hide(.secondary)
-//            try await Task.sleep(for: .seconds(3))
-//            split.show(.secondary)
-//            
-//            try await Task.sleep(for: .seconds(1))
-//            split.hide(.supplementary)
-//            try await Task.sleep(for: .seconds(3))
-//            split.show(.supplementary)
-//            
-//            if #available(macCatalyst 26.0, *) {
-//                try await Task.sleep(for: .seconds(1))
-//                split.hide(.inspector)
-//                try await Task.sleep(for: .seconds(3))
-//                split.show(.inspector)
-//            }
-//            
-           
-        }
+
         window.makeKeyAndVisible()
     }
     

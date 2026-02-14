@@ -26,16 +26,16 @@ import EZSwiftUIBridgeKit
 /// // In SwiftUI View:
 /// struct ProfileIOSV: View, EZUIPackSViewProtocol {
 ///     let access = ProfilePackM.accessV
-///     
-///     func makeContext() -> Mediator.ContextV {
-///         .init(actions: .init(
+///
+///     func makeInput() -> Mediator.InputV {
+///         .init(
 ///             showError: { message in
 ///                 // Show error alert
 ///                 print("Error: \(message)")
 ///             }
-///         ))
+///         )
 ///     }
-///     
+///
 ///     var body: some View {
 ///         VStack {
 ///             Text(viewModel.profile?.name ?? "")
@@ -67,13 +67,10 @@ public protocol EZUIPackSViewProtocol: EZUIPackViewProtocol, Equatable {
     /// Override this to provide additional `ObservableObject` instances that should trigger
     /// SwiftUI updates when they change.
     var additionalObservableObjects: [any ObservableObject] { get }
-    
-    /// Creates a new SwiftUI view instance.
-    init()
 }
 
 @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
-extension EZUIPackSViewProtocol{
+extension EZUIPackSViewProtocol {
     /// Default implementation: returns an empty array.
     ///
     /// Override to provide additional observable objects for SwiftUI updates.
@@ -193,15 +190,15 @@ extension EZUIPackSViewProtocol where Self: EZView {
 /// ```swift
 /// struct ProfileIOSV: EZUIPackSV {
 ///     let access = ProfilePackM.accessV
-///     
-///     func makeContext() -> Mediator.ContextV {
-///         .init(actions: .init(
+///
+///     func makeInput() -> Mediator.InputV {
+///         .init(
 ///             showError: { message in
 ///                 // Handle error display
 ///             }
-///         ))
+///         )
 ///     }
-///     
+///
 ///     var body: some View {
 ///         VStack {
 ///             if viewModel.isLoading {
@@ -245,19 +242,19 @@ public typealias EZUIPackSV = View & EZUIPackSViewProtocol
 /// ```swift
 /// class ProfileContainerView: EZUIPackSUIV {
 ///     let access = ProfilePackM.accessV
-///     
-///     func makeContext() -> Mediator.ContextV {
-///         .init(actions: .init(
+///
+///     func makeInput() -> Mediator.InputV {
+///         .init(
 ///             showError: { message in /* ... */ },
 ///             refreshUI: { /* ... */ }
-///         ))
+///         )
 ///     }
-///     
+///
 ///     func create() {
 ///         // Set up UIKit-specific properties
 ///         backgroundColor = .systemBackground
 ///     }
-///     
+///
 ///     var body: some View {
 ///         // SwiftUI content
 ///         ProfileContentView()

@@ -56,9 +56,7 @@ public typealias EZView = NSView
 /// class ProfileIOSV: UIView, EZUIPackUIViewProtocol {
 ///     let access = ProfilePackM.accessV
 ///     
-///     func makeContext() -> Mediator.ContextV {
-///         .init(actions: self)
-///     }
+///     func makeInput() -> Mediator.InputV { self }
 ///     
 ///     func create() {
 ///         backgroundColor = .systemBackground
@@ -90,27 +88,25 @@ extension EZUIPackUIViewProtocol{
 /// ```swift
 /// class ProfileIOSV: EZUIPackV {
 ///     let access = ProfilePackM.accessV
-///     
-///     func makeContext() -> Mediator.ContextV {
-///         .init(actions: self)
-///     }
-///     
+///
+///     func makeInput() -> Mediator.InputV { self }
+///
 ///     func create() {
 ///         backgroundColor = .systemBackground
 ///         setupSubviews()
 ///         configureConstraints()
 ///     }
-///     
+///
 ///     func willOpen() {
 ///         // Prepare for appearance
 ///     }
-///     
+///
 ///     func animateOpen() {
 ///         UIView.animate(withDuration: 0.3) {
 ///             self.alpha = 1.0
 ///         }
 ///     }
-///     
+///
 ///     private func setupSubviews() {
 ///         // Add and configure subviews
 ///     }
@@ -120,7 +116,7 @@ extension EZUIPackUIViewProtocol{
 ///     func showError(message: String) {
 ///         // Display error alert
 ///     }
-///     
+///
 ///     func refreshUI() {
 ///         // Update UI elements based on viewModel
 ///         if viewModel.isLoading {

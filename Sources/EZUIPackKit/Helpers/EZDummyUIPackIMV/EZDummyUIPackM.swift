@@ -30,12 +30,12 @@ import Foundation
 /// - Note: This mediator provides no functionality beyond basic pack infrastructure.
 ///   For any shared state or communication, create your own mediator class.
 final public class EZDummyUIPackM: EZUIPackMediator, EZUIPackMediatorProtocol {
-    /// Creates a dummy mediator with empty contexts.
+    /// Creates a dummy mediator with empty inputs.
     ///
     /// - Parameters:
-    ///   - contextI: Context from interactor (ignored, as `InputI` and `ViewModel` are `Void`).
-    ///   - contextV: Context from view (ignored, as `InputV` is `Void`).
-    public init(contextI: EZUIPackMediatorContextI<EZDummyUIPackM>, contextV: EZUIPackMediatorContextV<EZDummyUIPackM>) {}    
+    ///   - inputI: Input from interactor (ignored, as `InputI` is `Void`).
+    ///   - inputV: Input from view (ignored, as `InputV` is `Void`).
+    public init(inputI: Void, inputV: Void) {}
 }
 #endif
 

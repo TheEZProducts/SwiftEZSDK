@@ -17,11 +17,9 @@ import Foundation
 /// ```swift
 /// class ProfileIOSV: EZUIPackV {
 ///     let access = ProfilePackM.accessV
-///     
-///     func makeContext() -> Mediator.ContextV {
-///         .init(actions: self)
-///     }
-///     
+///
+///     func makeInput() -> Mediator.InputV { self }
+///
 ///     func create() {
 ///         // Set up UI elements
 ///         setupSubviews()
@@ -38,30 +36,23 @@ import Foundation
 public protocol EZViewProtocol<Mediator> {
     /// The type of mediator that manages communication and state for this view.
     associatedtype Mediator: EZUIPackMediatorProtocol
-    
+
     /// Access object providing controlled access to the mediator.
     ///
     /// Use this to read/write the view model and access the interactor's action interface.
     var access: Mediator.AccessV { get }
-    
-    /// Creates a new view instance.
+
+    /// Creates the input needed to initialize the mediator.
     ///
-    /// Views must be initializable without parameters.
-    init()
-   
-    /// Creates the context needed to initialize the mediator.
+    /// The input is the view's action interface (typically `self`).
     ///
-    /// This context contains the view's action interface (typically `self`).
-    ///
-    /// - Returns: A context containing actions.
+    /// - Returns: The view's action interface.
     ///
     /// ### Example
     /// ```swift
-    /// func makeContext() -> Mediator.ContextV {
-    ///     .init(actions: self)  // The view implements InputVProtocol
-    /// }
+    /// func makeInput() -> Mediator.InputV { self }
     /// ```
-    func makeContext() -> Mediator.ContextV
+    func makeInput() -> Mediator.InputV
     
     /// Called once when the view is first created, before it appears.
     ///
@@ -123,6 +114,20 @@ extension EZViewProtocol {
     public var inputI: Mediator.InputI {
         _read { yield access.inputI }
     }
+}
+
+extension EZViewProtocol where Mediator.InputV == Void {
+    /// Default implementation when `InputV` is `Void`.
+    ///
+    /// Returns `()` when no view actions are needed.
+    public func makeInput() -> Mediator.InputV { () }
+}
+
+extension EZViewProtocol where Mediator.InputV == Self {
+    /// Default implementation when the view itself is the input interface.
+    ///
+    /// Returns `self` when the view conforms to `InputVProtocol` directly.
+    public func makeInput() -> Mediator.InputV { self }
 }
 
 extension EZViewProtocol {
