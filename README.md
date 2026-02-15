@@ -21,10 +21,13 @@ EZSDK is a collection of small, focused Swift modules ("kits") that you can use 
 - **All** — umbrella product that re-exports the stable kits.
 - **EZHelpersKit** — general-purpose helpers (thread-safety primitives, small utilities). *(some APIs may require newer Swift features)*
 - **EZAssociatedKit** — associated-object helpers (ObjC runtime based).
-- **EZAsyncKit** — async/concurrency helpers. 
+- **EZAsyncKit** — async/concurrency helpers.
 - **EZObservableKit** — lightweight observation system.
 - **EZBuilderKit** — a set of protocols for implementing builders for any objects.
-- **EZUIPackKit** — a large toolkit for building UI using the IMV architecture.
+- **EZUIPackBaseKit** — platform-agnostic base protocols for the IMV (Interactor-Mediator-View) architecture (base mediator, interactor, and view contracts).
+- **EZTransitionKit** — custom view controller transition system with fluent API for navigation, tab bar, modal, and page transitions (iOS/tvOS/visionOS/macCatalyst).
+- **EZUIPackKit** — UIKit toolkit for building UI using the IMV architecture. Includes interactors (`UIViewController`-based), mediators, platform-specific views, shared storage, and transition integration.
+- **EZSUIPackKit** — SwiftUI toolkit for building UI using the IMV architecture. Provides SwiftUI-native interactors, mediators with `ObservableObject` view models, and a `EZSUIPack` container view.
 - **EZSwiftUIBridgeKit** — convenient tools to embed UIKit/AppKit views in SwiftUI and embed SwiftUI views into platform views.
 - **EZMacrosKit** — helpers and protocols for defining constant-storage property macros (implemented by the `EZMacros` macro target).
 

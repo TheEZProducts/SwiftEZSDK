@@ -19,6 +19,14 @@ import Foundation
 @_exported import EZObservableKit
 #endif
 
+#if canImport(EZUIPackBaseKit)
+@_exported import EZUIPackBaseKit
+#endif
+
+#if canImport(EZTransitionKit) && !os(watchOS) && !os(macOS)
+@_exported import EZTransitionKit
+#endif
+
 #if canImport(EZUIPackKit) && !os(watchOS) && !os(macOS)
 @_exported import EZUIPackKit
 #endif
