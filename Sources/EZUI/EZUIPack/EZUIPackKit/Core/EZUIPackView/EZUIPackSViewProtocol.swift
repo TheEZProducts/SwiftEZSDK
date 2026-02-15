@@ -5,7 +5,7 @@
 //  Created by Александр Сенин on 07.01.2026.
 //
 
-#if canImport(SwiftUI)
+#if canImport(SwiftUI) && canImport(UIKit) && !os(watchOS)
 import SwiftUI
 
 import EZSwiftUIBridgeKit

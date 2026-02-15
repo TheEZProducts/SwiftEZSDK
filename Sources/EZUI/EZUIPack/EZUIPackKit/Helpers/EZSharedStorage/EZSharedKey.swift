@@ -18,8 +18,10 @@ public protocol EZSharedKeyChainProtocol {}
 ///
 /// ### Example
 /// ```swift
-/// enum UserKeys: EZSharedKeyChainProtocol {}
-/// let userIDKey = EZSharedKey<UserKeys, Int>(key: "userID")
+/// extension EZSharedKeyChain<OnboardingViewController> {
+///     var onboardingStatus: EZSharedKey<Self, OnboardingStatus> { .init(key: "OnboardingStatus") }
+///     var onboardingActions: EZSharedKey<Self, OnboardingActions> { .init(key: "OnboardingActions") }
+/// }
 /// ```
 public struct EZSharedKeyChain<T>: EZSharedKeyChainProtocol {
     /// Creates a new key chain.
@@ -51,21 +53,21 @@ extension EZSharedKeyProtocol{
 ///
 /// ### Example: Defining keys
 /// ```swift
-/// enum AppKeys: EZSharedKeyChainProtocol {}
-///
-/// extension EZSharedKey where Chain == AppKeys {
-///     static var userID: EZSharedKey<AppKeys, Int> {
-///         .init(key: "userID")
-///     }
-///     
-///     static var sessionToken: EZSharedKey<AppKeys, String> {
-///         .init(key: "sessionToken")
-///     }
+/// // 1. Define keys for the view controller's shared storage
+/// extension EZSharedKeyChain<OnboardingViewController> {
+///     var onboardingStatus: EZSharedKey<Self, OnboardingStatus> { .init(key: "OnboardingStatus") }
+///     var onboardingActions: EZSharedKey<Self, OnboardingActions> { .init(key: "OnboardingActions") }
 /// }
 ///
-/// // Usage:
-/// storage[.userID] = 123
-/// let id: Int? = storage[.userID]
+/// // 2. Create a static var for easy access to the chain
+/// extension EZSharedKey {
+///     static var onboardingChain: EZSharedKeyChain<OnboardingViewController> { .init() }
+/// }
+///
+/// // 3. Usage:
+/// storage[.onboardingChain.onboardingStatus] = currentStatus
+/// let status: OnboardingStatus? = storage[.onboardingChain.onboardingStatus]
+/// ezParentShered[.onboardingChain.onboardingActions]?.next()
 /// ```
 ///
 /// - Note: The key string is automatically prefixed with the chain and value type names

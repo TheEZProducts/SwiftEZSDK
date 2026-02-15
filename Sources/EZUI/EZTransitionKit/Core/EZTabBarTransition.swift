@@ -478,7 +478,7 @@ public struct EZTabBarReplaceTransition: EZReplaceTransitionProtocol, EZTabBarTr
                 tabBarController: tabBarController,
                 controllers: controllers
             )
-        }else{ return false }
+        } else { return false }
         
         return true
     }
@@ -492,7 +492,7 @@ public struct EZTabBarReplaceTransition: EZReplaceTransitionProtocol, EZTabBarTr
             animation: context._animation,
             interactive: context._interactive != nil
         ) { animator in
-            animator.map{ context._interactive?($0) }
+            animator.map { context._interactive?($0) }
             tabBarController.selectedIndex = index
             if let transitionCoordinator = tabBarController.transitionCoordinator{
                 transitionCoordinator.animate(
@@ -516,9 +516,9 @@ public struct EZTabBarReplaceTransition: EZReplaceTransitionProtocol, EZTabBarTr
             animation: context._animation,
             interactive: context._interactive != nil
         ) { animator in
-            animator.map{ context._interactive?($0) }
+            animator.map { context._interactive?($0) }
             tabBarController.setViewControllers(controllers, animated: context._animate)
-            if let transitionCoordinator = tabBarController.transitionCoordinator{
+            if let transitionCoordinator = tabBarController.transitionCoordinator {
                 transitionCoordinator.animate(
                     alongsideTransition: nil,
                     completion: {_ in context._completion?() }

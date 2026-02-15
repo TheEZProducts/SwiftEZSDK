@@ -17,10 +17,14 @@ extension UIViewController {
     ///
     /// ### Example
     /// ```swift
-    /// // In a child pack mediator:
-    /// func start() {
-    ///     if let userID = ezParentShared[.userID] {
-    ///         // Use parent's user ID
+    /// // In any child view controller:
+    /// class OnboardingStepViewController: UIViewController {
+    ///     override func viewWillAppear(_ animated: Bool) {
+    ///         super.viewWillAppear(animated)
+    ///         if let status = ezParentShared[.onboardingChain.onboardingStatus] {
+    ///             // Use parent's onboarding status
+    ///         }
+    ///         ezParentShared[.onboardingChain.onboardingActions]?.next()
     ///     }
     /// }
     /// ```

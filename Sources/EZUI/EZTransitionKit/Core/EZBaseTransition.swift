@@ -306,7 +306,7 @@ extension EZPresentTransition<EZContainerView>{
 /// ### Example
 /// ```swift
 /// let transition = presentedVC.ezTransit.dismiss()
-///     .animation(EZCloseAnimation.ezClose(direction: .down))
+///     .animation(.ezClose(direction: .down))
 ///     .animate()
 ///     .completion {
 ///         print("Dismissal completed")

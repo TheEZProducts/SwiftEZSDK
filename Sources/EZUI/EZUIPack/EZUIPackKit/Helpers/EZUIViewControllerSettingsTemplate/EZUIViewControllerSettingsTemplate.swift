@@ -142,8 +142,8 @@ extension EZUIViewControllerSettingsTemplate where Controller: EZUINavigationInt
     /// ### Example
     /// ```swift
     /// let template = EZUIViewControllerSettingsTemplate.childAnimations(
-    ///     push: EZOpenAnimation.ezOpen(direction: .right),
-    ///     pop: EZCloseAnimation.ezClose(direction: .right)
+    ///     push: .ezOpen(direction: .right),
+    ///     pop: .ezClose(direction: .right)
     /// )
     /// navController.apply(template: template)
     /// ```
