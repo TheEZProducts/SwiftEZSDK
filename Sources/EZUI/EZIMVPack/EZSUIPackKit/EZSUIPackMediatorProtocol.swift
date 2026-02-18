@@ -42,25 +42,15 @@ import Combine
 ///   as your base type.
 @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 @MainActor
-public protocol EZSUIPackMediatorProtocol: EZIMVPackMediatorProtocol where ViewModel: ObservableObject {}
+public protocol EZSUIPackMediatorProtocol: EZIMVPackMediatorProtocol {}
 
 @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
-extension EZSUIPackMediatorProtocol where ViewModel == EZSUIPackVoidViewModel {
+extension EZSUIPackMediatorProtocol where ViewModel == Void {
     /// Default implementation when `ViewModel` is `EZSUIPackVoidViewModel` (no shared state needed).
     public var viewModel: ViewModel {
-        get { .shared }
+        get { () }
         set {}
     }
-}
-
-/// A shared singleton `ObservableObject` used when a mediator has no view model state.
-///
-/// Use `EZSUIPackVoidViewModel` as the `ViewModel` type when no shared state is needed.
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
-@MainActor
-public final class EZSUIPackVoidViewModel: ObservableObject {
-    public static let shared = EZSUIPackVoidViewModel()
-    private init() {}
 }
 
 /// Base class for SwiftUI mediators.

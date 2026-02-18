@@ -9,6 +9,8 @@
 import SwiftUI
 import Combine
 
+
+
 // MARK: - Container (persists across SwiftUI re-renders)
 
 /// Internal container that holds the IMV components and persists across SwiftUI re-renders.
@@ -30,16 +32,18 @@ public final class EZSUIPackContainer<
     private var viewModelCancellable: AnyCancellable?
 
     init(
-        interactor makeI: (M.AccessI) -> I,
+        interactor makeI: () -> I,
         mediator makeM: (M.InputI, M.InputV, I.Context) -> M,
-        view makeV: @escaping (M.AccessV) -> V
+        view makeV: @escaping () -> V
     ) {
-        interactor = makeI(M.accessI)
-        view = makeV(M.accessV)
+        interactor = makeI()
+        view = makeV()
         mediator = makeM(interactor.makeInput(), view.makeInput(), interactor.makeContext())
 
-        viewModelCancellable = mediator.viewModel.objectWillChange.sink {[weak self] _ in
-            self?.objectWillChange.send()
+        if let vm = mediator.viewModel as? (any ObservableObject) {
+            viewModelCancellable = vm.willChangeSync {[weak self] in
+                self?.objectWillChange.send()
+            }
         }
 
         interactor.access.setMediator(mediator)
@@ -100,9 +104,9 @@ public struct EZSUIPack<
     }
 
     public init(
-        interactor: @escaping (M.AccessI) -> I,
+        interactor: @escaping () -> I,
         mediator: @escaping (M.InputI, M.InputV, I.Context) -> M,
-        view: @escaping (M.AccessV) -> V
+        view: @escaping () -> V
     ) {
         _container = StateObject(wrappedValue: EZSUIPackContainer<I, M, V>(
             interactor: interactor,
@@ -119,9 +123,9 @@ public struct EZSUIPack<
 @available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
 extension EZSUIPack where I.Context == Void {
     public init(
-        interactor: @escaping (M.AccessI) -> I,
+        interactor: @escaping () -> I,
         mediator: @escaping (M.InputI, M.InputV) -> M,
-        view: @escaping (M.AccessV) -> V
+        view: @escaping () -> V
     ) {
         self.init(
             interactor: interactor,

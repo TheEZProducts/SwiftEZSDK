@@ -52,7 +52,7 @@ public class EZObservableObjectGroup: ObservableObject {
     /// Creates a group from an array of objects.
     public init(objects: [any ObservableObject]){
         self.objects = objects
-        keys = objects.map{ addObserver(observObj: $0) }
+        keys = objects.map { addObserver(observObj: $0) }
     }
     
     private func addObserver<ObservObj: ObservableObject>(observObj: ObservObj) -> AnyCancellable{
