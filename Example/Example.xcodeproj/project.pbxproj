@@ -82,6 +82,9 @@
 		AA00000200000038000AA001 /* ProfilePackI.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000100000038000AA001 /* ProfilePackI.swift */; };
 		AA00000200000039000AA001 /* ProfilePackV.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000100000039000AA001 /* ProfilePackV.swift */; };
 		AA0000020000003A000AA001 /* ProfilePack.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000010000003A000AA001 /* ProfilePack.swift */; };
+		AA0000020000003B000AA001 /* ColorUIPack.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000010000003B000AA001 /* ColorUIPack.swift */; };
+		AA0000020000003C000AA001 /* SUIInUIKitPack.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000010000003C000AA001 /* SUIInUIKitPack.swift */; };
+		AA0000020000003D000AA001 /* UIKitInSUIPack.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000010000003D000AA001 /* UIKitInSUIPack.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -161,6 +164,9 @@
 		AA00000100000038000AA001 /* ProfilePackI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfilePackI.swift; sourceTree = "<group>"; };
 		AA00000100000039000AA001 /* ProfilePackV.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfilePackV.swift; sourceTree = "<group>"; };
 		AA0000010000003A000AA001 /* ProfilePack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfilePack.swift; sourceTree = "<group>"; };
+		AA0000010000003B000AA001 /* ColorUIPack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorUIPack.swift; sourceTree = "<group>"; };
+		AA0000010000003C000AA001 /* SUIInUIKitPack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SUIInUIKitPack.swift; sourceTree = "<group>"; };
+		AA0000010000003D000AA001 /* UIKitInSUIPack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIKitInSUIPack.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -228,6 +234,7 @@
 			children = (
 				515023D72A2C8845008255CA /* UIPacs */,
 				AA00000300000001000AA001 /* EZSUIPack */,
+				AA00000300000012000AA001 /* CrossIntegration */,
 			);
 			path = UI;
 			sourceTree = "<group>";
@@ -531,6 +538,16 @@
 			path = Profile;
 			sourceTree = "<group>";
 		};
+		AA00000300000012000AA001 /* CrossIntegration */ = {
+			isa = PBXGroup;
+			children = (
+				AA0000010000003B000AA001 /* ColorUIPack.swift */,
+				AA0000010000003C000AA001 /* SUIInUIKitPack.swift */,
+				AA0000010000003D000AA001 /* UIKitInSUIPack.swift */,
+			);
+			path = CrossIntegration;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -679,6 +696,9 @@
 				AA00000200000038000AA001 /* ProfilePackI.swift in Sources */,
 				AA00000200000039000AA001 /* ProfilePackV.swift in Sources */,
 				AA0000020000003A000AA001 /* ProfilePack.swift in Sources */,
+				AA0000020000003B000AA001 /* ColorUIPack.swift in Sources */,
+				AA0000020000003C000AA001 /* SUIInUIKitPack.swift in Sources */,
+				AA0000020000003D000AA001 /* UIKitInSUIPack.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
