@@ -40,7 +40,7 @@
 │ • логика    │                         │ • ViewModel │                         │ • UI        │
 │ • загрузка  │   ┌─────────────────┐   │ • inputI    │   ┌─────────────────┐   │ • события   │
 │             │   │     AccessI     │   │ • inputV    │   │     AccessV     │   │             │
-│  access ------->│ • viewModel(RW) │-->│             │<--│ • viewModel(R)  │<------- access  │
+│  access ------->│ • viewModel(RW) │-->│             │<--│ • viewModel(RW) │<------- access  │
 │             │   │ • inputV(R)     │   │             │   │ • inputI(R)     │   │             │
 └─────────────┘   └─────────────────┘   └─────────────┘   └─────────────────┘   └─────────────┘
 ```
@@ -55,14 +55,14 @@
 
 Mediator хранит состояние (`ViewModel`) и определяет интерфейсы взаимодействия.
 
-**Ключевое отличие от UIKit:** `ViewModel` должен конформить `ObservableObject`, а его свойства должны использовать `@Published` (или `@EZObservable` с `snapEZObservable()`). SwiftUI автоматически обновляет View при изменении `ObservableObject`.
+**Ключевое отличие от UIKit:** для автоматических обновлений SwiftUI `ViewModel` должен конформить `ObservableObject`, а его свойства должны использовать `@Published` (или `@EZObservable` с `snapEZObservable()`). Используйте `Void`, когда общее состояние не нужно.
 
 ```swift
 import EZSUIPackKit
 
 final class ProfilePackM: EZSUIPackM {
     // MARK: - ViewModel (состояние UI)
-    // Должен быть ObservableObject для автоматических обновлений SwiftUI
+    // Рекомендуется ObservableObject для автоматических обновлений SwiftUI (или Void когда не нужен)
     var viewModel: ViewModel
     @MainActor class ViewModel: ObservableObject {
         @Published var userName: String = ""
@@ -97,7 +97,7 @@ final class ProfilePackM: EZSUIPackM {
 **Важно:**
 - `inputI` — интерфейс, методы которого **реализует Interactor**, а **вызывает View**
 - `inputV` — для SwiftUI View (struct) используйте struct с замыканиями вместо протокола
-- `ViewModel` — класс `ObservableObject` со свойствами `@Published`
+- `ViewModel` — обычно класс `ObservableObject` со свойствами `@Published` (или `Void` когда не нужен)
 - **I и V не имеют прямого доступа** к Mediator, только через access объекты
 
 ---
@@ -166,7 +166,7 @@ extension ProfilePackI: ProfilePackM.InputIProtocol {
 
 ### 3. View
 
-Стандартный SwiftUI `View` с read-only доступом к `viewModel` и `inputI`.
+Стандартный SwiftUI `View` с доступом к `viewModel` (RW) и `inputI` (R).
 
 ```swift
 import SwiftUI
@@ -225,9 +225,9 @@ import EZSUIPackKit
 struct ProfileScreen: View {
     var body: some View {
         EZSUIPack(
-            interactor: { _ in ProfilePackI() },
+            interactor: { ProfilePackI() },
             mediator: { inputI, inputV in ProfilePackM(inputI: inputI, inputV: inputV) },
-            view: { _ in ProfileView() }
+            view: { ProfileView() }
         )
     }
 }
@@ -261,11 +261,11 @@ struct ProfileScreen: View {
 
     var body: some View {
         EZSUIPack(
-            interactor: { _ in ProfilePackI(userId: userId) },
+            interactor: { ProfilePackI(userId: userId) },
             mediator: { inputI, inputV, context in
                 ProfilePackM(inputI: inputI, inputV: inputV, userId: context.userId)
             },
-            view: { _ in ProfileView() }
+            view: { ProfileView() }
         )
     }
 }
@@ -281,11 +281,11 @@ struct ProfileScreen: View {
 
     var body: some View {
         EZSUIPack(
-            interactor: { _ in ProfilePackI(userId: userId) },
+            interactor: { ProfilePackI(userId: userId) },
             mediator: { inputI, inputV in
                 ProfilePackM(inputI: inputI, inputV: inputV, userId: userId)
             },
-            view: { _ in ProfileView() }
+            view: { ProfileView() }
         )
     }
 }
@@ -355,10 +355,6 @@ let inputV: Void = ()
 
 | Ошибка | Решение |
 |--------|---------|
-| ViewModel — struct, а не class | ViewModel должен быть `class`, конформящим `ObservableObject` |
-| Использование `@State` во View для общих данных | Используйте `viewModel` из access объекта |
-| Хранение Interactor в `@State`/`@ObservedObject` | `EZSUIPack` управляет lifecycle компонентов через `@StateObject` |
-| `weak let` для InputV struct | `weak` только для class типов; используйте `let` для struct-based InputV |
 | Обращение к Mediator до `didInitialize()` | Access объект подключается только после инициализации |
 
 ---

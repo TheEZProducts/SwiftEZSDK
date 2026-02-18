@@ -69,9 +69,9 @@ public final class EZSUIPackContainer<
 /// struct ProfileScreen: View {
 ///     var body: some View {
 ///         EZSUIPack(
-///             interactor: { _ in ProfilePackI() },
+///             interactor: { ProfilePackI() },
 ///             mediator: { inputI, inputV, context in ProfilePackM(inputI: inputI, inputV: inputV) },
-///             view: { _ in ProfileView() }
+///             view: { ProfileView() }
 ///         )
 ///     }
 /// }
@@ -80,9 +80,9 @@ public final class EZSUIPackContainer<
 /// When `I.Context == Void`, you can use the shorter form:
 /// ```swift
 /// EZSUIPack(
-///     interactor: { _ in ProfilePackI() },
+///     interactor: { ProfilePackI() },
 ///     mediator: { inputI, inputV in ProfilePackM(inputI: inputI, inputV: inputV) },
-///     view: { _ in ProfileView() }
+///     view: { ProfileView() }
 /// )
 /// ```
 @available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)

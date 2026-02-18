@@ -40,7 +40,7 @@ A **Pack** is a screen or application module consisting of three components:
 │ • logic     │                         │ • ViewModel │                         │ • UI        │
 │ • data load │   ┌─────────────────┐   │ • inputI    │   ┌─────────────────┐   │ • events    │
 │             │   │     AccessI     │   │ • inputV    │   │     AccessV     │   │             │
-│  access ------->│ • viewModel(RW) │-->│             │<--│ • viewModel(R)  │<------- access  │
+│  access ------->│ • viewModel(RW) │-->│             │<--│ • viewModel(RW) │<------- access  │
 │             │   │ • inputV(R)     │   │             │   │ • inputI(R)     │   │             │
 └─────────────┘   └─────────────────┘   └─────────────┘   └─────────────────┘   └─────────────┘
 ```
@@ -55,14 +55,14 @@ Let's create a simple user profile screen.
 
 Mediator stores state (`ViewModel`) and defines interaction interfaces.
 
-**Key difference from UIKit:** the `ViewModel` must conform to `ObservableObject`, and its properties must use `@Published` (or `@EZObservable` with `snapEZObservable()`). SwiftUI automatically updates the View when `ObservableObject` changes.
+**Key difference from UIKit:** for automatic SwiftUI updates, the `ViewModel` should conform to `ObservableObject`, and its properties should use `@Published` (or `@EZObservable` with `snapEZObservable()`). Use `Void` when no shared state is needed.
 
 ```swift
 import EZSUIPackKit
 
 final class ProfilePackM: EZSUIPackM {
     // MARK: - ViewModel (UI state)
-    // Must be ObservableObject for automatic SwiftUI updates
+    // Should be ObservableObject for automatic SwiftUI updates (or use Void when not needed)
     var viewModel: ViewModel
     @MainActor class ViewModel: ObservableObject {
         @Published var userName: String = ""
@@ -97,7 +97,7 @@ final class ProfilePackM: EZSUIPackM {
 **Important:**
 - `inputI` — an interface whose methods are **implemented by the Interactor** and **called by the View**
 - `inputV` — since SwiftUI View is a `struct`, use a struct with closures instead of a protocol
-- `ViewModel` — an `ObservableObject` class with `@Published` properties
+- `ViewModel` — typically an `ObservableObject` class with `@Published` properties (or `Void` when not needed)
 - **I and V do not have direct access** to the Mediator, only through access objects
 
 ---
@@ -166,7 +166,7 @@ extension ProfilePackI: ProfilePackM.InputIProtocol {
 
 ### 3. View
 
-A standard SwiftUI `View` with read-only access to `viewModel` and `inputI`.
+A standard SwiftUI `View` with access to `viewModel` (RW) and `inputI` (R).
 
 ```swift
 import SwiftUI
@@ -225,9 +225,9 @@ import EZSUIPackKit
 struct ProfileScreen: View {
     var body: some View {
         EZSUIPack(
-            interactor: { _ in ProfilePackI() },
+            interactor: { ProfilePackI() },
             mediator: { inputI, inputV in ProfilePackM(inputI: inputI, inputV: inputV) },
-            view: { _ in ProfileView() }
+            view: { ProfileView() }
         )
     }
 }
@@ -261,11 +261,11 @@ struct ProfileScreen: View {
 
     var body: some View {
         EZSUIPack(
-            interactor: { _ in ProfilePackI(userId: userId) },
+            interactor: { ProfilePackI(userId: userId) },
             mediator: { inputI, inputV, context in
                 ProfilePackM(inputI: inputI, inputV: inputV, userId: context.userId)
             },
-            view: { _ in ProfileView() }
+            view: { ProfileView() }
         )
     }
 }
@@ -281,11 +281,11 @@ struct ProfileScreen: View {
 
     var body: some View {
         EZSUIPack(
-            interactor: { _ in ProfilePackI(userId: userId) },
+            interactor: { ProfilePackI(userId: userId) },
             mediator: { inputI, inputV in
                 ProfilePackM(inputI: inputI, inputV: inputV, userId: userId)
             },
-            view: { _ in ProfileView() }
+            view: { ProfileView() }
         )
     }
 }
@@ -355,7 +355,7 @@ let inputV: Void = ()
 
 | Mistake | Fix |
 |---------|-----|
-| ViewModel is a struct, not a class | ViewModel must be a `class` conforming to `ObservableObject` |
+| ViewModel is a struct, not a class | For reactivity, ViewModel should be a `class` conforming to `ObservableObject` (or `Void` when not needed) |
 | Using `@State` in View for shared data | Use `viewModel` from the access object instead |
 | Storing Interactor in `@State`/`@ObservedObject` | `EZSUIPack` manages component lifecycle via `@StateObject` |
 | Using `weak let` for InputV struct | `weak` is only for class types; use `let` for struct-based InputV |

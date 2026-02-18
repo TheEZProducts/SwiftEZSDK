@@ -10,7 +10,7 @@ A SwiftUI module for building UI using the **IMV (Interactor-Mediator-View)** ar
 
 ### 1. Mediator
 
-The mediator stores state via an `ObservableObject` view model and defines interfaces for interactor and view communication.
+The mediator stores state via a view model and defines interfaces for interactor and view communication. When ViewModel conforms to `ObservableObject`, SwiftUI updates happen automatically.
 
 ```swift
 import EZSUIPackKit
@@ -70,7 +70,7 @@ extension ProfilePackI: ProfilePackM.InputIProtocol {
 
 ### 3. View
 
-A standard SwiftUI `View` with read-only access to `viewModel` and `inputI`.
+A standard SwiftUI `View` with access to `viewModel` (RW) and `inputI` (R).
 
 ```swift
 import SwiftUI
@@ -99,9 +99,9 @@ Use `EZSUIPack` to assemble all three components:
 struct ProfileScreen: View {
     var body: some View {
         EZSUIPack(
-            interactor: { _ in ProfilePackI() },
+            interactor: { ProfilePackI() },
             mediator: { inputI, inputV in ProfilePackM(inputI: inputI, inputV: inputV) },
-            view: { _ in ProfileView() }
+            view: { ProfileView() }
         )
     }
 }
@@ -111,9 +111,9 @@ When the interactor uses a custom `Context`, pass the full closure:
 
 ```swift
 EZSUIPack(
-    interactor: { _ in MyPackI() },
+    interactor: { MyPackI() },
     mediator: { inputI, inputV, context in MyPackM(inputI: inputI, inputV: inputV, context: context) },
-    view: { _ in MyView() }
+    view: { MyView() }
 )
 ```
 
@@ -125,7 +125,7 @@ EZSUIPack(
 |-----------|-------------|
 | `EZSUIPack` | SwiftUI view that assembles and manages an IMV pack |
 | `EZSUIPackI` / `EZSUIPackInteractorProtocol` | Interactor protocol with `onAppear`/`onDisappear` lifecycle |
-| `EZSUIPackM` / `EZSUIPackMediator` | Base mediator class with `ObservableObject` view model |
+| `EZSUIPackM` / `EZSUIPackMediator` | Base mediator class (ViewModel optionally conforms to `ObservableObject`) |
 | `EZSUIPackV` / `EZSUIPackViewProtocol` | View protocol combining `View` + `EZIMVPackViewProtocol` |
 
 ---

@@ -10,7 +10,7 @@
 
 ### 1. Mediator
 
-Медиатор хранит состояние через `ObservableObject` view model и определяет интерфейсы для коммуникации интерактора и вью.
+Медиатор хранит состояние через view model и определяет интерфейсы для коммуникации интерактора и вью. Когда ViewModel конформит `ObservableObject`, SwiftUI обновляется автоматически.
 
 ```swift
 import EZSUIPackKit
@@ -70,7 +70,7 @@ extension ProfilePackI: ProfilePackM.InputIProtocol {
 
 ### 3. View
 
-Стандартный SwiftUI `View` с read-only доступом к `viewModel` и `inputI`.
+Стандартный SwiftUI `View` с доступом к `viewModel` (RW) и `inputI` (R).
 
 ```swift
 import SwiftUI
@@ -99,9 +99,9 @@ struct ProfileView: EZSUIPackV {
 struct ProfileScreen: View {
     var body: some View {
         EZSUIPack(
-            interactor: { _ in ProfilePackI() },
+            interactor: { ProfilePackI() },
             mediator: { inputI, inputV in ProfilePackM(inputI: inputI, inputV: inputV) },
-            view: { _ in ProfileView() }
+            view: { ProfileView() }
         )
     }
 }
@@ -111,9 +111,9 @@ struct ProfileScreen: View {
 
 ```swift
 EZSUIPack(
-    interactor: { _ in MyPackI() },
+    interactor: { MyPackI() },
     mediator: { inputI, inputV, context in MyPackM(inputI: inputI, inputV: inputV, context: context) },
-    view: { _ in MyView() }
+    view: { MyView() }
 )
 ```
 
@@ -125,7 +125,7 @@ EZSUIPack(
 |-----------|----------|
 | `EZSUIPack` | SwiftUI view, который собирает и управляет IMV паком |
 | `EZSUIPackI` / `EZSUIPackInteractorProtocol` | Протокол интерактора с lifecycle `onAppear`/`onDisappear` |
-| `EZSUIPackM` / `EZSUIPackMediator` | Базовый класс медиатора с `ObservableObject` view model |
+| `EZSUIPackM` / `EZSUIPackMediator` | Базовый класс медиатора (ViewModel опционально конформит `ObservableObject`) |
 | `EZSUIPackV` / `EZSUIPackViewProtocol` | Протокол вью, комбинирующий `View` + `EZIMVPackViewProtocol` |
 
 ---

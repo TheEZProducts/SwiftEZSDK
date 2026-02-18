@@ -1,6 +1,10 @@
-# Xcode File Template для IMV
+# Xcode File Templates для IMV
 
-Шаблон позволяет быстро создавать структуру Pack (Interactor + Mediator + View) в Xcode.
+Шаблоны для быстрого создания структуры Pack (Interactor + Mediator + View) в Xcode.
+
+Доступны два шаблона:
+- **IMV** — UIKit пак (EZUIPackKit)
+- **SUI IMV** — SwiftUI пак (EZSUIPackKit)
 
 ---
 
@@ -24,7 +28,9 @@ cp -R "File Templates/EZSDK" ~/Library/Developer/Xcode/Templates/
 
 ---
 
-## Использование
+## UIKit шаблон (IMV)
+
+### Использование
 
 1. В Xcode: **File → New → File...** (или `⌘N`)
 2. В разделе шаблонов найдите **EZSDK**
@@ -33,26 +39,22 @@ cp -R "File Templates/EZSDK" ~/Library/Developer/Xcode/Templates/
 5. Введите имя Pack (например, `Profile`)
 6. Нажмите **Create**
 
----
+### Структура генерируемых файлов
 
-## Структура генерируемых файлов
-
-При создании Pack с именем `Profile` и платформой `IPhone` будет создана следующая структура:
+При создании Pack с именем `Profile` и платформой `IPhone`:
 
 ```
 Profile/
-├── Profile.swift        # typealias + View платформы
-├── ProfileI.swift       # Interactor
+├── Profile.swift        # enum фабрика + View платформы
+├── ProfileI.swift       # Interactor (UIViewController)
 ├── ProfileM.swift       # Mediator
 └── ProfileV/
-    └── ProfileIOSV.swift   # View для iOS
+    └── ProfileIOSV.swift   # View для iOS (UIView)
 ```
 
 Для мультиплатформенных конфигураций (например, `IPhoneIPadMac`) будут созданы View для каждой платформы.
 
----
-
-## Что делать после создания
+### Что делать после создания
 
 1. Откройте `*M.swift` (Mediator) и добавьте:
    - Свойства в `ViewModel`
@@ -69,7 +71,46 @@ Profile/
 
 ---
 
+## SwiftUI шаблон (SUI IMV)
+
+### Использование
+
+1. В Xcode: **File → New → File...** (или `⌘N`)
+2. В разделе шаблонов найдите **EZSDK**
+3. Выберите **SUI IMV**
+4. Введите имя Pack (например, `Profile`)
+5. Нажмите **Create**
+
+### Структура генерируемых файлов
+
+При создании Pack с именем `Profile`:
+
+```
+Profile/
+├── Profile.swift        # enum фабрика, возвращающая some View
+├── ProfileI.swift       # Interactor (обычный класс)
+├── ProfileM.swift       # Mediator с ObservableObject ViewModel
+└── ProfileV.swift       # View (SwiftUI)
+```
+
+### Что делать после создания
+
+1. Откройте `*M.swift` (Mediator) и добавьте:
+   - `@Published` свойства в `ViewModel`
+   - Методы в `InputIProtocol`
+
+2. Откройте `*I.swift` (Interactor) и:
+   - Реализуйте `start()`, `onAppear()`, `onDisappear()`
+   - Добавьте бизнес-логику
+   - Реализуйте `InputIProtocol`
+
+3. Откройте `*V.swift` (View) и:
+   - Постройте UI в `body`
+   - Используйте `viewModel` для состояния и `inputI` для действий
+
+---
+
 ## См. также
 
-- [Быстрый старт](../QuickStart/README.md) — пошаговое создание Pack вручную
-- [Главная страница модуля](../README.md) — полный список возможностей
+- [Быстрый старт EZUIPackKit](../QuickStart/README.md) — пошаговое создание UIKit Pack
+- [Быстрый старт EZSUIPackKit](../../EZSUIPackKit/QuickStart/README.md) — пошаговое создание SwiftUI Pack

@@ -11,8 +11,9 @@ import Combine
 
 /// Protocol for mediators in the SwiftUI IMV architecture.
 ///
-/// Extends `EZIMVPackMediatorProtocol` with the requirement that `ViewModel` conforms
-/// to `ObservableObject`, enabling automatic SwiftUI view updates when the view model changes.
+/// Extends `EZIMVPackMediatorProtocol` for SwiftUI. When `ViewModel` conforms to
+/// `ObservableObject`, SwiftUI view updates happen automatically. Use `Void` when
+/// no shared state is needed.
 ///
 /// ### Example
 /// ```swift
@@ -46,7 +47,7 @@ public protocol EZSUIPackMediatorProtocol: EZIMVPackMediatorProtocol {}
 
 @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension EZSUIPackMediatorProtocol where ViewModel == Void {
-    /// Default implementation when `ViewModel` is `EZSUIPackVoidViewModel` (no shared state needed).
+    /// Default implementation when `ViewModel` is `Void` (no shared state needed).
     public var viewModel: ViewModel {
         get { () }
         set {}

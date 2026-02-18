@@ -1,6 +1,10 @@
-# Xcode File Template for IMV
+# Xcode File Templates for IMV
 
-The template allows you to quickly create a Pack structure (Interactor + Mediator + View) in Xcode.
+Templates for quickly creating Pack structures (Interactor + Mediator + View) in Xcode.
+
+Two templates are available:
+- **IMV** — UIKit pack (EZUIPackKit)
+- **SUI IMV** — SwiftUI pack (EZSUIPackKit)
 
 ---
 
@@ -24,7 +28,9 @@ cp -R "File Templates/EZSDK" ~/Library/Developer/Xcode/Templates/
 
 ---
 
-## Usage
+## UIKit Template (IMV)
+
+### Usage
 
 1. In Xcode: **File -> New -> File...** (or `Cmd+N`)
 2. In the templates section, find **EZSDK**
@@ -33,26 +39,22 @@ cp -R "File Templates/EZSDK" ~/Library/Developer/Xcode/Templates/
 5. Enter the Pack name (e.g., `Profile`)
 6. Click **Create**
 
----
+### Generated File Structure
 
-## Generated File Structure
-
-When creating a Pack named `Profile` with the `IPhone` platform, the following structure will be generated:
+When creating a Pack named `Profile` with the `IPhone` platform:
 
 ```
 Profile/
-├── Profile.swift        # typealias + platform View
-├── ProfileI.swift       # Interactor
+├── Profile.swift        # enum factory + platform View
+├── ProfileI.swift       # Interactor (UIViewController)
 ├── ProfileM.swift       # Mediator
 └── ProfileV/
-    └── ProfileIOSV.swift   # View for iOS
+    └── ProfileIOSV.swift   # View for iOS (UIView)
 ```
 
 For multi-platform configurations (e.g., `IPhoneIPadMac`), Views will be created for each platform.
 
----
-
-## What to Do After Creation
+### What to Do After Creation
 
 1. Open `*M.swift` (Mediator) and add:
    - Properties to `ViewModel`
@@ -69,7 +71,46 @@ For multi-platform configurations (e.g., `IPhoneIPadMac`), Views will be created
 
 ---
 
+## SwiftUI Template (SUI IMV)
+
+### Usage
+
+1. In Xcode: **File -> New -> File...** (or `Cmd+N`)
+2. In the templates section, find **EZSDK**
+3. Select **SUI IMV**
+4. Enter the Pack name (e.g., `Profile`)
+5. Click **Create**
+
+### Generated File Structure
+
+When creating a Pack named `Profile`:
+
+```
+Profile/
+├── Profile.swift        # enum factory returning some View
+├── ProfileI.swift       # Interactor (plain class)
+├── ProfileM.swift       # Mediator with ObservableObject ViewModel
+└── ProfileV.swift       # View (SwiftUI)
+```
+
+### What to Do After Creation
+
+1. Open `*M.swift` (Mediator) and add:
+   - `@Published` properties to `ViewModel`
+   - Methods to `InputIProtocol`
+
+2. Open `*I.swift` (Interactor) and:
+   - Implement `start()`, `onAppear()`, `onDisappear()`
+   - Add business logic
+   - Implement `InputIProtocol`
+
+3. Open `*V.swift` (View) and:
+   - Build the UI in `body`
+   - Use `viewModel` for state and `inputI` for actions
+
+---
+
 ## See Also
 
-- [Quick Start](../QuickStart/README.md) — step-by-step manual Pack creation
-- [Module Main Page](../README.md) — full list of features
+- [EZUIPackKit Quick Start](../QuickStart/README.md) — step-by-step UIKit Pack creation
+- [EZSUIPackKit Quick Start](../../EZSUIPackKit/QuickStart/README.md) — step-by-step SwiftUI Pack creation

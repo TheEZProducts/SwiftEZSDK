@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>SupportsSwiftPackage</key>
+	<true/>
+	<key>Kind</key>
+	<string>Xcode.IDEFoundation.TextSubstitutionFileTemplateKind</string>
+	<key>Description</key>
+	<string>A SwiftUI IMV Pack with Interactor, Mediator, and View.</string>
+	<key>Summary</key>
+	<string>A SwiftUI IMV Pack</string>
+	<key>SortOrder</key>
+	<string>2</string>
+	<key>AllowedTypes</key>
+	<array>
+		<string>public.swift-source</string>
+	</array>
+	<key>Platforms</key>
+	<array/>
+	<key>Options</key>
+	<array>
+		<dict>
+			<key>Identifier</key>
+			<string>productName</string>
+			<key>Required</key>
+			<true/>
+			<key>Name</key>
+			<string>Module:</string>
+			<key>Description</key>
+			<string>The name of the SUI IMV Pack</string>
+			<key>Type</key>
+			<string>text</string>
+			<key>Default</key>
+			<string>SUIIMVPack</string>
+		</dict>
+	</array>
+</dict>
+</plist>
