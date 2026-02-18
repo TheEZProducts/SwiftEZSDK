@@ -65,12 +65,21 @@ public final class EZSUIPackContainer<
 /// struct ProfileScreen: View {
 ///     var body: some View {
 ///         EZSUIPack(
-///             interactor: { access in ProfilePackI(access: access) },
-///             mediator: { inputI, inputV in ProfilePackM(inputI: inputI, inputV: inputV) },
-///             view: { access in ProfileView(access: access) }
+///             interactor: { _ in ProfilePackI() },
+///             mediator: { inputI, inputV, context in ProfilePackM(inputI: inputI, inputV: inputV) },
+///             view: { _ in ProfileView() }
 ///         )
 ///     }
 /// }
+/// ```
+///
+/// When `I.Context == Void`, you can use the shorter form:
+/// ```swift
+/// EZSUIPack(
+///     interactor: { _ in ProfilePackI() },
+///     mediator: { inputI, inputV in ProfilePackM(inputI: inputI, inputV: inputV) },
+///     view: { _ in ProfileView() }
+/// )
 /// ```
 @available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
 public struct EZSUIPack<
@@ -103,6 +112,10 @@ public struct EZSUIPack<
     }
 }
 
+/// Convenience initializer for packs where the interactor's `Context` is `Void`.
+///
+/// This overload omits the context parameter from the mediator closure,
+/// making the call site shorter for the most common case.
 @available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
 extension EZSUIPack where I.Context == Void {
     public init(

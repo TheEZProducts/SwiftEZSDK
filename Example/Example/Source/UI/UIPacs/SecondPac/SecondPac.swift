@@ -13,15 +13,25 @@ import SwiftUI
 
 typealias SecondPac = EZUIPack<SecondPacI, SecondPacM, SecondPacSV1>
 
+extension SecondPac {
+    static func make(interactor makeI: @autoclosure () -> SecondPacI = .init()) -> SecondPacI {
+        make(
+            interactor: makeI,
+            mediator: { inputI, inputV in SecondPacM(inputI: inputI, inputV: inputV) },
+            view: { SecondPacSV1() }
+        )
+    }
+}
+
 class SecondPacI: EZUIPackI {
     var access = SecondPacM.accessI
     
-    func makeContext() -> Mediator.ContextI {
+    func makeInput() -> Mediator.InputI {
         var inputI = SecondPacM.IAction()
         inputI.next = {[weak self] in self?.next() }
         inputI.back = {[weak self] in self?.back() }
         inputI.close = {[weak self] in self?.close() }
-        return .init(actions: inputI, viewModel: .init())
+        return inputI
     }
     
     func start() {
@@ -97,40 +107,19 @@ class SecondPacM: EZUIPackM {
         var back = {}
         var close = {}
     }
-        
-    required init(contextI: EZUIPackMediatorContextI<SecondPacM>, contextV: EZUIPackMediatorContextV<SecondPacM>) {
-        viewModel = contextI.viewModel
-        inputI = contextI.actions
-    }
-}
 
-class SecondPacM1: EZUIPackM {
-    var viewModel: ViewModel
-    class ViewModel: ObservableObject {
-        var color: Color = Color(uiColor: .init(red: .random(in: 0...1), green: .random(in: 0...1), blue: .random(in: 0...1), alpha: 1))
-        @Published var count: Int = 0
-        @Published var count1: Bool = false
-    }
-    
-    var inputI: IAction
-    struct IAction {
-        var next = {}
-        var back = {}
-        var close = {}
-    }
-    
-    required init(contextI: ContextI, contextV: ContextV) {
-        viewModel = contextI.viewModel
-        inputI = contextI.actions
+    let inputV: Void = ()
+
+    init(inputI: InputI, inputV: InputV) {
+        self.viewModel = .init()
+        self.inputI = inputI
     }
 }
 
 class SecondPacV: EZUIPackV {
     var supportedInterfaceOrientations: UIInterfaceOrientationMask? { .all }
-    
+
     var access = SecondPacM.accessV
-    
-    func makeContext() -> Mediator.ContextV { .init(actions: ()) }
     
     func animateOpen() {
         print("aaaaa")
@@ -173,10 +162,6 @@ class SecondPacSV1: EZUIPackSUIV {
     var viewStorage = MyViewStates()
     var additionalObservableObjects: [any ObservableObject] {[viewStorage]}
     
-    func makeContext() -> Mediator.ContextV {
-        .init(actions: ())
-    }
-    
     var body: some View{
         ZStack{
             viewModel.color
@@ -208,12 +193,8 @@ struct SecondPacSV: EZUIPackSV {
     @Environment(\.colorScheme) var color
     @State var count: Int = 0
     
-    func makeContext() -> Mediator.ContextV {
-        .init(actions: ())
-    }
-    
     func create() {
-//        print("create", uiView?.bounds, ezParentShered[.mainPackMChain.test])
+//        print("create", uiView?.bounds, ezParentShared[.mainPackMChain.test])
         print("huh", UIView.inheritedAnimationDuration)
     }
     

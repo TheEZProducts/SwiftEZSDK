@@ -85,7 +85,6 @@ class EZPackMediatorContainer<Value> {
 /// Provides the interactor with:
 /// - `viewModel` — read/write access to the shared view model
 /// - `inputV` — read-only access to the view's action interface
-/// - `mediator` — direct reference (available after `didInitialize()`)
 /// - Dynamic member access to properties defined in the access map
 ///
 /// Created via `MyMediator.accessI` and assigned in the interactor:
@@ -103,7 +102,7 @@ public class EZPackMediatorAccessI<
     private var container = EZPackMediatorContainer<Mediator>(
         errorMessage: "Use the access only after the `didInitialize()` was called."
     )
-    public var mediator: Mediator { container.get() }
+    package var mediator: Mediator { container.get() }
 
     public var viewModel: Mediator.ViewModel {
         get { mediator.viewModel }
@@ -114,7 +113,7 @@ public class EZPackMediatorAccessI<
         get { mediator.inputV }
     }
 
-    public func setMediator(_ mediator: Mediator) { container.set(mediator) }
+    package func setMediator(_ mediator: Mediator) { container.set(mediator) }
 
     public init(_ mediator: Mediator? = nil, accessMap: AccessMap) {
         super.init({[container] in container.get() }, accessMap: accessMap)
@@ -129,7 +128,6 @@ public class EZPackMediatorAccessI<
 /// Provides the view with:
 /// - `viewModel` — read/write access to the shared view model
 /// - `inputI` — read-only access to the interactor's action interface
-/// - `mediator` — direct reference (available after `didInitialize()`)
 /// - Dynamic member access to properties defined in the access map
 ///
 /// Created via `MyMediator.accessV` and assigned in the view:
@@ -147,9 +145,9 @@ open class EZPackMediatorAccessV<
     private var container = EZPackMediatorContainer<Mediator>(
         errorMessage: "Use the access only after the `didInitialize()` was called."
     )
-    public var mediator: Mediator { container.get() }
+    package var mediator: Mediator { container.get() }
 
-    public func setMediator(_ mediator: Mediator) {
+    package func setMediator(_ mediator: Mediator) {
         container.set(mediator)
     }
 

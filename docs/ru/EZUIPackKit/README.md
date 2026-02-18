@@ -81,4 +81,4 @@
 ## Полезные ссылки
 
 - [Package.swift](../../../Package.swift) — описание модуля в SPM
-- [Исходный код](../../../Sources/EZUIPackKit/) — реализация модуля
+- [Исходный код](../../../Sources/EZUI/EZUIPack/EZUIPackKit/) — реализация модуля

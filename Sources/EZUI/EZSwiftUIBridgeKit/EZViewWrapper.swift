@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  EZViewWrapper.swift
 //
 //
 //  Created by Александр Сенин on 04.06.2023.
@@ -82,7 +82,7 @@ extension EZView{
     /// _ = wrapped
     /// ```
     public static func ezWrap<V: View, ObservObj: ObservableObject>(
-        _ observable: ObservObj = EZViewWraperObservable(),
+        _ observable: ObservObj = EZViewWrapperObservable(),
         view: V
     ) -> EZView { .ezWrap(observable){_ in view} }
     
@@ -92,14 +92,14 @@ extension EZView{
     ///
     /// ### Example
     /// ```swift
-    /// let vm = EZViewWraperObservable()
+    /// let vm = EZViewWrapperObservable()
     /// let wrapped = EZView.ezWrap(vm) {
     ///     Text("Hello")
     /// }
     /// _ = wrapped
     /// ```
     public static func ezWrap<V: View, ObservObj: ObservableObject>(
-        _ observable: ObservObj = EZViewWraperObservable(),
+        _ observable: ObservObj = EZViewWrapperObservable(),
         @ViewBuilder view: @escaping ()->V
     ) -> EZView { .ezWrap(observable){_ in view()} }
     
@@ -126,7 +126,7 @@ extension EZView{
     /// _ = wrapped
     /// ```
     public static func ezWrap<V: View, ObservObj: ObservableObject>(
-        _ observable: ObservObj = EZViewWraperObservable(),
+        _ observable: ObservObj = EZViewWrapperObservable(),
         @ViewBuilder view: @escaping (ObservObj)->V
     ) -> EZView {
         if #available(iOS 16.0, tvOS 16.0, *) {
@@ -166,25 +166,29 @@ extension EZView{
 ///
 /// ### Example
 /// ```swift
-/// let driver = EZViewWraperObservable()
+/// let driver = EZViewWrapperObservable()
 /// let wrapped = EZView.ezWrap(driver) { _ in
 ///     Text("Hello")
 /// }
 /// driver.update() // forces the wrapped SwiftUI view to refresh
 /// _ = wrapped
 /// ```
-public class EZViewWraperObservable: ObservableObject {
+public class EZViewWrapperObservable: ObservableObject {
     /// Triggers `objectWillChange`, causing the hosted SwiftUI view to update.
     public func update() { objectWillChange.send() }
     /// Creates a new update driver.
     public init(){}
 }
 
+/// An internal SwiftUI view that observes an `ObservableObject` and rebuilds its content on changes.
+///
+/// Used by `EZView.ezWrap(_:view:)` to bridge platform views with SwiftUI content.
+/// You typically don't use this type directly.
 @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 public struct EZObserveView<V: View, ObservObj: ObservableObject>: View {
     @ObservedObject var obj: ObservObj
     private var view: (ObservObj)->V?
-    
+
     public init(_ obj: ObservObj, _ view: @escaping (ObservObj)->V){
         self.view = view
         self.obj = obj

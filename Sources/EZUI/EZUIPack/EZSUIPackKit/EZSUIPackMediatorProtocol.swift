@@ -45,15 +45,6 @@ import Combine
 public protocol EZSUIPackMediatorProtocol: EZPackMediatorBaseProtocol where ViewModel: ObservableObject {}
 
 @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
-extension EZSUIPackMediatorProtocol {
-    /// The view access type for SwiftUI mediators.
-    public typealias AccessV = EZPackMediatorAccessV<Self, AccessMapV>
-
-    /// Creates a new view access object.
-    public static var accessV: AccessV { .init(accessMap: accessMapV) }
-}
-
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension EZSUIPackMediatorProtocol where ViewModel == EZSUIPackVoidViewModel {
     /// Default implementation when `ViewModel` is `EZSUIPackVoidViewModel` (no shared state needed).
     public var viewModel: ViewModel {

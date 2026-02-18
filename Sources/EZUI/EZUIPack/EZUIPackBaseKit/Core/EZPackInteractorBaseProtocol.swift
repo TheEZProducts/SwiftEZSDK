@@ -48,7 +48,7 @@ public protocol EZPackInteractorBaseProtocol: AnyObject {
     /// ```swift
     /// let access = MyPackM.accessI
     /// ```
-    var access: Mediator.AccessI { get }
+    var access: EZPackMediatorAccessI<Mediator, Mediator.AccessMapI> { get }
 
     /// Provides the interactor's action interface to the mediator.
     ///

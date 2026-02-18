@@ -1,6 +1,6 @@
 //
 //  EZPackMediatorBaseProtocol.swift
-//  EZSDK
+//  EZUIPackBaseKit
 //
 //  Created by Александр Сенин on 15.02.2026.
 //
@@ -42,7 +42,7 @@ import Foundation
 /// ```
 @MainActor
 public protocol EZPackMediatorBaseProtocol: AnyObject {
-    //MARK: - Required Objects
+    // MARK: - Required Objects
 
     /// Shared state accessible to both interactor and view.
     associatedtype ViewModel
@@ -61,7 +61,7 @@ public protocol EZPackMediatorBaseProtocol: AnyObject {
     associatedtype InputV
     var inputV: InputV { get }
 
-    //MARK: - Access
+    // MARK: - Access
 
     /// The type that maps mediator key paths for interactor access.
     ///

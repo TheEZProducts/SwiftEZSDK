@@ -34,10 +34,7 @@ import SwiftUI
 @MainActor
 public protocol EZSUIPackViewProtocol: EZPackViewBaseProtocol, View, Equatable
     where Mediator: EZSUIPackMediatorProtocol
-{
-    /// The access object providing controlled access to the mediator.
-    var access: Mediator.AccessV { get }
-}
+{}
 
 @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension EZSUIPackViewProtocol {

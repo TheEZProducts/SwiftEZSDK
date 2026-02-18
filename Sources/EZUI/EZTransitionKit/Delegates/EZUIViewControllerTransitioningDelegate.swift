@@ -1,5 +1,5 @@
 //
-//  UIViewControllerTransitioning.swift
+//  EZUIViewControllerTransitioningDelegate.swift
 //  EZSDK
 //
 //  Created by Александр Сенин on 25.12.2025.

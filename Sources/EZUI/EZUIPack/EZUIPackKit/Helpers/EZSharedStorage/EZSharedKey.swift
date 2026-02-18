@@ -67,7 +67,7 @@ extension EZSharedKeyProtocol{
 /// // 3. Usage:
 /// storage[.onboardingChain.onboardingStatus] = currentStatus
 /// let status: OnboardingStatus? = storage[.onboardingChain.onboardingStatus]
-/// ezParentShered[.onboardingChain.onboardingActions]?.next()
+/// ezParentShared[.onboardingChain.onboardingActions]?.next()
 /// ```
 ///
 /// - Note: The key string is automatically prefixed with the chain and value type names

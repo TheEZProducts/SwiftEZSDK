@@ -99,10 +99,11 @@ final class ProfilePackM: EZUIPackM {
     }
 
     // MARK: - Init
-    required init(contextI: BaseContextI, contextV: BaseContextV) {
-        viewModel = contextI.viewModel
-        inputI = contextI.actions
-        inputV = contextV.actions
+    // Free-form initializer — receives InputI and InputV directly
+    init(inputI: InputI, inputV: InputV) {
+        self.inputI = inputI
+        self.inputV = inputV
+        self.viewModel = .init()
     }
 
     // MARK: - Access objects
@@ -142,10 +143,9 @@ final class ProfilePackI: EZUIPackI {
     // No direct access to the Mediator itself
     let access = ProfilePackM.accessI
 
-    // MARK: - Creating context for Mediator
-    func makeContext() -> Mediator.ContextI {
-        .init(actions: self, viewModel: .init())
-    }
+    // MARK: - Input for Mediator
+    // Returns self as InputI (default when Mediator.InputI == Self)
+    // func makeInput() -> Mediator.InputI { self }
 
     // MARK: - Lifecycle
     func didInitialize() {
@@ -226,10 +226,9 @@ final class ProfilePackV: EZUIPackV {
     private let loadingIndicator = UIActivityIndicatorView(style: .large)
     private let logoutButton = UIButton(type: .system)
 
-    // MARK: - Creating context for Mediator
-    func makeContext() -> Mediator.ContextV {
-        .init(actions: self)
-    }
+    // MARK: - Input for Mediator
+    // Returns self as InputV (default when Mediator.InputV == Self)
+    // func makeInput() -> Mediator.InputV { self }
 
     // MARK: - Creating UI
     func create() {
@@ -368,13 +367,34 @@ extension ProfilePackV: ProfilePackM.InputVProtocol {
 
 ### 4. Combining into a Pack
 
+**Option A — typealias (compact):**
+
 ```swift
 import EZUIPackKit
 
 typealias ProfilePack = EZUIPack<ProfilePackI, ProfilePackM, ProfilePackV>
 ```
 
+**Option B — enum factory (flexible, allows custom parameters):**
+
+```swift
+import EZUIPackKit
+
+enum ProfilePack {
+    @MainActor
+    static func make() -> ProfilePackI {
+        EZPackMaker.make(
+            interactor: { ProfilePackI() },
+            mediator: { inputI, inputV in ProfilePackM(inputI: inputI, inputV: inputV) },
+            view: { ProfilePackV() }
+        )
+    }
+}
+```
+
 Done! Now `ProfilePack` is a fully functional screen.
+
+Both approaches support the same `.make()` API below.
 
 ---
 
@@ -397,7 +417,17 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = scene as? UIWindowScene else { return }
 
         window = UIWindow(windowScene: windowScene)
+
+        // Option A (typealias):
+        window?.rootViewController = ProfilePack.make(
+            interactor: { ProfilePackI() },
+            mediator: { inputI, inputV in ProfilePackM(inputI: inputI, inputV: inputV) },
+            view: { ProfilePackV() }
+        )
+
+        // Option B (enum factory):
         window?.rootViewController = ProfilePack.make()
+
         window?.makeKeyAndVisible()
     }
 }
@@ -406,25 +436,25 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 ### Modal Presentation
 
 ```swift
-let profilePack = ProfilePack.make()
-present(profilePack.interactor, animated: true)
+let interactor = ProfilePack.make()
+present(interactor, animated: true)
 ```
 
 ### Push in NavigationController
 
 ```swift
-let profilePack = ProfilePack.make()
-navigationController?.pushViewController(profilePack.interactor, animated: true)
+let interactor = ProfilePack.make()
+navigationController?.pushViewController(interactor, animated: true)
 ```
 
 ### Using the Transition System
 
 ```swift
 // From any UIViewController
-ezTransit.present(ProfilePack.make().interactor).animate().transit()
+ezTransit.present(ProfilePack.make()).animate().transit()
 
 // Or navigation push
-ezTransit.navigationPush(ProfilePack.make().interactor).animate().transit()
+ezTransit.navigationPush(ProfilePack.make()).animate().transit()
 ```
 
 ---
@@ -447,13 +477,13 @@ struct ProfileSwiftUIPackV: EZUIPackSV {
 
     // For SwiftUI View we use a struct with closures instead of a protocol,
     // because SwiftUI View is a struct and cannot be weak
-    func makeContext() -> Mediator.ContextV {
-        .init(actions: .init(
+    func makeInput() -> Mediator.InputV {
+        .init(
             showError: { [weak access] message in
                 // Handle error
                 print("Error: \(message)")
             }
-        ))
+        )
     }
 
     var body: some View {
@@ -505,10 +535,10 @@ final class ProfileSwiftUIPackM: EZUIPackM {
     }
 
     // MARK: - Init
-    required init(contextI: BaseContextI, contextV: BaseContextV) {
-        viewModel = contextI.viewModel
-        inputI = contextI.actions
-        inputV = contextV.actions
+    init(inputI: InputI, inputV: InputV) {
+        self.inputI = inputI
+        self.inputV = inputV
+        self.viewModel = .init()
     }
 }
 ```
@@ -527,7 +557,7 @@ final class ProfileSwiftUIPackM: EZUIPackM {
 
 ```swift
 // Push
-ezTransit.navigationPush(OtherPack.make().interactor).animate().transit()
+ezTransit.navigationPush(OtherPack.make()).animate().transit()
 
 // Pop
 ezTransit.navigationPop().animate().transit()
@@ -540,7 +570,7 @@ ezTransit.navigationPopToRoot().animate().transit()
 
 ```swift
 // Present
-ezTransit.present(OtherPack.make().interactor)
+ezTransit.present(OtherPack.make())
     .presentationStyle(.fullScreen)
     .animation(.coverVertical)
     .transit()
@@ -615,12 +645,12 @@ class OnboardingStepViewController: UIViewController {
         super.viewWillAppear(animated)
 
         // Get data from parent (hierarchy is already built)
-        if let status = ezParentShered[.onboardingChain.onboardingStatus] {
+        if let status = ezParentShared[.onboardingChain.onboardingStatus] {
             // Use onboarding status from parent
         }
 
         // Call parent actions
-        ezParentShered[.onboardingChain.onboardingActions]?.next()
+        ezParentShared[.onboardingChain.onboardingActions]?.next()
     }
 }
 ```

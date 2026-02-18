@@ -1,5 +1,5 @@
 //
-//  EZUIPagePack.swift
+//  EZUIPagePackI.swift
 //  UIPackkages
 //
 //  Created by Александр Сенин on 16.02.2025.

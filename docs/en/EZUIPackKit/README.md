@@ -81,4 +81,4 @@ Detailed documentation — [EZTransitionAnimations](Transitions/EZTransitionAnim
 ## Useful Links
 
 - [Package.swift](../../../Package.swift) — module definition in SPM
-- [Source Code](../../../Sources/EZUIPackKit/) — module implementation
+- [Source Code](../../../Sources/EZUI/EZUIPack/EZUIPackKit/) — module implementation

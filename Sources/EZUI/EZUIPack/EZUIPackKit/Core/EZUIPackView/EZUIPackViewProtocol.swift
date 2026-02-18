@@ -1,5 +1,5 @@
 //
-//  EZUIPackV.swift
+//  EZUIPackViewProtocol.swift
 //  UIPackkages
 //
 //  Created by Александр Сенин on 08.02.2025.

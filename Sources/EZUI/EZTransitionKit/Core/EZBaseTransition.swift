@@ -49,7 +49,7 @@ extension EZTransition<EZContainerView>{
     ///
     /// ### Example
     /// ```swift
-    /// let transition = containerView.transit.present(vc)
+    /// let transition = containerView.ezTransit.present(vc)
     ///     .animate()
     ///     .transit()
     /// ```
@@ -212,7 +212,7 @@ extension EZTransitionProtocol<EZBaseTransitionContext>{
 /// ### Example: Presenting in a container view
 ///
 /// ```swift
-/// let transition = containerView.transit.present(vc)
+/// let transition = containerView.ezTransit.present(vc)
 ///     .animate()
 ///     .transit()
 /// ```

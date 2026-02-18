@@ -37,9 +37,6 @@ import Foundation
 public protocol EZViewProtocol<Mediator>: EZPackViewBaseProtocol
     where Mediator: EZUIPackMediatorProtocol
 {
-    /// Access object providing controlled access to the mediator.
-    var access: Mediator.AccessV { get }
-
     /// Called once when the view is first created, before it appears.
     func create()
 }

@@ -99,21 +99,22 @@ final class ProfilePackM: EZUIPackM {
     }
     
     // MARK: - Init
-    required init(contextI: BaseContextI, contextV: BaseContextV) {
-        viewModel = contextI.viewModel
-        inputI = contextI.actions
-        inputV = contextV.actions
+    // Свободный инициализатор — получает InputI и InputV напрямую
+    init(inputI: InputI, inputV: InputV) {
+        self.inputI = inputI
+        self.inputV = inputV
+        self.viewModel = .init()
     }
-    
+
     // MARK: - Access объекты
     // Эти статические свойства создают объекты доступа для I и V
     // Interactor использует: let access = ProfilePackM.accessI
     // View использует: let access = ProfilePackM.accessV
-    // 
+    //
     // Access объекты предоставляют контролируемый доступ к:
     // - viewModel (чтение и запись)
     // - inputI / inputV (только чтение)
-    // 
+    //
     // Прямого доступа к самому Mediator у I и V нет!
 }
 ```
@@ -142,11 +143,10 @@ final class ProfilePackI: EZUIPackI {
     // Прямого доступа к самому Mediator нет
     let access = ProfilePackM.accessI
     
-    // MARK: - Создание контекста для Mediator
-    func makeContext() -> Mediator.ContextI {
-        .init(actions: self, viewModel: .init())
-    }
-    
+    // MARK: - Input для Mediator
+    // Возвращает self как InputI (по умолчанию когда Mediator.InputI == Self)
+    // func makeInput() -> Mediator.InputI { self }
+
     // MARK: - Жизненный цикл
     func didInitialize() {
         // Вызывается после создания Pack
@@ -226,11 +226,10 @@ final class ProfilePackV: EZUIPackV {
     private let loadingIndicator = UIActivityIndicatorView(style: .large)
     private let logoutButton = UIButton(type: .system)
     
-    // MARK: - Создание контекста для Mediator
-    func makeContext() -> Mediator.ContextV {
-        .init(actions: self)
-    }
-    
+    // MARK: - Input для Mediator
+    // Возвращает self как InputV (по умолчанию когда Mediator.InputV == Self)
+    // func makeInput() -> Mediator.InputV { self }
+
     // MARK: - Создание UI
     func create() {
         view.backgroundColor = .systemBackground
@@ -286,7 +285,7 @@ final class ProfilePackV: EZUIPackV {
     }
     
     func animateOpen() {
-        // Вызывается в контексте анамиции перехода на экран
+        // Вызывается в контексте анимации перехода на экран
     }
     
     func didOpen() {
@@ -303,7 +302,7 @@ final class ProfilePackV: EZUIPackV {
     
 
     func animateClose() {
-        // Вызывается в контексте анамиции перехода с экрана
+        // Вызывается в контексте анимации перехода с экрана
     }
     
     func didClose() {
@@ -368,13 +367,34 @@ extension ProfilePackV: ProfilePackM.InputVProtocol {
 
 ### 4. Объединение в Pack
 
+**Вариант A — typealias (компактный):**
+
 ```swift
 import EZUIPackKit
 
 typealias ProfilePack = EZUIPack<ProfilePackI, ProfilePackM, ProfilePackV>
 ```
 
+**Вариант B — enum factory (гибкий, позволяет передавать параметры):**
+
+```swift
+import EZUIPackKit
+
+enum ProfilePack {
+    @MainActor
+    static func make() -> ProfilePackI {
+        EZPackMaker.make(
+            interactor: { ProfilePackI() },
+            mediator: { inputI, inputV in ProfilePackM(inputI: inputI, inputV: inputV) },
+            view: { ProfilePackV() }
+        )
+    }
+}
+```
+
 Готово! Теперь `ProfilePack` — это полноценный экран.
+
+Оба подхода поддерживают одинаковый API `.make()` ниже.
 
 ---
 
@@ -390,14 +410,24 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     var window: UIWindow?
 
     func scene(
-        _ scene: UIScene, 
-        willConnectTo session: UISceneSession, 
+        _ scene: UIScene,
+        willConnectTo session: UISceneSession,
         options connectionOptions: UIScene.ConnectionOptions
     ) {
         guard let windowScene = scene as? UIWindowScene else { return }
-        
+
         window = UIWindow(windowScene: windowScene)
+
+        // Вариант A (typealias):
+        window?.rootViewController = ProfilePack.make(
+            interactor: { ProfilePackI() },
+            mediator: { inputI, inputV in ProfilePackM(inputI: inputI, inputV: inputV) },
+            view: { ProfilePackV() }
+        )
+
+        // Вариант B (enum factory):
         window?.rootViewController = ProfilePack.make()
+
         window?.makeKeyAndVisible()
     }
 }
@@ -406,25 +436,25 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 ### Модальное открытие
 
 ```swift
-let profilePack = ProfilePack.make()
-present(profilePack.interactor, animated: true)
+let interactor = ProfilePack.make()
+present(interactor, animated: true)
 ```
 
 ### Push в NavigationController
 
 ```swift
-let profilePack = ProfilePack.make()
-navigationController?.pushViewController(profilePack.interactor, animated: true)
+let interactor = ProfilePack.make()
+navigationController?.pushViewController(interactor, animated: true)
 ```
 
 ### Через систему переходов
 
 ```swift
 // Из любого UIViewController
-ezTransit.present(ProfilePack.make().interactor).animate().transit()
+ezTransit.present(ProfilePack.make()).animate().transit()
 
 // Или navigation push
-ezTransit.navigationPush(ProfilePack.make().interactor).animate().transit()
+ezTransit.navigationPush(ProfilePack.make()).animate().transit()
 ```
 
 ---
@@ -447,13 +477,13 @@ struct ProfileSwiftUIPackV: EZUIPackSV {
     
     // Для SwiftUI View используем struct с замыканиями вместо протокола,
     // потому что SwiftUI View — это struct, и не может быть weak
-    func makeContext() -> Mediator.ContextV {
-        .init(actions: .init(
+    func makeInput() -> Mediator.InputV {
+        .init(
             showError: { [weak access] message in
                 // Обработка ошибки
                 print("Error: \(message)")
             }
-        ))
+        )
     }
     
     var body: some View {
@@ -505,10 +535,10 @@ final class ProfileSwiftUIPackM: EZUIPackM {
     }
     
     // MARK: - Init
-    required init(contextI: BaseContextI, contextV: BaseContextV) {
-        viewModel = contextI.viewModel
-        inputI = contextI.actions
-        inputV = contextV.actions
+    init(inputI: InputI, inputV: InputV) {
+        self.inputI = inputI
+        self.inputV = inputV
+        self.viewModel = .init()
     }
 }
 ```
@@ -527,7 +557,7 @@ final class ProfileSwiftUIPackM: EZUIPackM {
 
 ```swift
 // Push
-ezTransit.navigationPush(OtherPack.make().interactor).animate().transit()
+ezTransit.navigationPush(OtherPack.make()).animate().transit()
 
 // Pop
 ezTransit.navigationPop().animate().transit()
@@ -540,7 +570,7 @@ ezTransit.navigationPopToRoot().animate().transit()
 
 ```swift
 // Present
-ezTransit.present(OtherPack.make().interactor)
+ezTransit.present(OtherPack.make())
     .presentationStyle(.fullScreen)
     .animation(.coverVertical)
     .transit()
@@ -615,12 +645,12 @@ class OnboardingStepViewController: UIViewController {
         super.viewWillAppear(animated)
         
         // Получаем данные от родителя (иерархия уже построена)
-        if let status = ezParentShered[.onboardingChain.onboardingStatus] {
+        if let status = ezParentShared[.onboardingChain.onboardingStatus] {
             // Используем статус онбординга от родителя
         }
         
         // Вызываем действия родителя
-        ezParentShered[.onboardingChain.onboardingActions]?.next()
+        ezParentShared[.onboardingChain.onboardingActions]?.next()
     }
 }
 ```

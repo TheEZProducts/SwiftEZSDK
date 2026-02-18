@@ -41,6 +41,16 @@ class ColorSeter<Subject>{
 
 typealias FirstPac = EZUIPack<FirstPacI, FirstPacM, FirstPacV>
 
+extension FirstPac {
+    static func make(interactor makeI: @autoclosure () -> FirstPacI = .init()) -> FirstPacI {
+        make(
+            interactor: makeI,
+            mediator: { inputI, inputV in FirstPacM(inputI: inputI, inputV: inputV) },
+            view: { FirstPacV() }
+        )
+    }
+}
+
 class FirstPacV: EZUIPackPlatformsV<FirstPacM>{
     override var iOS: (any EZUIPackViewProtocol<FirstPacM>)? { FirstPacIOSV() }
     override var macCatalyst: (any EZUIPackViewProtocol<FirstPacM>)? { FirstPacIOSV() }
@@ -52,9 +62,7 @@ class FirstPacI: EZUIPackI {
     
     var value: Int = 10
     
-    func makeContext() -> Mediator.ContextI {
-        .init(actions: .init(), viewModel: .init())
-    }
+    func makeInput() -> Mediator.InputI { .init() }
     
     
     func didInitialize() {
@@ -269,12 +277,14 @@ class FirstPacM: EZUIPackM {
     
     var inputI = IAction()
     struct IAction {
-        
+
     }
-    
-    required init(contextI: EZUIPackMediatorContextI<FirstPacM>, contextV: EZUIPackMediatorContextV<FirstPacM>) {
-        viewModel = contextI.viewModel
-        inputI = contextI.actions
+
+    let inputV: Void = ()
+
+    init(inputI: InputI, inputV: InputV) {
+        self.viewModel = .init()
+        self.inputI = inputI
     }
 }
  
@@ -284,12 +294,9 @@ extension UIView {
 
 class FirstPacIOSV: EZUIPackV {
     var supportedInterfaceOrientations: UIInterfaceOrientationMask? { .all }
-    
+
     let access = FirstPacM.accessV
     
-    func makeContext() -> EZUIPackKit.EZUIPackMediatorContextV<FirstPacM> {
-        .init(actions: ())
-    }
     
     
     func create() {

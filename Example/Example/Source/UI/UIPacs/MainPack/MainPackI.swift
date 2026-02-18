@@ -12,9 +12,7 @@ import Foundation
 class MainPackI: EZUINavigationPackI {
     let access = MainPackM.accessI
     
-    func makeContext() -> Mediator.ContextI {
-        .init(actions: self, viewModel: .init())
-    }
+    func makeInput() -> Mediator.InputI { self }
     
     var firstPac = FirstPac.make(interactor: .init())
     
@@ -171,10 +169,10 @@ class MainPackM: EZUIPackM {
         func test()
     }
     
-    required init(contextI: BaseContextI, contextV: BaseContextV) {
-        viewModel = contextI.viewModel
-        inputI = contextI.actions
-        inputV = contextV.actions
+    init(inputI: InputI, inputV: InputV) {
+        self.viewModel = .init()
+        self.inputI = inputI
+        self.inputV = inputV
     }
 }
 
@@ -182,10 +180,8 @@ class MainPackM: EZUIPackM {
 
 class MainPackV: EZUIPackV {
     let access = MainPackM.accessV
-    
-    func makeContext() -> Mediator.ContextV {
-        .init(actions: self)
-    }
+
+    func makeInput() -> Mediator.InputV { self }
     
     func create() {
         createSelf()

@@ -1,5 +1,5 @@
 //
-//  UIViewController + ezParentShared.swift
+//  UIViewController + parentShared.swift
 //  EZSDK
 //
 //  Created by Александр Сенин on 25.12.2025.

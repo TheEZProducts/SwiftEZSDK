@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  EZTypesWrapper.swift
 //
 //
 //  Created by Александр Сенин on 04.06.2023.

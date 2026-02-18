@@ -1,5 +1,5 @@
 //
-//  EZUIPack1.swift
+//  EZUIPack.swift
 //  EZSDK
 //
 //  Created by Александр Сенин on 24.12.2025.
@@ -453,6 +453,67 @@ open class EZUIPack<
         if !animated {
             openAction = action
         }
+    }
+}
+
+
+// MARK: - EZUIPack + make()
+
+extension EZUIPack {
+    /// Creates a fully initialized pack using `EZPackMaker`.
+    ///
+    /// A convenience shortcut so that a typealias can serve as the pack's namespace:
+    /// ```swift
+    /// typealias ProfilePack = EZUIPack<ProfilePackI, ProfilePackM, ProfilePackV>
+    ///
+    /// let interactor = ProfilePack.make(
+    ///     interactor: { ProfilePackI() },
+    ///     mediator: { inputI, inputV, context in ProfilePackM(inputI: inputI, inputV: inputV) },
+    ///     view: { ProfilePackV() }
+    /// )
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - makeI: A closure that creates the interactor. The pack is available via `EZPackMaker.getPack()`.
+    ///   - makeM: A closure that creates the mediator, receiving inputs from interactor and view,
+    ///     plus optional context from the interactor.
+    ///   - makeV: A closure that creates the view.
+    /// - Returns: The fully initialized interactor ready to use.
+    public static func make(
+        interactor makeI: () -> I,
+        mediator makeM: (M.InputI, M.InputV, I.Context) -> M,
+        view makeV: () -> V
+    ) -> I {
+        EZPackMaker.make(interactor: makeI, mediator: makeM, view: makeV)
+    }
+}
+
+extension EZUIPack where I.Context == Void {
+    /// Creates a fully initialized pack using `EZPackMaker`.
+    ///
+    /// Convenience overload for interactors with `Context == Void`.
+    ///
+    /// ```swift
+    /// typealias ProfilePack = EZUIPack<ProfilePackI, ProfilePackM, ProfilePackV>
+    ///
+    /// let interactor = ProfilePack.make(
+    ///     interactor: { ProfilePackI() },
+    ///     mediator: { inputI, inputV in ProfilePackM(inputI: inputI, inputV: inputV) },
+    ///     view: { ProfilePackV() }
+    /// )
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - makeI: A closure that creates the interactor. The pack is available via `EZPackMaker.getPack()`.
+    ///   - makeM: A closure that creates the mediator, receiving inputs from interactor and view.
+    ///   - makeV: A closure that creates the view.
+    /// - Returns: The fully initialized interactor ready to use.
+    public static func make(
+        interactor makeI: () -> I,
+        mediator makeM: (M.InputI, M.InputV) -> M,
+        view makeV: () -> V
+    ) -> I {
+        EZPackMaker.make(interactor: makeI, mediator: makeM, view: makeV)
     }
 }
 

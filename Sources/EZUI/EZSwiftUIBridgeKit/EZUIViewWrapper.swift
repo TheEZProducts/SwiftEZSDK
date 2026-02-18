@@ -1,5 +1,5 @@
 //
-//  EZUIViewWraper.swift
+//  EZUIViewWrapper.swift
 //  RelizApp
 //
 //  Created by Александр Сенин on 16.11.2020.
