@@ -28,9 +28,9 @@ Docker-based Linux build: `docker build .`
 
 ```
 EZKit (umbrella, re-exports all stable kits)
-├── EZUIPackKit ──────→ EZUIPackBaseKit, EZTransitionKit, EZSwiftUIBridgeKit
-├── EZSUIPackKit ─────→ EZUIPackBaseKit
-├── EZUIPackBaseKit   (leaf, platform-agnostic IMV base protocols)
+├── EZUIPackKit ──────→ EZIMVPackKit, EZTransitionKit, EZSwiftUIBridgeKit
+├── EZSUIPackKit ─────→ EZIMVPackKit
+├── EZIMVPackKit      (leaf, platform-agnostic IMV base protocols)
 ├── EZTransitionKit   (leaf, custom VC transitions)
 ├── EZObservableKit ──→ EZAssociatedKit, EZAsyncKit, EZMacrosKit
 ├── EZAsyncKit ───────→ EZAssociatedKit, EZHelpersKit, EZMacrosKit
@@ -48,7 +48,7 @@ Experimental: `EZJsonStriderKit`, `EZJsonKeysPlugin` + `EZJsonKeysGenerator`
 - **EZHelpersKit** — Thread-safety primitives (`EZMutex`, `EZRecursiveMutex`, `EZLockingMutex`), weak wrappers, extensions on Collection/Optional/Codable/Result. Requires `Lifetimes` experimental feature.
 - **EZAsyncKit** — Async channels (`EZChannel`, `EZBufferedChannel`), `EZThreadSafety<T>`, `EZAsyncSemaphore`, `EZActorIsolator`, task group helpers, `ezWithCheckedStoppableContinuation`.
 - **EZObservableKit** — `@EZObservable` macro for observable properties with token-based subscriptions. Bridges to SwiftUI via `snapEZObservable()`.
-- **EZUIPackBaseKit** — Platform-agnostic base protocols for the IMV architecture: `EZPackMediatorBaseProtocol`, `EZPackInteractorBaseProtocol`, `EZPackViewBaseProtocol`, access objects (`EZPackMediatorAccessI`/`V`), and `EZPackMediator` base class. Used by both EZUIPackKit and EZSUIPackKit.
+- **EZIMVPackKit** — Platform-agnostic base protocols for the IMV architecture: `EZIMVPackMediatorProtocol`, `EZIMVPackInteractorProtocol`, `EZIMVPackViewProtocol`, access objects (`EZIMVPackAccessI`/`V`), and `EZIMVPackMediator` base class. Used by both EZUIPackKit and EZSUIPackKit.
 - **EZTransitionKit** — Custom view controller transition system. Provides a fluent API (`UIViewController.ezTransit`) for navigation push/pop, tab bar switching, modal present/dismiss, page transitions, and custom animated transitions. Platform-limited to iOS/macCatalyst/visionOS/tvOS.
 - **EZUIPackKit** — UIKit IMV (Interactor-Mediator-View) architecture framework. Interactor = UIViewController with business logic, Mediator = shared state/communication hub, View = UI presentation. Includes `EZPackMaker` for pack creation, `EZUIPackPlatformsV` for multi-platform views, shared storage, and UIKit lifecycle integration. Platform-limited to iOS/macCatalyst/visionOS/tvOS.
 - **EZSUIPackKit** — SwiftUI IMV architecture framework. Provides `EZSUIPack` container view, SwiftUI-native interactors with `onAppear`/`onDisappear`, and mediators with `ObservableObject` view models. Available on all Apple platforms.
@@ -81,7 +81,7 @@ All major types are `Sendable` or explicitly handle Sendable constraints. The ma
 
 Code uses `#if canImport()` and SPM `.when(platforms:)` conditions extensively. Key restrictions:
 - `EZAssociatedKit`: Not available on Linux/Android (needs ObjC runtime)
-- `EZUIPackBaseKit`: iOS, macCatalyst, visionOS, macOS, tvOS, watchOS
+- `EZIMVPackKit`: iOS, macCatalyst, visionOS, macOS, tvOS, watchOS
 - `EZTransitionKit`: iOS, macCatalyst, visionOS, tvOS only
 - `EZUIPackKit`: iOS, macCatalyst, visionOS, tvOS only
 - `EZSUIPackKit`: iOS, macCatalyst, visionOS, macOS, tvOS, watchOS
@@ -94,8 +94,8 @@ Code uses `#if canImport()` and SPM `.when(platforms:)` conditions extensively. 
   - `Sources/EZUI/` — UI-related modules:
     - `EZSwiftUIBridgeKit/` — SwiftUI ↔ UIKit/AppKit bridging
     - `EZTransitionKit/` — Custom view controller transitions
-    - `EZUIPack/` — IMV architecture modules:
-      - `EZUIPackBaseKit/` — Platform-agnostic base protocols
+    - `EZIMVPack/` — IMV architecture modules:
+      - `EZIMVPackKit/` — Platform-agnostic base protocols
       - `EZUIPackKit/` — UIKit IMV implementation
       - `EZSUIPackKit/` — SwiftUI IMV implementation
 - `Macros/EZMacros/` — Compiler plugin implementation

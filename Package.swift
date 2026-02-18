@@ -13,7 +13,7 @@ let products: [Product] = [
     .library(name: EZObservableKit.name, targets: [EZObservableKit.name]),
     .library(name: EZBuilderKit.name, targets: [EZBuilderKit.name]),
     .library(name: EZSwiftUIBridgeKit.name, targets: [EZSwiftUIBridgeKit.name]),
-    .library(name: EZUIPackBaseKit.name, targets: [EZUIPackBaseKit.name]),
+    .library(name: EZIMVPackKit.name, targets: [EZIMVPackKit.name]),
     .library(name: EZTransitionKit.name, targets: [EZTransitionKit.name]),
     .library(name: EZUIPackKit.name, targets: [EZUIPackKit.name]),
     .library(name: EZSUIPackKit.name, targets: [EZSUIPackKit.name]),
@@ -33,7 +33,7 @@ let targets: [Target] = [
             .target(name: EZObservableKit.name, condition: EZObservableKit.condition),
             .target(name: EZBuilderKit.name, condition: EZBuilderKit.condition),
             .target(name: EZSwiftUIBridgeKit.name, condition: EZSwiftUIBridgeKit.condition),
-            .target(name: EZUIPackBaseKit.name, condition: EZUIPackBaseKit.condition),
+            .target(name: EZIMVPackKit.name, condition: EZIMVPackKit.condition),
             .target(name: EZTransitionKit.name, condition: EZTransitionKit.condition),
             .target(name: EZUIPackKit.name, condition: EZUIPackKit.condition),
             .target(name: EZSUIPackKit.name, condition: EZSUIPackKit.condition)
@@ -121,11 +121,11 @@ let targets: [Target] = [
         path: EZSwiftUIBridgeKit.path
     ),
 
-    //MARK: - EZUIPackBaseKit
+    //MARK: - EZIMVPackKit
     .target(
-        name: EZUIPackBaseKit.name,
+        name: EZIMVPackKit.name,
         dependencies: [],
-        path: EZUIPackBaseKit.path
+        path: EZIMVPackKit.path
     ),
 
     //MARK: - EZTransitionKit
@@ -139,7 +139,7 @@ let targets: [Target] = [
     .target(
         name: EZUIPackKit.name,
         dependencies: [
-            .target(name: EZUIPackBaseKit.name, condition: EZUIPackBaseKit.condition),
+            .target(name: EZIMVPackKit.name, condition: EZIMVPackKit.condition),
             .target(name: EZTransitionKit.name, condition: EZTransitionKit.condition),
             .target(name: EZSwiftUIBridgeKit.name, condition: EZSwiftUIBridgeKit.condition)
         ],
@@ -150,7 +150,7 @@ let targets: [Target] = [
     .target(
         name: EZSUIPackKit.name,
         dependencies: [
-            .target(name: EZUIPackBaseKit.name, condition: EZUIPackBaseKit.condition)
+            .target(name: EZIMVPackKit.name, condition: EZIMVPackKit.condition)
         ],
         path: EZSUIPackKit.path
     ),
@@ -246,10 +246,10 @@ struct EZBuilderKit: EZTargetProtocol {}
 
 struct EZHelpersKit: EZTargetProtocol {}
 
-//MARK: EZUIPackBaseKit
-struct EZUIPackBaseKit: EZTargetProtocol {
+//MARK: EZIMVPackKit
+struct EZIMVPackKit: EZTargetProtocol {
     static var condition: TargetDependencyCondition? {.when(platforms: [.iOS, .macCatalyst, .visionOS, .macOS, .tvOS, .watchOS])}
-    static var path: String? { "Sources/EZUI/EZUIPack/EZUIPackBaseKit" }
+    static var path: String? { "Sources/EZUI/EZIMVPack/EZIMVPackKit" }
 }
 
 //MARK: EZTransitionKit
@@ -261,13 +261,13 @@ struct EZTransitionKit: EZTargetProtocol {
 //MARK: EZUIPackKit
 struct EZUIPackKit: EZTargetProtocol {
     static var condition: TargetDependencyCondition? {.when(platforms: [.iOS, .macCatalyst, .visionOS, .tvOS])}
-    static var path: String? { "Sources/EZUI/EZUIPack/EZUIPackKit" }
+    static var path: String? { "Sources/EZUI/EZIMVPack/EZUIPackKit" }
 }
 
 //MARK: EZSUIPackKit
 struct EZSUIPackKit: EZTargetProtocol {
     static var condition: TargetDependencyCondition? {.when(platforms: [.iOS, .macCatalyst, .visionOS, .macOS, .tvOS, .watchOS])}
-    static var path: String? { "Sources/EZUI/EZUIPack/EZSUIPackKit" }
+    static var path: String? { "Sources/EZUI/EZIMVPack/EZSUIPackKit" }
 }
 
 struct EZSwiftUIBridgeKit: EZTargetProtocol {
