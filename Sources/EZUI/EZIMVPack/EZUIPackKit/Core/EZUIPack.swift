@@ -452,6 +452,7 @@ open class EZUIPack<
         
         if !animated {
             openAction = action
+            interactor?.view.setNeedsLayout()
         }
     }
 }
