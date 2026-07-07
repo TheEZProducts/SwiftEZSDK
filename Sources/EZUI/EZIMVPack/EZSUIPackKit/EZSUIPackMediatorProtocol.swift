@@ -54,6 +54,22 @@ extension EZSUIPackMediatorProtocol where ViewModel == Void {
     }
 }
 
+@available(iOS 13.0, macOS 10.15, tvOS 13.0, watchOS 6.0, *)
+extension EZSUIPackMediatorProtocol {
+    /// The SwiftUI access object type for views.
+    public typealias AccessSV = EZSUIPackAccessV<Self, AccessMapV>
+
+    /// Creates the SwiftUI access object for views. Shadows the base
+    /// `accessV` factory for SwiftUI mediators, so the call-site declaration
+    /// stays identical to the UIKit flavor:
+    /// ```swift
+    /// let access = MyPackM.accessV
+    /// ```
+    /// Being a `DynamicProperty`, the returned access registers the owning
+    /// view as a SwiftUI dependency of the view model.
+    public static var accessV: AccessSV { .init(accessMap: accessMapV) }
+}
+
 /// Base class for SwiftUI mediators.
 ///
 /// Inherits from `EZIMVPackMediator`. Use `EZSUIPackM` as the base type for your mediators.

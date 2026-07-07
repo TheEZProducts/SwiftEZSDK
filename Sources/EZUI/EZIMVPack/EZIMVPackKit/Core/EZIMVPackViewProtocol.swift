@@ -27,14 +27,6 @@ public protocol EZIMVPackViewProtocol {
     /// The mediator type this view works with.
     associatedtype Mediator: EZIMVPackMediatorProtocol
 
-    /// Access object providing controlled access to the mediator.
-    ///
-    /// Initialize with the mediator's static factory:
-    /// ```swift
-    /// let access = MyPackM.accessV
-    /// ```
-    var access: EZIMVPackAccessV<Mediator, Mediator.AccessMapV> { get }
-
     /// Provides the view's action interface to the mediator.
     ///
     /// Default implementations are provided when `Mediator.InputV` is `Void` or `Self`.

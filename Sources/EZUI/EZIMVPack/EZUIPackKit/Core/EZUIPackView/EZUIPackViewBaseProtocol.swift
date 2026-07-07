@@ -37,6 +37,18 @@ import Foundation
 public protocol EZUIPackViewBaseProtocol<Mediator>: EZIMVPackViewProtocol
     where Mediator: EZUIPackMediatorProtocol
 {
+    /// Re-anchored here so `Mediator` is inferred reliably from the typed
+    /// `access` requirement below (cross-protocol inference is fragile).
+    associatedtype Mediator: EZUIPackMediatorProtocol
+
+    /// Access object providing controlled access to the mediator.
+    ///
+    /// Initialize with the mediator's static factory:
+    /// ```swift
+    /// let access = MyPackM.accessV
+    /// ```
+    var access: EZIMVPackAccessV<Mediator, Mediator.AccessMapV> { get }
+
     /// Called once when the view is first created, before it appears.
     func create()
 }

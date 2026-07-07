@@ -34,7 +34,21 @@ import SwiftUI
 @MainActor
 public protocol EZSUIPackViewProtocol: EZIMVPackViewProtocol, View, Equatable
     where Mediator: EZSUIPackMediatorProtocol
-{}
+{
+    /// Re-anchored here so `Mediator` is inferred reliably from the typed
+    /// `access` requirement below (cross-protocol inference is fragile).
+    associatedtype Mediator: EZSUIPackMediatorProtocol
+
+    /// Access object providing controlled access to the mediator. The SwiftUI
+    /// flavor is a `DynamicProperty`: storing it registers the view as a
+    /// SwiftUI dependency of the pack's view model.
+    ///
+    /// Initialize with the mediator's static factory:
+    /// ```swift
+    /// let access = MyPackM.accessV
+    /// ```
+    var access: EZSUIPackAccessV<Mediator, Mediator.AccessMapV> { get }
+}
 
 @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension EZSUIPackViewProtocol {

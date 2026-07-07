@@ -11,32 +11,14 @@ import Combine
 
 
 
-// MARK: - ViewModel Observation Box (type-erased ObservableObject proxy)
-
-/// Type-erased `ObservableObject` that forwards `objectWillChange` from any `ObservableObject` ViewModel.
-///
-/// Used as `@ObservedObject` inside `EZSUIPackBodyView` to establish proper SwiftUI dirty-flag
-/// propagation into lazy containers (LazyVStack, LazyHStack, etc.).
-@available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
-@MainActor
-final class EZSUIPackViewModelBox: ObservableObject {
-    private var cancellable: AnyCancellable?
-
-    func observe(_ observable: some ObservableObject) {
-        cancellable = observable.objectWillChange.sink { [weak self] _ in
-            self?.objectWillChange.send()
-        }
-    }
-}
-
-
 // MARK: - Container (persists across SwiftUI re-renders)
 
 /// Internal container that holds the IMV components and persists across SwiftUI re-renders.
 ///
 /// `EZSUIPackContainer` is stored as a `@StateObject` inside `EZSUIPack`, ensuring that the
 /// interactor, mediator, and view survive SwiftUI's identity-based lifecycle. View updates are
-/// driven by `EZSUIPackViewModelBox` via `@ObservedObject` in `EZSUIPackBodyView`.
+/// driven by the view's `EZSUIPackAccessV` (`DynamicProperty`), which registers the pack view
+/// as a SwiftUI dependency of the view model.
 @available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
 @MainActor
 public final class EZSUIPackContainer<
@@ -47,7 +29,6 @@ public final class EZSUIPackContainer<
     let interactor: I
     let mediator: M
     let view: V
-    let viewModelBox: EZSUIPackViewModelBox?
 
     init(
         interactor makeI: () -> I,
@@ -58,14 +39,9 @@ public final class EZSUIPackContainer<
         view = makeV()
         mediator = makeM(interactor.makeInput(), view.makeInput(), interactor.makeContext())
 
-        if let vm = mediator.viewModel as? (any ObservableObject) {
-            let box = EZSUIPackViewModelBox()
-            box.observe(vm)
-            viewModelBox = box
-        } else {
-            viewModelBox = nil
-        }
-
+        // View-model observation lives in the view's `EZSUIPackAccessV`
+        // (a `DynamicProperty`), wired below by `setMediator` — SwiftUI
+        // invalidates the pack view directly when the view model changes.
         interactor.access.setMediator(mediator)
         view.access.setMediator(mediator)
 
@@ -114,15 +90,7 @@ public struct EZSUIPack<
     @StateObject private var container: EZSUIPackContainer<I, M, V>
 
     public var body: some View {
-        Group {
-            if let box = container.viewModelBox {
-                EZSUIPackBodyView(box: box) {
-                    AnyView(container.view)
-                }
-            } else {
-                AnyView(container.view)
-            }
-        }
+        AnyView(container.view)
         .onAppear {
             container.interactor.onAppear()
         }
@@ -163,22 +131,4 @@ extension EZSUIPack where I.Context == Void {
     }
 }
 
-
-// MARK: - Body View (observation bridge for lazy containers)
-
-/// Intermediary view that uses `@ObservedObject` to establish proper SwiftUI dirty-flag propagation.
-///
-/// Without this wrapper, `AnyView` breaks the dirty-flag chain from `@StateObject` to lazy container
-/// cells (LazyVStack, LazyHStack, etc.). By placing `@ObservedObject` as the direct parent of
-/// the inner view content, SwiftUI properly propagates updates to all descendants, including
-/// lazy container cells.
-@available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
-private struct EZSUIPackBodyView<Content: View>: View {
-    @ObservedObject var box: EZSUIPackViewModelBox
-    @ViewBuilder let content: () -> Content
-
-    var body: some View {
-        content()
-    }
-}
 #endif
