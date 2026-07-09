@@ -289,6 +289,14 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
                options connectionOptions: UIScene.ConnectionOptions) {
 
         guard let ws = scene as? UIWindowScene else { return }
+
+        if let uiTestRoot = Self.uiTestRoot() {
+            let window = UIWindow(windowScene: ws)
+            window.rootViewController = uiTestRoot
+            window.makeKeyAndVisible()
+            self.window = window
+            return
+        }
 //        window = MyWindow(windowScene: ws)
         
         let window = UINSWindow(
@@ -397,9 +405,19 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     @objc
     func addTapped() {
-        
+
     }
 
+    private static func uiTestRoot() -> UIViewController? {
+        let args = ProcessInfo.processInfo.arguments
+        guard let flag = args.firstIndex(of: "-uitest"), args.indices.contains(flag + 1) else { return nil }
+        switch args[flag + 1] {
+        case "pure": return UIHostingController(rootView: CounterPack.make())
+        case "sview": return SecondStructPac.make()
+        case "suiv": return SecondPac.make()
+        default: return nil
+        }
+    }
 }
 
 

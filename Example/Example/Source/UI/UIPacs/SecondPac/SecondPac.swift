@@ -23,8 +23,20 @@ extension SecondPac {
     }
 }
 
+typealias SecondStructPac = EZUIPack<SecondPacI, SecondPacM, SecondPacSV>
+
+extension SecondStructPac {
+    static func make(interactor makeI: @autoclosure () -> SecondPacI = .init()) -> SecondPacI {
+        make(
+            interactor: makeI,
+            mediator: { inputI, inputV in SecondPacM(inputI: inputI, inputV: inputV) },
+            view: { SecondPacSV() }
+        )
+    }
+}
+
 class SecondPacI: EZUIPackI {
-    var access = SecondPacM.accessI
+    let access = SecondPacM.accessI
     
     func makeInput() -> Mediator.InputI {
         var inputI = SecondPacM.IAction()
@@ -36,7 +48,8 @@ class SecondPacI: EZUIPackI {
     
     func start() {
         print("C - start")
-        
+
+        guard !ProcessInfo.processInfo.arguments.contains("-uitest") else { return }
         _ = Timer.scheduledTimer(withTimeInterval: 1, repeats: true, block: {[weak self] _ in
             Task{@MainActor in
                 self?.viewModel.count += 1
@@ -119,7 +132,7 @@ class SecondPacM: EZUIPackM {
 class SecondPacV: EZUIPackV {
     var supportedInterfaceOrientations: UIInterfaceOrientationMask? { .all }
 
-    var access = SecondPacM.accessV
+    let access = SecondPacM.accessV
     
     func animateOpen() {
         print("aaaaa")
@@ -157,7 +170,7 @@ class MyViewStates: ObservableObject{
 }
 
 class SecondPacSV1: EZUIPackSUIV {
-    var access = SecondPacM.accessV
+    let access = SecondPacM.accessV
     
     var viewStorage = MyViewStates()
     var additionalObservableObjects: [any ObservableObject] {[viewStorage]}
@@ -171,8 +184,10 @@ class SecondPacSV1: EZUIPackSUIV {
                 } label: {
                     Text("up")
                 }
+                .accessibilityIdentifier("suiv.inc")
                 Text("hello \(viewModel.count)")
-                
+                    .accessibilityIdentifier("suiv.vmCount")
+
                 Button{[viewStorage] in
                     viewStorage.test += 1
                 } label: {
@@ -186,8 +201,8 @@ class SecondPacSV1: EZUIPackSUIV {
 
 struct SecondPacSV: EZUIPackSV {
     var supportedInterfaceOrientations: UIInterfaceOrientationMask? { .all }
-    var access = SecondPacM.accessV
-    
+    let access = SecondPacM.accessV
+
     @ObservedObject var viewStorage1 = MyViewStates()
     
     @Environment(\.colorScheme) var color
@@ -222,7 +237,16 @@ struct SecondPacSV: EZUIPackSV {
             viewModel.color
             TestR(bool: gsdg()){
                 Spacer()
-            
+
+                Text("vm-count \(viewModel.count)")
+                    .accessibilityIdentifier("sview.vmCount")
+                Button{
+                    viewModel.count += 1
+                } label: {
+                    Text("sview-inc")
+                }
+                .accessibilityIdentifier("sview.inc")
+
                 Button{
                     inputI.back()
                 } label: {
