@@ -74,7 +74,8 @@ extension EZUIPackBaseInteractorProtocol {
 @MainActor
 public protocol EZUIPackInteractorProtocol: EZUIPackBaseInteractorProtocol,
     EZIMVPackInteractorProtocol, EZSharingProtocol
-    where Mediator: EZUIPackMediatorProtocol
+    where Mediator: EZUIPackMediatorProtocol,
+          Access == EZIMVPackAccessI<Mediator, Mediator.AccessMapI>
 {
     /// Called after the view's `create()` method completes.
     ///

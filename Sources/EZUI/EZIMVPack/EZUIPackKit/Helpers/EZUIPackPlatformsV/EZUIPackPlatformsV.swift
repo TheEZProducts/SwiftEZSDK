@@ -42,7 +42,7 @@ open class EZUIPackPlatformsV<M: EZUIPackMediatorProtocol>: EZUIPackViewProtocol
     /// Access to the mediator via the selected platform view.
     ///
     /// Delegates to the currently selected platform-specific view's access.
-    public var access: M.AccessV { view.access }
+    public var access: EZUIPackPlatformsAccessV<M> { .init(base: view.access) }
     
     /// The currently selected platform-specific view.
     ///

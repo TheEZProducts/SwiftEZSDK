@@ -7,4 +7,5 @@
 
 #if canImport(SwiftUI)
 @_exported import EZIMVPackKit
+@_exported import EZUIPackHelpersKit
 #endif

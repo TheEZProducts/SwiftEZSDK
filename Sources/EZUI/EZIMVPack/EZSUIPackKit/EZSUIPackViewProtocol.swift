@@ -10,8 +10,10 @@ import SwiftUI
 
 /// Protocol for SwiftUI views in the IMV architecture.
 ///
-/// Combines `EZIMVPackViewProtocol`, SwiftUI `View`, and `Equatable` to create a view
-/// that integrates with the IMV pattern. The view model is accessible as a read-only property.
+/// Refines `EZIMVPackViewProtocol` for SwiftUI: the view's `access` is the SwiftUI
+/// `DynamicProperty` flavor, so storing it (`let access = MyPackM.accessV`) registers the
+/// view as a SwiftUI dependency of the pack's view model. The view model and `inputI`
+/// convenience properties are inherited from the base protocol.
 ///
 /// ### Example
 /// ```swift
@@ -32,42 +34,10 @@ import SwiftUI
 /// - Note: Use `EZSUIPackV` (which is `View & EZSUIPackViewProtocol`) as your base type.
 @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 @MainActor
-public protocol EZSUIPackViewProtocol: EZIMVPackViewProtocol, View, Equatable
-    where Mediator: EZSUIPackMediatorProtocol
-{
-    /// Re-anchored here so `Mediator` is inferred reliably from the typed
-    /// `access` requirement below (cross-protocol inference is fragile).
-    associatedtype Mediator: EZSUIPackMediatorProtocol
-
-    /// Access object providing controlled access to the mediator. The SwiftUI
-    /// flavor is a `DynamicProperty`: storing it registers the view as a
-    /// SwiftUI dependency of the pack's view model.
-    ///
-    /// Initialize with the mediator's static factory:
-    /// ```swift
-    /// let access = MyPackM.accessV
-    /// ```
-    var access: EZSUIPackAccessV<Mediator, Mediator.AccessMapV> { get }
-}
-
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
-extension EZSUIPackViewProtocol {
-    /// Always returns `false` to ensure SwiftUI treats each view instance as unique.
-    nonisolated static public func ==(lhs: Self, rhs: Self) -> Bool { false }
-}
-
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
-extension EZSUIPackViewProtocol {
-    /// Read-only access to the mediator's view model.
-    public var viewModel: Mediator.ViewModel {
-        _read { yield self.access.viewModel }
-    }
-
-    /// Read-only access to the interactor's action interface.
-    public var inputI: Mediator.InputI {
-        _read { yield self.access.inputI }
-    }
-}
+public protocol EZSUIPackViewProtocol: EZIMVPackViewProtocol, View
+    where Mediator: EZSUIPackMediatorProtocol,
+          Access == EZIMVPackAccessV<Mediator, Mediator.AccessMapV>
+{ }
 
 /// The primary type for creating SwiftUI views in the IMV architecture.
 ///

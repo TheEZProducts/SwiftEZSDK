@@ -35,7 +35,8 @@ import Foundation
 @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 @MainActor
 public protocol EZSUIPackInteractorProtocol: EZIMVPackInteractorProtocol
-    where Mediator: EZSUIPackMediatorProtocol
+    where Mediator: EZSUIPackMediatorProtocol,
+          Access == EZIMVPackAccessI<Mediator, Mediator.AccessMapI>
 {
     /// Called when the pack's SwiftUI view appears.
     func onAppear()

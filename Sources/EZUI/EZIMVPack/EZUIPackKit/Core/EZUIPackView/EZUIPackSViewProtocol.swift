@@ -9,6 +9,7 @@
 import SwiftUI
 
 import EZSwiftUIBridgeKit
+import EZUIPackHelpersKit
 
 /// Protocol for views built with SwiftUI in the IMV architecture.
 ///
@@ -47,13 +48,16 @@ import EZSwiftUIBridgeKit
 /// }
 /// ```
 ///
-/// - Note: If your `viewModel` conforms to `ObservableObject`, it will automatically be
-///   observed for changes, triggering SwiftUI updates.
+/// - Note: All views declare `let access = MyPackM.accessV`. In struct-based SwiftUI views
+///   (`EZUIPackSV`) the access acts as a `DynamicProperty` (when the view model is an
+///   `ObservableObject`) — the view model is observed at the point of use. In UIView-hosted
+///   SwiftUI views (`EZUIPackSUIV`) the `ObservableObject` view model is observed at the
+///   hosting wrapper instead.
 /// - Important: SwiftUI views are structs and cannot be weak references. Always use struct-based
 ///   `InputV` with closures in the mediator when working with SwiftUI views.
 @MainActor
 @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
-public protocol EZUIPackSViewProtocol: EZUIPackViewProtocol, Equatable {
+public protocol EZUIPackSViewProtocol: EZUIPackViewProtocol {
     /// The type of the SwiftUI view body.
     associatedtype Body : View
     
@@ -86,37 +90,23 @@ extension EZUIPackSViewProtocol where Self: View {
     
     /// Returns a `UIView` wrapper containing this SwiftUI view.
     ///
-    /// Automatically wraps the SwiftUI view in a `UIView` container and sets up
-    /// `ObservableObject` observation if the view model conforms to `ObservableObject`.
+    /// Wraps the SwiftUI view in a `UIView` container. View-model invalidation is driven by
+    /// the stored `DynamicProperty` access at the point of use; only
+    /// `additionalObservableObjects` are observed at the wrapper.
     ///
     /// - Returns: A configured `UIView` ready for display.
     public func getView() -> EZView {
-        if let observObj = access.viewModel as? (any ObservableObject) {
-            return .ezWrap(
-                EZObservableObjectGroup(objects: additionalObservableObjects + [observObj])
-            ){ self }
-        }else{
-            return .ezWrap(
-                EZObservableObjectGroup(objects: additionalObservableObjects),
-                view: self
-            )
-        }
+        .ezWrap(EZObservableObjectGroup(objects: additionalObservableObjects)) { self }
     }
 }
 
 @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension EZUIPackSViewProtocol where Self: View {
-    /// Equality comparison that always returns `false`.
-    ///
-    /// This ensures SwiftUI treats each view instance as unique, preventing unwanted reuse.
-    nonisolated
-    public static func ==(l: Self, r: Self) -> Bool { false }
-    
     /// A read-only binding to the mediator access object.
     ///
     /// Useful for passing access to child SwiftUI views.
     /// Uses `.constant()` — writes through this binding are ignored.
-    public var bAccess: Binding<Mediator.AccessV> { .constant(access) }
+    public var bAccess: Binding<Access> { .constant(access) }
 
     /// A read-only binding to the view model.
     ///
@@ -138,7 +128,7 @@ extension EZUIPackSViewProtocol where Self: EZView {
     ///
     /// Useful for passing access to child SwiftUI views.
     /// Uses `.constant()` — writes through this binding are ignored.
-    public var bAccess: Binding<Mediator.AccessV> { .constant(access) }
+    public var bAccess: Binding<Access> { .constant(access) }
 
     /// A read-only binding to the view model.
     ///
@@ -186,7 +176,8 @@ extension EZUIPackSViewProtocol where Self: EZView {
 ///
 /// SwiftUI views created with this type:
 /// - Automatically integrate with the IMV architecture
-/// - Support reactive updates when `viewModel` conforms to `ObservableObject`
+/// - Store the access (`let access = MyPackM.accessV`) as a `DynamicProperty`, so reactive
+///   updates are delivered at the point of use when `viewModel` conforms to `ObservableObject`
 /// - Are automatically wrapped in a `UIView` container for UIKit integration
 /// - Can access the mediator's view model and interactor's actions
 ///

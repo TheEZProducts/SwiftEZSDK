@@ -17,7 +17,7 @@ import Combine
 ///
 /// `EZSUIPackContainer` is stored as a `@StateObject` inside `EZSUIPack`, ensuring that the
 /// interactor, mediator, and view survive SwiftUI's identity-based lifecycle. View updates are
-/// driven by the view's `EZSUIPackAccessV` (`DynamicProperty`), which registers the pack view
+/// driven by the view's `EZIMVPackAccessV` (`DynamicProperty`), which registers the pack view
 /// as a SwiftUI dependency of the view model.
 @available(iOS 14.0, macOS 11.0, tvOS 14.0, watchOS 7.0, *)
 @MainActor
@@ -39,9 +39,10 @@ public final class EZSUIPackContainer<
         view = makeV()
         mediator = makeM(interactor.makeInput(), view.makeInput(), interactor.makeContext())
 
-        // View-model observation lives in the view's `EZSUIPackAccessV`
-        // (a `DynamicProperty`), wired below by `setMediator` — SwiftUI
-        // invalidates the pack view directly when the view model changes.
+        // View-model observation lives in the view's `EZIMVPackAccessV`
+        // (a `DynamicProperty`): once the mediator is set, the access
+        // subscribes lazily in `update()` and SwiftUI invalidates the pack
+        // view directly when the view model changes.
         interactor.access.setMediator(mediator)
         view.access.setMediator(mediator)
 

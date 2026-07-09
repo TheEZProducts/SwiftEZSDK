@@ -42,13 +42,16 @@ public protocol EZIMVPackInteractorProtocol: AnyObject {
     /// ```
     associatedtype Context = Void
 
+    /// The concrete access this interactor uses to reach the mediator.
+    associatedtype Access: EZIMVPackInteractorAccess where Access.Mediator == Mediator
+
     /// The access object providing controlled access to the mediator.
     ///
     /// Initialize with the mediator's static factory:
     /// ```swift
     /// let access = MyPackM.accessI
     /// ```
-    var access: EZIMVPackAccessI<Mediator, Mediator.AccessMapI> { get }
+    var access: Access { get }
 
     /// Provides the interactor's action interface to the mediator.
     ///

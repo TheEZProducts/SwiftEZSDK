@@ -7,5 +7,6 @@
 
 #if canImport(UIKit) && !os(watchOS)
 @_exported import EZIMVPackKit
+@_exported import EZUIPackHelpersKit
 @_exported import EZTransitionKit
 #endif

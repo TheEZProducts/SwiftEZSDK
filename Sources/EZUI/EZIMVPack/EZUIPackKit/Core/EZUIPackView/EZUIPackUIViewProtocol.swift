@@ -64,7 +64,8 @@ public typealias EZView = NSView
 ///     }
 /// }
 /// ```
-public protocol EZUIPackUIViewProtocol: EZView, EZUIPackViewProtocol {}
+public protocol EZUIPackUIViewProtocol: EZView, EZUIPackViewProtocol
+    where Access == EZIMVPackAccessV<Mediator, Mediator.AccessMapV> {}
 extension EZUIPackUIViewProtocol{
     /// Returns the view itself since it's already a `UIView`/`NSView`.
     public func getView() -> EZView { self }

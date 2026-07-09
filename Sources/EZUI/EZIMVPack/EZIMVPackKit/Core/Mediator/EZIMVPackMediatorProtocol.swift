@@ -113,48 +113,6 @@ extension EZIMVPackMediatorProtocol where AccessMapV == () {
     public static var accessMapV: AccessMapV { () }
 }
 
-// MARK: - Access typealiases & factories
-
-extension EZIMVPackMediatorProtocol {
-    /// The access object type for interactors.
-    ///
-    /// Provides controlled access to mediator properties via `@dynamicMemberLookup`.
-    public typealias AccessI = EZIMVPackAccessI<Self, AccessMapI>
-
-    /// Creates a new access object for interactors.
-    ///
-    /// Call this in the interactor to initialize its `access` property:
-    /// ```swift
-    /// let access = MyPackM.accessI
-    /// ```
-    public static var accessI: AccessI { .init(accessMap: accessMapI) }
-
-    /// The access object type for views.
-    ///
-    /// Provides controlled access to mediator properties via `@dynamicMemberLookup`.
-    public typealias AccessV = EZIMVPackAccessV<Self, AccessMapV>
-
-    /// Creates a new access object for views.
-    ///
-    /// Call this in the view to initialize its `access` property:
-    /// ```swift
-    /// let access = MyPackM.accessV
-    /// ```
-    public static var accessV: AccessV { .init(accessMap: accessMapV) }
-}
-
-// MARK: - Base Mediator Class
-
-/// Base class for mediators in the IMV architecture.
-///
-/// Provides a default `init()`. Platform-specific mediator classes inherit from this:
-/// - `EZUIPackMediator` (UIKit — adds `packBridge`)
-/// - `EZSUIPackMediator` (SwiftUI)
-@MainActor
-open class EZIMVPackMediator {
-    public init() {}
-}
-
 // MARK: - Key helpers
 
 extension EZIMVPackMediatorProtocol {

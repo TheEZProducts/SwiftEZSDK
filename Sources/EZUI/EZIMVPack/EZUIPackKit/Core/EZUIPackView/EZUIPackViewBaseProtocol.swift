@@ -35,36 +35,11 @@ import Foundation
 
 @MainActor
 public protocol EZUIPackViewBaseProtocol<Mediator>: EZIMVPackViewProtocol
-    where Mediator: EZUIPackMediatorProtocol
+    where Mediator: EZUIPackMediatorProtocol,
+          Access: EZUIPackViewAccessProtocol
 {
-    /// Re-anchored here so `Mediator` is inferred reliably from the typed
-    /// `access` requirement below (cross-protocol inference is fragile).
-    associatedtype Mediator: EZUIPackMediatorProtocol
-
-    /// Access object providing controlled access to the mediator.
-    ///
-    /// Initialize with the mediator's static factory:
-    /// ```swift
-    /// let access = MyPackM.accessV
-    /// ```
-    var access: EZIMVPackAccessV<Mediator, Mediator.AccessMapV> { get }
-
     /// Called once when the view is first created, before it appears.
     func create()
-}
-
-
-extension EZUIPackViewBaseProtocol {
-    /// Access to the mediator's view model for reading and writing state.
-    public var viewModel: Mediator.ViewModel {
-        _read { yield self.access.viewModel }
-        nonmutating _modify { yield &self.access.viewModel }
-    }
-
-    /// Access to the interactor's action interface.
-    public var inputI: Mediator.InputI {
-        _read { yield self.access.inputI }
-    }
 }
 
 extension EZUIPackViewBaseProtocol {
