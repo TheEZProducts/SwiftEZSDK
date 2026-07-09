@@ -463,7 +463,7 @@ ezTransit.navigationPush(ProfilePack.make()).animate().transit()
 
 If you prefer SwiftUI, use `EZUIPackSV`:
 
-**Important:** The SwiftUI View also **does not have direct access** to the Mediator and uses the `access` object, just like the UIKit View.
+**Important:** The SwiftUI View also **does not have direct access** to the Mediator and uses the same `access` object as the UIKit View (`let access = M.accessV`). When the view model conforms to `ObservableObject`, the stored access acts as a `DynamicProperty` — it registers the view as a SwiftUI dependency of the view model, so updates are delivered at the point of use.
 
 ```swift
 import SwiftUI
@@ -479,7 +479,7 @@ struct ProfileSwiftUIPackV: EZUIPackSV {
     // because SwiftUI View is a struct and cannot be weak
     func makeInput() -> Mediator.InputV {
         .init(
-            showError: { [weak access] message in
+            showError: { message in
                 // Handle error
                 print("Error: \(message)")
             }
