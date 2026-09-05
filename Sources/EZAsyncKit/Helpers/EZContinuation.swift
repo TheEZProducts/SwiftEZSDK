@@ -225,13 +225,14 @@ public final class EZSafeContinuation<T: Sendable>: Sendable, EZContinuationProt
     ///
     /// If a result was already produced, the continuation is resumed immediately.
     public func set(continuation: CheckedContinuation<T, Error>? = nil) {
-        storage.withLock {
-            if let value = $0.value.result {
-                continuation?.resume(with: value)
-            }else{
-                $0.value.continuation = continuation
+        let readyResult: Result<T, Error>? = storage.withLock { access in
+            guard let result = access.value.result else {
+                access.value.continuation = continuation
+                return nil
             }
+            return result
         }
+        if let readyResult { continuation?.resume(with: readyResult) }
     }
     
     /// Resumes by failing with `error`.
@@ -248,12 +249,13 @@ public final class EZSafeContinuation<T: Sendable>: Sendable, EZContinuationProt
     ///
     /// Only the first call wins; later calls are ignored.
     public func resume(with result: sending Result<T, Error>) {
-        storage.withLock {[result] in
-            guard $0.value.result == nil else { return }
-            $0.value.result = result
-            $0.value.continuation?.resume(with: result)
-            $0.value.continuation = nil
+        let pendingContinuation: CheckedContinuation<T, Error>? = storage.withLock {[result] access in
+            guard access.value.result == nil else { return nil }
+            access.value.result = result
+            defer { access.value.continuation = nil }
+            return access.value.continuation
         }
+        pendingContinuation?.resume(with: result)
     }
      
     deinit { resume(with: .failure(EZContinuationError.wasDeinit)) }

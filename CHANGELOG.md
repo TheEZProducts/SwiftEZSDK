@@ -1,5 +1,22 @@
 # Changelog
 
+## 7.1.1 — EZSafeContinuation deadlock fix
+
+### Fixed
+- **`EZSafeContinuation` no longer resumes a `CheckedContinuation` while holding its own mutex.**
+  Resuming a continuation makes the runtime take the resumed task's status-record lock, while
+  `withTaskCancellationHandler` invokes `onCancel` *with that same lock already held* — so the
+  cancellation handler's `resume` (which takes the `EZSafeContinuation` mutex) and a concurrent
+  `resume` on another thread could deadlock, both parked in the kernel at 0% CPU. The Swift
+  stdlib documents this hazard on `withTaskCancellationHandler`: code must not resume
+  continuations while holding a lock the cancellation handler also takes.
+  `resume(with:)` and `set(continuation:)` now take the continuation out under the lock and
+  resume it after releasing it. Behaviour is otherwise unchanged — first resume still wins,
+  the continuation is still resumed exactly once — and the lock is held strictly shorter.
+  Reachable from every `ezWithCheckedStoppableContinuation` caller (`EZChannel`,
+  `EZBufferedChannel`, `EZAsyncValue`, `EZAsyncSemaphore`), i.e. from shipping apps, whenever a
+  task is cancelled on one thread while its continuation is resumed on another.
+
 ## Unreleased — IMV access unification, protocols-only base (breaking)
 
 Recommended bump: **major** (breaking API changes across the IMV kits).
